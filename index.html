@@ -1,0 +1,2777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>锅圈小炒出海 AI 化 · 多伦多样板 · 杨总驾驶舱</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    --gq-red:#E53935;
+    --gq-red-dark:#B71C1C;
+    --gq-orange:#FF6B35;
+    --gq-gold:#F2A93B;
+    --bg-0:#f7f8fb;
+    --bg-1:#ffffff;
+    --bg-2:#f1f5f9;
+    --bg-3:#e2e8f0;
+    --line:#e5e7eb;
+    --text-main:#0f172a;
+    --text-dim:#64748b;
+    --ok:#16a34a;
+    --warn:#d97706;
+    --bad:#dc2626;
+  }
+  html,body{background:var(--bg-0);color:var(--text-main);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+  .card{background:var(--bg-1);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 1px 3px rgba(15,23,42,0.03);}
+  .card-2{background:var(--bg-2);border:1px solid var(--line);border-radius:10px;}
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;}
+  .pill-ok{background:rgba(22,163,74,.12);color:#15803d;}
+  .pill-warn{background:rgba(217,119,6,.12);color:#b45309;}
+  .pill-bad{background:rgba(220,38,38,.12);color:#b91c1c;}
+  .pill-info{background:rgba(255,107,53,.12);color:#c2410c;}
+  .pill-ai{background:linear-gradient(90deg,rgba(229,57,53,.12),rgba(255,107,53,.12));color:#b91c1c;border:1px solid rgba(255,107,53,.25);}
+  .grad-red{background:linear-gradient(135deg,#E53935,#FF6B35);}
+  .grad-red-text{background:linear-gradient(90deg,#E53935,#FF6B35);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .nav-item{cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:var(--text-dim);transition:all .15s;font-size:14px;}
+  .nav-item:hover{background:var(--bg-2);color:var(--text-main);}
+  .nav-item.active{background:linear-gradient(90deg,rgba(229,57,53,.10),rgba(255,107,53,.02));color:#B71C1C;border-left:3px solid #E53935;padding-left:11px;font-weight:600;}
+  .nav-icon{width:18px;height:18px;flex-shrink:0;}
+  .module{display:none;}
+  .module.active{display:block;animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .kpi-num{font-size:28px;font-weight:700;letter-spacing:-.5px;color:var(--text-main);}
+  .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:pulse 2s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.5);}70%{box-shadow:0 0 0 10px rgba(22,163,74,0);}100%{box-shadow:0 0 0 0 rgba(22,163,74,0);}}
+  /* 金字塔 */
+  .pyramid-row{display:flex;justify-content:center;gap:8px;margin-bottom:10px;}
+  .pyramid-cell{padding:10px 14px;border-radius:10px;text-align:center;min-width:130px;font-size:12.5px;line-height:1.4;}
+  .py-l1{background:linear-gradient(135deg,#E53935,#FF6B35);color:#fff;font-weight:700;min-width:200px;padding:14px 24px;}
+  .py-l2{background:#52247c;color:#fff;}
+  .py-l3{background:#1e3a8a;color:#fff;}
+  .py-l4{background:#0f766e;color:#fff;}
+  .py-l5{background:#3f3f46;color:#e5e7eb;}
+  /* Agent 卡片 */
+  .agent-card{background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+  .agent-card:hover{transform:translateY(-2px);border-color:#FF6B35;box-shadow:0 8px 24px rgba(255,107,53,.12);}
+  .agent-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#E53935,#FF6B35);}
+  /* 流程时间线 */
+  .flow-step{position:relative;padding:14px 16px;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;}
+  .flow-step.active{border-color:#FF6B35;background:linear-gradient(135deg,rgba(229,57,53,.12),rgba(255,107,53,.06));}
+  /* 技术架构层 */
+  .stack-layer{padding:18px;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;gap:18px;}
+  .stack-layer .layer-name{font-size:13px;font-weight:700;writing-mode:vertical-rl;text-orientation:upright;letter-spacing:4px;flex-shrink:0;width:32px;text-align:center;}
+  /* 进度条 */
+  .progress-bar{height:6px;border-radius:3px;background:var(--bg-3);overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#E53935,#FF6B35);border-radius:3px;}
+  /* tooltip / scenario */
+  .scenario-step{position:relative;padding-left:36px;padding-bottom:24px;border-left:2px dashed var(--line);}
+  .scenario-step:last-child{border-left:0;padding-bottom:0;}
+  .scenario-dot{position:absolute;left:-15px;top:0;width:28px;height:28px;border-radius:50%;background:var(--bg-1);border:2px solid #FF6B35;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#FF6B35;}
+  /* roadmap */
+  .phase{padding:18px;border-radius:14px;border:1px solid var(--line);position:relative;overflow:hidden;}
+  .phase::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;}
+  .phase-1::before{background:#22c55e;}
+  .phase-2::before{background:#FF6B35;}
+  .phase-3::before{background:#a855f7;}
+  /* small util */
+  .scrollbar::-webkit-scrollbar{width:6px;height:6px;}
+  .scrollbar::-webkit-scrollbar-track{background:transparent;}
+  .scrollbar::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px;}
+  .blink{animation:blink 1.4s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.45;}}
+  details>summary{list-style:none;cursor:pointer;}
+  details>summary::-webkit-details-marker{display:none;}
+
+  /* Logo · 复刻锅圈食汇官方视觉（红底白字 2×2） */
+  .gq-logo{display:inline-flex;align-items:center;gap:12px;}
+  .gq-logo-mark{position:relative;width:46px;height:46px;border-radius:7px;background:linear-gradient(135deg,#E53935 0%,#C0181C 100%);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;padding:4px;gap:0;box-shadow:0 4px 12px rgba(229,57,53,.3),inset 0 1px 0 rgba(255,255,255,.15);font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",serif;}
+  .gq-logo-mark span{color:#fff;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;letter-spacing:-1.5px;line-height:1;}
+  .gq-logo-mark::after{content:"®";position:absolute;top:-2px;right:-2px;background:#fff;color:#E53935;font-size:8px;font-weight:700;width:11px;height:11px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;border:1px solid #E53935;}
+  .gq-logo-text-cn{font-weight:800;font-size:15px;color:var(--text-main);letter-spacing:.3px;line-height:1.15;}
+  .gq-logo-text-cn .accent{color:#E53935;}
+  .gq-logo-text-cn .slogan{font-weight:500;font-size:10.5px;color:#E53935;margin-left:6px;}
+  .gq-logo-text-en{font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;}
+
+  /* 移动端汉堡按钮 */
+  .menu-btn{display:none;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 8px;cursor:pointer;}
+  .menu-btn svg{width:20px;height:20px;color:var(--text-main);}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:40;}
+
+  /* Leaflet 自定义 marker */
+  .leaflet-container{font-family:inherit;background:#eaf2fa !important;border-radius:10px;}
+  .gq-marker{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center;}
+  .gq-marker .ring{position:absolute;inset:0;border-radius:50%;animation:pulseRing 2.4s infinite;}
+  .gq-marker .dot{position:relative;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  .gq-marker.lvl-active .dot{background:#FF6B35;width:18px;height:18px;}
+  .gq-marker.lvl-active .ring{background:#FF6B35;opacity:.25;}
+  .gq-marker.lvl-base .dot{background:#E53935;width:18px;height:18px;}
+  .gq-marker.lvl-base .ring{background:#E53935;opacity:.22;}
+  .gq-marker.lvl-soon .dot{background:#F59E0B;}
+  .gq-marker.lvl-soon .ring{background:#F59E0B;opacity:.18;}
+  .gq-marker.lvl-future .dot{background:#A855F7;width:11px;height:11px;}
+  .gq-marker.lvl-future .ring{background:#A855F7;opacity:.14;}
+  .gq-marker .label{position:absolute;left:36px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;color:var(--text-main);white-space:nowrap;box-shadow:0 2px 8px rgba(15,23,42,.06);}
+  .gq-marker .label .sub{display:block;font-size:9px;font-weight:500;color:var(--text-dim);}
+  @keyframes pulseRing{0%{transform:scale(.5);opacity:.6;}80%,100%{transform:scale(1.3);opacity:0;}}
+
+  /* 小型 AI 辅助分析按钮（用于金字塔每层 + 部门卡片） */
+  .ai-btn-mini{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:5px;background:linear-gradient(90deg,rgba(255,255,255,.95),rgba(255,255,255,.85));color:#B71C1C;font-size:10px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.5);line-height:1.5;letter-spacing:.2px;transition:all .15s;}
+  .ai-btn-mini:hover{background:#fff;color:#E53935;box-shadow:0 2px 8px rgba(229,57,53,.25);transform:translateY(-1px);}
+  .ai-btn-on-light{background:linear-gradient(90deg,#fff,#fff4ef);color:#B71C1C;border:1px solid rgba(229,57,53,.3);}
+  .ai-btn-on-light:hover{background:linear-gradient(90deg,#E53935,#FF6B35);color:#fff;border-color:transparent;}
+
+  /* 部门工作台 mockup */
+  .dept-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;}
+  .dept-tab{padding:8px 14px;border-radius:8px;background:#fff;border:1px solid var(--line);cursor:pointer;font-size:12.5px;color:var(--text-dim);transition:all .15s;}
+  .dept-tab.active{background:linear-gradient(90deg,#E53935,#FF6B35);color:#fff;border-color:transparent;font-weight:600;}
+  .dept-tab:hover:not(.active){background:#fff7f3;color:#B71C1C;border-color:rgba(229,57,53,.3);}
+  .dept-mockup{display:none;}
+  .dept-mockup.active{display:block;}
+  .mockup-frame{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .mockup-bar{padding:10px 14px;background:#f8fafc;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-size:12px;}
+
+  /* 响应式 - 平板 / 窄桌面（≤1280px） */
+  @media (max-width: 1280px){
+    .menu-btn{display:inline-flex;}
+    .desktop-side{position:fixed !important;left:-280px;top:0 !important;bottom:0;width:260px;height:100vh;z-index:50;transition:left .25s;background:#fff;border-right:1px solid var(--line);overflow-y:auto;padding-top:60px !important;}
+    .desktop-side.open{left:0;}
+    .desktop-side.open ~ .sidebar-overlay{display:block;}
+    main.flex-1{padding:14px !important;max-width:100% !important;width:100% !important;}
+    /* 强力把 grid 列数压缩 */
+    .grid-cols-7{grid-template-columns:repeat(2,1fr) !important;}
+    .grid-cols-5,.grid-cols-4{grid-template-columns:repeat(2,1fr) !important;}
+    .grid-cols-3{grid-template-columns:repeat(2,1fr) !important;}
+    /* col-span-2 在 2 列网格里就是占满整行 */
+    .col-span-2{grid-column:1 / -1 !important;}
+    /* AI 抽屉收窄 */
+    .ai-drawer{width:340px !important;}
+    /* AI Fab 缩小避免压主体 */
+    .ai-fab{padding:11px 16px !important;font-size:13px !important;}
+    /* 头部紧凑 */
+    header .text-xs{display:none;}
+    header .pl-4{display:none;}
+    .hide-on-mobile{display:none !important;}
+    .gq-logo-text-en{display:none;}
+    /* 卡片间距收紧 */
+    .gap-4{gap:10px !important;}
+    .gap-3{gap:8px !important;}
+    /* 部门 tabs 横向滚动 */
+    .dept-tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
+    .dept-tabs::-webkit-scrollbar{display:none;}
+    .dept-tab{flex-shrink:0;padding:7px 12px;font-size:12px;}
+    /* 表格水平滚动 */
+    .mockup-frame table{display:block;overflow-x:auto;white-space:nowrap;}
+  }
+
+  /* 平板（≤900px） */
+  @media (max-width: 900px){
+    h1.text-2xl{font-size:18px !important;}
+    .kpi-num{font-size:22px !important;}
+    .pyramid-cell{min-width:auto;font-size:11px;padding:6px 8px;}
+    .py-l1{min-width:auto;padding:10px 14px;}
+    table{font-size:10.5px;}
+    .stack-layer .layer-name{display:none;}
+    .stack-layer{padding:14px;}
+    /* 地图变矮 */
+    #miniMap{height:240px !important;}
+    #bigMap{height:380px !important;}
+    /* 卡片更窄 */
+    .card{border-radius:12px;}
+    /* AI 抽屉全宽 */
+    .ai-drawer{width:92vw !important;max-width:340px;}
+  }
+
+  /* 手机（≤640px） */
+  @media (max-width: 640px){
+    /* 全部强制 1 列 */
+    [class*="grid-cols-"]{grid-template-columns:1fr !important;}
+    .col-span-2{grid-column:1 / -1 !important;}
+    /* CEO 视图：大字 KPI */
+    #cockpit .kpi-num{font-size:24px !important;}
+    /* 金字塔每层垂直 */
+    .pyramid-row{flex-direction:column;align-items:stretch;gap:5px;}
+    .pyramid-cell{min-width:auto;width:100%;font-size:11px;padding:8px 10px;}
+    /* tab */
+    .dept-tab{padding:6px 10px;font-size:11.5px;}
+    /* AI 抽屉占满屏 */
+    .ai-drawer{width:100vw !important;max-width:100vw;}
+    .ai-fab{padding:10px 14px !important;border-radius:50% !important;width:48px;height:48px;justify-content:center;}
+    .ai-fab .lbl{display:none;}
+    .ai-fab svg{width:22px;height:22px;}
+    /* 头部 logo 文字缩小 */
+    .gq-logo-text-cn{font-size:13px !important;}
+    .gq-logo-text-cn .slogan{display:none;}
+    .gq-logo img{height:38px !important;}
+    /* 部门 mockup 整体内边距收紧 */
+    .mockup-frame .grid{gap:8px !important;}
+    .mockup-frame .p-4{padding:10px !important;}
+    /* 视频卡画面 4 路改 2 路宽 */
+    section#cctv .grid-cols-4 > .card{aspect-ratio:16/12 !important;}
+    /* 头部位置 */
+    header{padding:0 !important;}
+    header > div{padding:8px 12px !important;}
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- 顶部 Header -->
+<header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50">
+  <div class="flex items-center justify-between px-4 md:px-6 py-3">
+    <div class="flex items-center gap-3">
+      <button class="menu-btn" id="menuBtn" aria-label="菜单"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <div class="gq-logo">
+        <img src="gq_logo_final.png" alt="锅圈食汇" style="height:46px;width:auto;border-radius:6px;box-shadow:0 2px 8px rgba(229,57,53,.2);" onerror="this.style.display='none';this.nextElementSibling.style.display='grid';">
+        <div class="gq-logo-mark" style="display:none;">
+          <span>锅</span><span>圈</span>
+          <span>食</span><span>汇</span>
+        </div>
+        <div>
+          <div class="gq-logo-text-cn">锅圈<span class="accent">食汇</span> · 小炒出海<span class="slogan hide-on-mobile">好吃不贵</span></div>
+          <div class="gq-logo-text-en">GUOQUAN AI COCKPIT · 多伦多样板</div>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 text-xs text-slate-500">
+      <span class="flex items-center gap-1.5"><span class="pulse"></span>系统运行中</span>
+      <span class="hide-on-mobile">15 Agents · 8 机器人 在线</span>
+      <span class="hide-on-mobile">数据更新：刚刚</span>
+      <div class="flex items-center gap-2 pl-4 border-l border-slate-200">
+        <div class="w-7 h-7 rounded-full grad-red flex items-center justify-center text-[11px] font-bold text-white">杨</div>
+        <span class="text-slate-800 font-medium">杨总</span>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="sidebar-overlay" id="sideOverlay"></div>
+
+<div class="flex">
+  <!-- 左侧导航 -->
+  <aside id="sidebar" class="desktop-side w-60 border-r border-slate-200 bg-white min-h-[calc(100vh-57px)] sticky top-[57px] py-4 px-3 flex-shrink-0">
+    <div class="text-[11px] uppercase tracking-widest text-slate-400 px-3 mb-2">主视图</div>
+    <nav class="flex flex-col gap-0.5 mb-4">
+      <a class="nav-item active" data-target="cockpit">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        CEO 驾驶舱
+      </a>
+      <a class="nav-item" data-target="org">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 6-9 6-9-6 9-6z"/><path d="M3 15l9 6 9-6"/></svg>
+        组织金字塔
+      </a>
+      <a class="nav-item" data-target="agents">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg>
+        AI Agent 矩阵
+      </a>
+      <a class="nav-item" data-target="workbench">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        部门工作台
+      </a>
+      <a class="nav-item" data-target="flow">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+        端到端流程
+      </a>
+      <a class="nav-item" data-target="stack">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7l10-4 10 4-10 4-10-4z"/><path d="M2 12l10 4 10-4M2 17l10 4 10-4"/></svg>
+        技术架构
+      </a>
+      <a class="nav-item" data-target="risk">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 22h20L12 2z"/><path d="M12 9v6M12 18h.01"/></svg>
+        风险监控中心
+      </a>
+      <a class="nav-item" data-target="scenario">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        场景演示
+      </a>
+      <a class="nav-item" data-target="roadmap">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><path d="M9 3v15M15 6v15"/></svg>
+        18 个月路线图
+      </a>
+      <a class="nav-item" data-target="globe">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/></svg>
+        全球布局地图
+      </a>
+      <a class="nav-item" data-target="robot">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="8" width="12" height="10" rx="2"/><path d="M9 18v3M15 18v3M12 3v5M9 12h.01M15 12h.01"/></svg>
+        小炒机器人
+      </a>
+      <a class="nav-item" data-target="cctv">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>
+        视频监控 <span style="font-size:9px;background:#f1f5f9;color:#94a3b8;padding:1px 5px;border-radius:4px;margin-left:auto;">可选</span>
+      </a>
+    </nav>
+    <div class="text-[11px] uppercase tracking-widest text-slate-400 px-3 mb-2 mt-4">速览</div>
+    <div class="px-3 space-y-3 text-xs">
+      <div>
+        <div class="text-slate-500 mb-1">在建项目</div>
+        <div class="text-base font-semibold">3 <span class="text-[10px] font-normal text-slate-400">/ 多伦多</span></div>
+      </div>
+      <div>
+        <div class="text-slate-500 mb-1">本月花费</div>
+        <div class="text-base font-semibold">CA$ 487K <span class="pill pill-ok ml-1">-3.2%</span></div>
+      </div>
+      <div>
+        <div class="text-slate-500 mb-1">风险等级</div>
+        <div class="text-base font-semibold text-amber-600">⚠ 黄</div>
+      </div>
+    </div>
+    <div class="mt-6 px-3">
+      <div class="card-2 p-3 text-[11px] text-slate-600">
+        <div class="font-semibold text-slate-800 mb-1">提示</div>
+        本原型为体系蓝图演示，所有数据为模拟示例。点击各模块查看 AI + 人协同细节。
+      </div>
+    </div>
+  </aside>
+
+  <!-- 主内容区 -->
+  <main class="flex-1 p-4 md:p-6 max-w-[1280px] w-full">
+
+    <!-- ========== 1. CEO 驾驶舱 ========== -->
+    <section id="cockpit" class="module active">
+      <div class="flex items-end justify-between mb-5">
+        <div>
+          <h1 class="text-2xl font-bold mb-1">杨总驾驶舱 <span class="grad-red-text">/ CEO Cockpit</span></h1>
+          <p class="text-sm text-slate-500">金字塔顶层视角 · 一屏看穿整个出海项目 · AI 7×24 实时监控</p>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <span class="pill pill-ok"><span class="pulse"></span>实时</span>
+          <span>•</span>
+          <span>2026-05-06 15:32</span>
+        </div>
+      </div>
+
+      <!-- 4 个核心 KPI -->
+      <div class="grid grid-cols-4 gap-4 mb-5">
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">在建/在营项目</div>
+          <div class="kpi-num">3 <span class="text-sm text-slate-500 font-normal">家</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">1 中央厨房 · 2 直营店</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">本月花费 / 预算</div>
+          <div class="kpi-num">487K <span class="text-sm text-slate-500 font-normal">/ 510K</span></div>
+          <div class="text-[11px] text-emerald-600 mt-1">▼ 4.5% 低于预算</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">综合毛利率（运营店）</div>
+          <div class="kpi-num">31.2<span class="text-base font-normal">%</span></div>
+          <div class="text-[11px] text-amber-600 mt-1">⚠ 比上月 -1.8pp</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">综合风险指数</div>
+          <div class="kpi-num text-amber-600">42 <span class="text-sm text-slate-500 font-normal">/ 100</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">中等 · 2 黄 · 1 红</div>
+        </div>
+      </div>
+
+      <!-- 中间区域：花费曲线 + 风险预警 -->
+      <div class="grid grid-cols-3 gap-4 mb-5">
+        <div class="card p-5 col-span-2">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <div class="text-sm font-semibold">日花费监控（近 30 天 · CA$）</div>
+              <div class="text-[11px] text-slate-500">AI 自动对照预算曲线，偏差 >5% 自动预警</div>
+            </div>
+            <div class="flex gap-2 text-[11px]">
+              <span class="pill pill-info">实际</span>
+              <span class="pill" style="background:rgba(148,163,184,.15);color:#94A3B8;">预算基线</span>
+            </div>
+          </div>
+          <div style="height:220px;position:relative;"><canvas id="expChart"></canvas></div>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-sm font-semibold">AI 实时风险预警</div>
+            <span class="pill pill-bad">3 待处理</span>
+          </div>
+          <div class="space-y-2 text-[12.5px]">
+            <div class="card-2 p-3 border-l-4" style="border-left-color:#ef4444;">
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <div class="font-semibold">1 号店周毛利掉至 18%</div>
+                <span class="pill pill-bad">红</span>
+              </div>
+              <div class="text-slate-500 text-[11px]">外卖平台抽佣调整 +3pp，AI 已生成 3 套应对方案</div>
+              <div class="text-[10px] text-[#FF6B35] mt-1.5">→ 财务 + 门店 + 外卖 Agent 联动中</div>
+            </div>
+            <div class="card-2 p-3 border-l-4" style="border-left-color:#f59e0b;">
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <div class="font-semibold">海运料包到港延期 5 天</div>
+                <span class="pill pill-warn">黄</span>
+              </div>
+              <div class="text-slate-500 text-[11px]">温哥华港拥堵 · AI 已联系本地备份供应商</div>
+              <div class="text-[10px] text-[#FF6B35] mt-1.5">→ 海运 + 供应链 Agent 处理中</div>
+            </div>
+            <div class="card-2 p-3 border-l-4" style="border-left-color:#f59e0b;">
+              <div class="flex items-start justify-between gap-2 mb-1">
+                <div class="font-semibold">2 号店装修超期 7 天</div>
+                <span class="pill pill-warn">黄</span>
+              </div>
+              <div class="text-slate-500 text-[11px]">市政许可审批延迟，AI 已重排开业节点</div>
+              <div class="text-[10px] text-[#FF6B35] mt-1.5">→ 装修 + 法务 Agent 协同中</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部：项目进度 + 异常事件流 -->
+      <div class="grid grid-cols-3 gap-4">
+        <div class="card p-5 col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-sm font-semibold">在建/在营项目进度</div>
+            <span class="text-[11px] text-slate-500">点击项目可下钻至单店驾驶舱</span>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-[12.5px] mb-1.5">
+                <div><span class="font-semibold">多伦多 1 号店</span> <span class="pill pill-ok ml-2">在营</span> <span class="text-slate-500">· Markham</span></div>
+                <div class="text-slate-500">运营 · 第 8 周</div>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:100%;"></div></div>
+              <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                <span>开业 ✓</span><span>每日 GMV: CA$ 12.4K</span><span>毛利率 18% ⚠</span>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[12.5px] mb-1.5">
+                <div><span class="font-semibold">多伦多 2 号店</span> <span class="pill pill-warn ml-2">装修</span> <span class="text-slate-500">· North York</span></div>
+                <div class="text-slate-500">第 14 周 / 16 周</div>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:74%;"></div></div>
+              <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                <span>选址 ✓ 设计 ✓ 装修中</span><span>已花 CA$ 287K / 预算 320K</span><span>预计延期 7 天</span>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[12.5px] mb-1.5">
+                <div><span class="font-semibold">多伦多中央厨房</span> <span class="pill pill-info ml-2">筹备</span> <span class="text-slate-500">· Mississauga</span></div>
+                <div class="text-slate-500">第 6 周 / 24 周</div>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:25%;"></div></div>
+              <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                <span>选址 ✓ 设计中</span><span>已花 CA$ 142K / 预算 1.85M</span><span>按计划</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-sm font-semibold">AI 事件流</div>
+            <span class="pill pill-info">实时</span>
+          </div>
+          <div class="space-y-3 text-[12px] max-h-[260px] overflow-y-auto scrollbar pr-1">
+            <div><span class="text-slate-500">15:32</span> · <span class="text-[#FF6B35]">财务 Agent</span> 完成今日成本归集</div>
+            <div><span class="text-slate-500">15:18</span> · <span class="text-[#FF6B35]">门店 Agent</span> 1 号店午市单量+12%</div>
+            <div><span class="text-slate-500">14:55</span> · <span class="text-red-600">风险 Agent</span> ⚠ 触发毛利红线告警</div>
+            <div><span class="text-slate-500">14:30</span> · <span class="text-[#FF6B35]">海运 Agent</span> 集装箱 #GQT-204 抵港 +1 天</div>
+            <div><span class="text-slate-500">14:02</span> · <span class="text-[#FF6B35]">招聘 Agent</span> 2 号店厨师 3/5 已签</div>
+            <div><span class="text-slate-500">13:45</span> · <span class="text-[#FF6B35]">市场 Agent</span> 推送本周竞品动态周报</div>
+            <div><span class="text-slate-500">13:10</span> · <span class="text-[#FF6B35]">合规 Agent</span> 卫生许可文件归档</div>
+            <div><span class="text-slate-500">12:48</span> · <span class="text-[#FF6B35]">外卖 Agent</span> Uber 抽佣变更已识别</div>
+            <div><span class="text-slate-500">12:20</span> · <span class="text-[#FF6B35]">中厨 Agent</span> 设备到货 8/12 项</div>
+            <div><span class="text-slate-500">11:55</span> · <span class="text-[#FF6B35]">客户 Agent</span> Google 评分 4.6→4.7</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 新增行：迷你世界地图 + 机器人队列 -->
+      <div class="grid grid-cols-3 gap-4 mt-4">
+        <!-- 迷你全球地图 -->
+        <div class="card p-5 col-span-2">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <div class="text-sm font-semibold">🌐 全球项目实时地图</div>
+              <div class="text-[11px] text-slate-500">点击「全球布局地图」模块可查看完整版</div>
+            </div>
+            <div class="flex gap-2 text-[11px]">
+              <span class="pill" style="background:rgba(229,57,53,.18);color:#f87171;">●在营/在建</span>
+              <span class="pill pill-warn">●近期</span>
+              <span class="pill" style="background:rgba(168,85,247,.18);color:#c084fc;">●远期</span>
+            </div>
+          </div>
+          <div id="miniMap" style="height:340px;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--line);"></div>
+          <div class="grid grid-cols-3 gap-2 mt-3 text-[11px]">
+            <div class="card-2 p-2"><b class="text-[#FF6B35]">在营/在建：</b><span class="text-slate-700">多伦多 3 项目</span></div>
+            <div class="card-2 p-2"><b class="text-amber-600">M13-M18 启动：</b><span class="text-slate-700">温哥华 / 美西 / 越南</span></div>
+            <div class="card-2 p-2"><b style="color:#c084fc;">远期评估：</b><span class="text-slate-700">伦敦 / 新加坡 / 悉尼</span></div>
+          </div>
+        </div>
+
+        <!-- 炒菜机器人队列 -->
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <div class="text-sm font-semibold">🤖 锅圈小炒机器人队列</div>
+              <div class="text-[11px] text-slate-500">8 台在役 · 实时 IoT 数据</div>
+            </div>
+            <span class="pill pill-ok"><span class="pulse"></span>在线</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[11.5px] mb-3">
+            <div class="card-2 p-2"><div class="text-slate-500">运行中</div><div class="font-semibold text-base text-emerald-600">7 / 8</div></div>
+            <div class="card-2 p-2"><div class="text-slate-500">今日出餐</div><div class="font-semibold text-base">1,847 份</div></div>
+            <div class="card-2 p-2"><div class="text-slate-500">单份成本</div><div class="font-semibold text-base">$2.18</div></div>
+            <div class="card-2 p-2"><div class="text-slate-500">故障</div><div class="font-semibold text-base text-amber-600">1 ⚠</div></div>
+          </div>
+          <div class="space-y-1.5 text-[11px]">
+            <div class="flex justify-between items-center"><span><span class="pulse"></span> GQ-T01 · 1 号店 · 运行中</span><span class="text-slate-500">82%</span></div>
+            <div class="flex justify-between items-center"><span><span class="pulse"></span> GQ-T02 · 1 号店 · 运行中</span><span class="text-slate-500">76%</span></div>
+            <div class="flex justify-between items-center"><span class="text-amber-600">⚠ GQ-T03 · 中央厨房 · 油温异常</span><span class="text-amber-600">维修中</span></div>
+            <div class="flex justify-between items-center"><span><span class="pulse"></span> GQ-T04 · 中央厨房 · 运行中</span><span class="text-slate-500">94%</span></div>
+            <div class="flex justify-between items-center"><span><span class="pulse"></span> GQ-T05 · 中央厨房 · 运行中</span><span class="text-slate-500">88%</span></div>
+            <div class="flex justify-between items-center"><span><span class="pulse"></span> GQ-T06 · 中央厨房 · 运行中</span><span class="text-slate-500">71%</span></div>
+            <div class="flex justify-between items-center"><span><span class="pulse"></span> GQ-T07 · 中央厨房 · 运行中</span><span class="text-slate-500">68%</span></div>
+            <div class="flex justify-between items-center"><span style="color:#94A3B8;">○ GQ-T08 · 2 号店待装</span><span class="text-slate-500">待装</span></div>
+          </div>
+          <div class="mt-3 text-[10px] text-[#FF6B35]">→ 点「小炒机器人」模块查看实时炒锅画面</div>
+        </div>
+      </div>
+
+      <!-- 末端视频监控实时（可选模块缩略） -->
+      <div class="grid grid-cols-4 gap-3 mt-4">
+        <div class="card p-3 col-span-1">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-[12px] font-semibold">📹 实时监控</div>
+            <span class="pill" style="background:#f1f5f9;color:#64748b;font-size:9px;">可选</span>
+          </div>
+          <div class="text-[11px] text-slate-500 mb-2">8 路在线 · 点放大</div>
+          <div class="text-[11px] space-y-1">
+            <div class="flex justify-between"><span><span class="pulse"></span> 1 号店入口</span><span class="text-slate-500">3 排队</span></div>
+            <div class="flex justify-between"><span><span class="pulse"></span> 1 号店餐区</span><span class="text-slate-500">9/12 桌</span></div>
+            <div class="flex justify-between"><span><span class="pulse"></span> 中厨 GQ-T04</span><span class="text-slate-500">81%</span></div>
+            <div class="flex justify-between text-amber-600"><span>⚠ 中厨出货台</span><span>色异 ⚠</span></div>
+          </div>
+        </div>
+
+        <!-- 实时监控画面缩略：1 号店入口 -->
+        <div class="card p-0 overflow-hidden col-span-1" style="aspect-ratio:16/10;position:relative;background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);">
+          <div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.6);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;">CAM-01 · 1 号店入口</div>
+          <div style="position:absolute;top:6px;right:6px;background:rgba(220,38,38,.85);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;display:flex;align-items:center;gap:3px;"><span style="width:5px;height:5px;background:#fff;border-radius:50%;animation:blink 1.5s infinite;"></span>LIVE</div>
+          <svg viewBox="0 0 200 125" style="width:100%;height:100%;">
+            <rect x="40" y="55" width="22" height="50" fill="none" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="42" y="52" fill="#22c55e" font-size="6">person</text>
+            <rect x="80" y="60" width="20" height="48" fill="none" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="82" y="58" fill="#22c55e" font-size="6">person</text>
+            <rect x="120" y="58" width="22" height="48" fill="none" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="3,2"/>
+          </svg>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);padding:14px 8px 6px;color:#fff;font-size:10px;">🚶 排队 3 人</div>
+        </div>
+
+        <!-- 实时画面：1 号店餐区 -->
+        <div class="card p-0 overflow-hidden col-span-1" style="aspect-ratio:16/10;position:relative;background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);">
+          <div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.6);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;">CAM-02 · 餐区</div>
+          <div style="position:absolute;top:6px;right:6px;background:rgba(220,38,38,.85);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;display:flex;align-items:center;gap:3px;"><span style="width:5px;height:5px;background:#fff;border-radius:50%;animation:blink 1.5s infinite;"></span>LIVE</div>
+          <svg viewBox="0 0 200 125" style="width:100%;height:100%;">
+            <rect x="20" y="40" width="35" height="22" fill="none" stroke="#FF6B35" stroke-width="1" opacity=".7"/>
+            <rect x="80" y="40" width="35" height="22" fill="none" stroke="#FF6B35" stroke-width="1" opacity=".7"/>
+            <rect x="140" y="40" width="35" height="22" fill="none" stroke="#22c55e" stroke-width="1"/>
+            <rect x="20" y="80" width="35" height="22" fill="none" stroke="#22c55e" stroke-width="1"/>
+            <rect x="80" y="80" width="35" height="22" fill="none" stroke="#FF6B35" stroke-width="1" opacity=".7"/>
+            <rect x="140" y="80" width="35" height="22" fill="none" stroke="#FF6B35" stroke-width="1" opacity=".7"/>
+          </svg>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);padding:14px 8px 6px;color:#fff;font-size:10px;">🪑 9/12 占用</div>
+        </div>
+
+        <!-- 实时画面：中厨 -->
+        <div class="card p-0 overflow-hidden col-span-1" style="aspect-ratio:16/10;position:relative;background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);">
+          <div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.6);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;">CAM-08 · 中厨出货</div>
+          <div style="position:absolute;top:6px;right:6px;background:rgba(217,119,6,.85);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;">⚠ 异常</div>
+          <svg viewBox="0 0 200 125" style="width:100%;height:100%;">
+            <rect x="50" y="50" width="40" height="25" fill="rgba(217,119,6,.25)" stroke="#d97706" stroke-width="1.5"/>
+            <text x="52" y="48" fill="#d97706" font-size="6">color anomaly</text>
+            <rect x="105" y="55" width="35" height="22" fill="rgba(34,197,94,.18)" stroke="#22c55e" stroke-width="1"/>
+          </svg>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);padding:14px 8px 6px;color:#fff;font-size:10px;">📦 鱼香肉丝 #2 色偏</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 2. 组织金字塔（精简编制版） ========== -->
+    <section id="org" class="module">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold mb-1">精简编制 <span class="grad-red-text">/ Lean Team Model</span></h1>
+        <p class="text-sm text-slate-500">极少全职 + 大量兼职/顾问 + 模块化外包 · AI 替代中后台 · 一人当 5 人用</p>
+      </div>
+
+      <!-- 编制总览 KPI -->
+      <div class="grid grid-cols-5 gap-3 mb-4">
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">本地 FT 全职</div>
+          <div class="kpi-num"><span class="grad-red-text">5</span> <span class="text-sm font-normal text-slate-500">人</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">多伦多必须自己人</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">🇨🇳 国内远程</div>
+          <div class="kpi-num text-rose-600">10 <span class="text-sm font-normal text-slate-500">人</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">总部 Franchise 支持</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">PT 顾问</div>
+          <div class="kpi-num text-amber-600">12 <span class="text-sm font-normal text-slate-500">人</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">本地律师/会计/经纪</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">外包供应商</div>
+          <div class="kpi-num text-emerald-600">14 <span class="text-sm font-normal text-slate-500">项</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">装修/法律/IT/物流</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">vs 传统编制</div>
+          <div class="kpi-num text-emerald-600">-78<span class="text-base">%</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">FT 本地人头缩减</div>
+        </div>
+      </div>
+
+      <!-- Franchise 模式说明 -->
+      <div class="card p-4 mb-4" style="background:linear-gradient(90deg,rgba(229,57,53,.06),rgba(255,107,53,.02));border-left:3px solid #E53935;">
+        <div class="flex items-start gap-3">
+          <div class="text-2xl">🇨🇳→🇨🇦</div>
+          <div class="flex-1">
+            <div class="font-semibold text-sm mb-1">Franchise 模式 · 国内总部远程支持团队</div>
+            <div class="text-[12px] text-slate-600">出海是 Franchise / 总部直营式扩张 → 大量决策与中后台职能由国内总部远程提供。本地多伦多团队只保留「必须当面/现场/合规需要」的角色。中国团队 8-12 小时时差正好覆盖北美夜间窗口（北美下班 = 国内白天），AI 体系做时区桥接。</div>
+            <div class="grid grid-cols-3 gap-2 mt-3 text-[11.5px]">
+              <div class="card-2 p-2"><b>国内远程做：</b><span class="text-slate-600">CFO 财务、CMO 品牌、市场情报、IT 运维、AI 维护、客服、招聘第一轮、合规清单、设计、菜品研发</span></div>
+              <div class="card-2 p-2"><b>本地必须做：</b><span class="text-slate-600">店长决策、面谈关键岗、政府关系、签证签字、突发危机、当面客户服务、市政许可</span></div>
+              <div class="card-2 p-2"><b>AI 做时区桥：</b><span class="text-slate-600">国内白天处理北美夜间/凌晨事件 · 早会自动同步 · 翻译 · 文档接力</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 极简哲学 banner -->
+      <div class="card p-4 mb-5" style="background:linear-gradient(135deg,rgba(229,57,53,.12),rgba(255,107,53,.04));border-color:rgba(255,107,53,.3);">
+        <div class="text-sm font-semibold mb-1.5">🎯 编制三原则</div>
+        <div class="grid grid-cols-3 gap-3 text-[12px]">
+          <div><b class="text-[#FF6B35]">① AI 优先：</b><span class="text-slate-700">能 AI 做的不雇人 · 会计/调研/招聘/合规跟进/客服等中后台 80% 由 AI 完成</span></div>
+          <div><b class="text-[#FF6B35]">② 兼职/顾问优先：</b><span class="text-slate-700">需要人判断但不需要每天上班的（律师/会计/选址/营销）= 月度顾问</span></div>
+          <div><b class="text-[#FF6B35]">③ 外包优先：</b><span class="text-slate-700">一次性或非核心（装修/设计/IT/海运/招聘服务）= 按项目购买</span></div>
+        </div>
+      </div>
+
+      <!-- 金字塔（精简版，标注 FT/PT/OUT） -->
+      <div class="card p-6 mb-5">
+        <div class="text-sm font-semibold mb-3">组织结构 · <span class="text-emerald-600">FT</span> 全职 / <span class="text-amber-600">PT</span> 兼职 / <span class="text-slate-500">OUT</span> 外包</div>
+        <div class="space-y-3">
+          <!-- L1 -->
+          <div class="pyramid-row">
+            <div class="pyramid-cell py-l1">
+              <div class="text-[11px] opacity-80">L1 · 决策层</div>
+              <div class="text-base font-bold">杨总（CEO）<span class="ml-2 text-[10px] bg-white/20 px-1.5 py-0.5 rounded">FT × 1</span></div>
+              <div class="text-[11px] opacity-90">驾驶舱 · 战略 · 关键面试</div>
+            </div>
+          </div>
+          <!-- L2 - 简化为 1 个 COO 全职 + 3 个 fractional -->
+          <div class="pyramid-row">
+            <div class="pyramid-cell py-l2"><div class="font-semibold">城市 COO（多伦多）</div><div class="text-[10px] opacity-90"><span class="bg-green-600/40 px-1 rounded">FT × 1</span> 当地决策官</div></div>
+            <div class="pyramid-cell py-l2" style="background:#3b3261;"><div class="font-semibold">Fractional CFO</div><div class="text-[10px] opacity-90"><span class="bg-yellow-600/40 px-1 rounded">PT</span> 月度顾问 · 16h/月</div></div>
+            <div class="pyramid-cell py-l2" style="background:#3b3261;"><div class="font-semibold">Fractional CMO</div><div class="text-[10px] opacity-90"><span class="bg-yellow-600/40 px-1 rounded">PT</span> 月度顾问 · 20h/月</div></div>
+            <div class="pyramid-cell py-l2"><div class="font-semibold">AI/数据负责人</div><div class="text-[10px] opacity-90"><span class="bg-green-600/40 px-1 rounded">FT × 1</span> 体系维护</div></div>
+          </div>
+          <!-- L3 业务部门 - 大部分 PT/OUT -->
+          <div class="pyramid-row flex-wrap">
+            <div class="pyramid-cell py-l3" style="background:#475569;"><div>市场调研</div><div class="text-[10px] opacity-80"><span class="bg-yellow-500/40 px-1 rounded">PT</span> + AI</div></div>
+            <div class="pyramid-cell py-l3" style="background:#475569;"><div>财务记账</div><div class="text-[10px] opacity-80"><span class="bg-slate-400/40 px-1 rounded">OUT</span> + AI</div></div>
+            <div class="pyramid-cell py-l3" style="background:#475569;"><div>选址</div><div class="text-[10px] opacity-80"><span class="bg-yellow-500/40 px-1 rounded">PT</span> 经纪</div></div>
+            <div class="pyramid-cell py-l3" style="background:#475569;"><div>装修</div><div class="text-[10px] opacity-80"><span class="bg-slate-400/40 px-1 rounded">OUT</span> 项目</div></div>
+            <div class="pyramid-cell py-l3" style="background:#475569;"><div>供应链</div><div class="text-[10px] opacity-80"><span class="bg-slate-400/40 px-1 rounded">OUT</span> 货代</div></div>
+            <div class="pyramid-cell py-l3"><div>中央厨房</div><div class="text-[10px] opacity-80"><span class="bg-green-500/40 px-1 rounded">FT × 2</span></div></div>
+            <div class="pyramid-cell py-l3" style="background:#475569;"><div>外卖运营</div><div class="text-[10px] opacity-80"><span class="bg-slate-400/40 px-1 rounded">OUT</span> 代运营</div></div>
+            <div class="pyramid-cell py-l3" style="background:#475569;"><div>HR / 招聘</div><div class="text-[10px] opacity-80"><span class="bg-slate-400/40 px-1 rounded">OUT</span> 猎头 + AI</div></div>
+            <div class="pyramid-cell py-l3" style="background:#475569;"><div>法务合规</div><div class="text-[10px] opacity-80"><span class="bg-yellow-500/40 px-1 rounded">PT</span> 律所</div></div>
+          </div>
+          <!-- L4 门店核心 - 仅店长全职 -->
+          <div class="pyramid-row flex-wrap">
+            <div class="pyramid-cell py-l4"><div>店长（每店）</div><div class="text-[10px] opacity-90"><span class="bg-white/30 px-1 rounded">FT × N</span></div></div>
+            <div class="pyramid-cell py-l4"><div>总厨（中厨）</div><div class="text-[10px] opacity-90"><span class="bg-white/30 px-1 rounded">FT × 1</span></div></div>
+            <div class="pyramid-cell py-l4" style="background:#0e5e54;"><div>厨师（高峰）</div><div class="text-[10px] opacity-90"><span class="bg-yellow-500/30 px-1 rounded">PT 主</span></div></div>
+            <div class="pyramid-cell py-l4" style="background:#0e5e54;"><div>前厅服务</div><div class="text-[10px] opacity-90"><span class="bg-yellow-500/30 px-1 rounded">PT</span></div></div>
+            <div class="pyramid-cell py-l4" style="background:#374151;"><div>设计 / 施工</div><div class="text-[10px] opacity-90"><span class="bg-slate-400/30 px-1 rounded">OUT</span></div></div>
+            <div class="pyramid-cell py-l4" style="background:#374151;"><div>会计 / 报税</div><div class="text-[10px] opacity-90"><span class="bg-slate-400/30 px-1 rounded">OUT</span></div></div>
+            <div class="pyramid-cell py-l4" style="background:#374151;"><div>IT / 网站</div><div class="text-[10px] opacity-90"><span class="bg-slate-400/30 px-1 rounded">OUT</span></div></div>
+            <div class="pyramid-cell py-l4" style="background:#374151;"><div>报关 / 物流</div><div class="text-[10px] opacity-90"><span class="bg-slate-400/30 px-1 rounded">OUT</span></div></div>
+          </div>
+          <!-- L5 - 几乎全部 PT 或第三方 -->
+          <div class="pyramid-row flex-wrap">
+            <div class="pyramid-cell py-l5">PT 厨师</div>
+            <div class="pyramid-cell py-l5">PT 配菜</div>
+            <div class="pyramid-cell py-l5">PT 服务员</div>
+            <div class="pyramid-cell py-l5">第三方外卖员</div>
+            <div class="pyramid-cell py-l5">外包客服（AI 主）</div>
+            <div class="pyramid-cell py-l5">兼职市场推广</div>
+            <div class="pyramid-cell py-l5">兼职社媒运营</div>
+            <div class="pyramid-cell py-l5">学生工实习</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 三种人才矩阵 -->
+      <div class="text-sm font-semibold mb-3">📋 三种人才矩阵</div>
+      <div class="grid grid-cols-3 gap-3 mb-5">
+        <!-- FT 核心 -->
+        <div class="card p-4 border-l-4" style="border-left-color:#22c55e;">
+          <div class="flex items-center justify-between mb-2"><div class="font-semibold">🟢 FT 核心团队（8 人）</div><span class="pill pill-ok">不可外包</span></div>
+          <div class="text-[11px] text-slate-500 mb-2">必须自己人 · 决策权 · 公司认同 · 长期持有 · 期权激励</div>
+          <ul class="text-[12px] space-y-1.5">
+            <li>• <b>杨总（CEO）</b> · 多伦多 / 国内</li>
+            <li>• <b>城市 COO</b> · 多伦多当地决策官</li>
+            <li>• <b>AI / 数据工程师</b> · 体系维护</li>
+            <li>• <b>总厨</b>（中央厨房） · 品质把控</li>
+            <li>• <b>中厨副厨</b> · 1-2 人</li>
+            <li>• <b>店长</b> · 每店 1 人（首批 1 家）</li>
+          </ul>
+          <div class="text-[11px] text-emerald-600 mt-2">月度成本约 CA$ 75-95K（含税与福利）</div>
+        </div>
+
+        <!-- PT 顾问 -->
+        <div class="card p-4 border-l-4" style="border-left-color:#fbbf24;">
+          <div class="flex items-center justify-between mb-2"><div class="font-semibold">🟡 PT 兼职 / 顾问（12 人）</div><span class="pill pill-warn">月度结算</span></div>
+          <div class="text-[11px] text-slate-500 mb-2">需要专业判断但不需每天上班 · 按工时付费 · 多个项目共享</div>
+          <ul class="text-[12px] space-y-1.5">
+            <li>• <b>Fractional CFO</b> · 16h/月（融资+税务）</li>
+            <li>• <b>Fractional CMO</b> · 20h/月（品牌+增长）</li>
+            <li>• <b>本地律师</b> · 月度 retainer</li>
+            <li>• <b>本地会计师</b> · 月度记账+申报</li>
+            <li>• <b>商业地产经纪</b> · 选址</li>
+            <li>• <b>移民律师</b> · 工签 LMIA</li>
+            <li>• <b>设计顾问</b> · 品牌+店铺</li>
+            <li>• <b>公关顾问</b> · 危机处理</li>
+            <li>• <b>市场调研员</b> · 实地走访</li>
+            <li>• <b>社媒达人合作</b> · 小红书/IG</li>
+            <li>• <b>培训师</b> · 厨房 + 服务</li>
+            <li>• <b>食品法规顾问</b></li>
+          </ul>
+          <div class="text-[11px] text-amber-600 mt-2">月度成本约 CA$ 22-32K</div>
+        </div>
+
+        <!-- 外包 -->
+        <div class="card p-4 border-l-4" style="border-left-color:#94a3b8;">
+          <div class="flex items-center justify-between mb-2"><div class="font-semibold">⚪ 外包供应商（14 项）</div><span class="pill" style="background:rgba(148,163,184,.18);color:#cbd5e1;">按项目</span></div>
+          <div class="text-[11px] text-slate-500 mb-2">一次性或非核心 · SLA 合同 · 多供应商比价 · 保留替换灵活性</div>
+          <ul class="text-[12px] space-y-1.5">
+            <li>• 装修施工总包</li>
+            <li>• 品牌 / 平面 / 摄影</li>
+            <li>• 网站 / 私域开发</li>
+            <li>• POS / IT 运维</li>
+            <li>• 海运货代 / 报关</li>
+            <li>• 本地仓储 / 配送</li>
+            <li>• 招聘服务（猎头）</li>
+            <li>• 食材供应商（Sysco/GFS/华人）</li>
+            <li>• 外卖代运营（前期）</li>
+            <li>• 数字营销代理</li>
+            <li>• 保险经纪</li>
+            <li>• 安保 / 保洁</li>
+            <li>• 培训课件本地化</li>
+            <li>• 客服 BPO（AI 主导，溢出转人工）</li>
+          </ul>
+          <div class="text-[11px] text-slate-500 mt-2">月度成本变量大 · 总年度 CA$ 200-350K</div>
+        </div>
+      </div>
+
+      <!-- 部门职责矩阵（带用人模型） -->
+      <div class="text-sm font-semibold mb-3">9 个职能 · AI + 人 协同矩阵</div>
+      <div class="grid grid-cols-3 gap-3">
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-1.5"><div class="font-semibold text-sm">市场调研</div><span class="pill pill-ai">市场情报 Agent</span></div>
+          <div class="text-[11px] text-[#FF6B35] mb-1.5">用人：<b>0 FT</b> / 1 PT 调研员（按需）</div>
+          <div class="text-[11.5px]"><span class="text-[#FF6B35]">AI 做：</span>抓取/分析/产出周报 90%<br><span class="text-[#FF6B35]">人做：</span>实地走访 + 文化判断 10%</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-1.5"><div class="font-semibold text-sm">财务规划</div><span class="pill pill-ai">财务监控 Agent</span></div>
+          <div class="text-[11px] text-[#FF6B35] mb-1.5">用人：<b>0 FT</b> / Fractional CFO（PT）+ 外包记账</div>
+          <div class="text-[11.5px]"><span class="text-[#FF6B35]">AI 做：</span>日核算/预警/汇率 95%<br><span class="text-[#FF6B35]">人做：</span>融资/税务架构</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-1.5"><div class="font-semibold text-sm">选址装修</div><span class="pill pill-ai">选址 + 装修 Agent</span></div>
+          <div class="text-[11px] text-[#FF6B35] mb-1.5">用人：<b>0 FT</b> / 商业经纪 PT + 装修外包</div>
+          <div class="text-[11.5px]"><span class="text-[#FF6B35]">AI 做：</span>商圈打分/进度核对/对账<br><span class="text-[#FF6B35]">人做：</span>谈租约/签证签</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-1.5"><div class="font-semibold text-sm">供应链 / 海运</div><span class="pill pill-ai">供应链 + 海运 Agent</span></div>
+          <div class="text-[11px] text-[#FF6B35] mb-1.5">用人：<b>0 FT</b> / 货代外包 + COO 兼管</div>
+          <div class="text-[11.5px]"><span class="text-[#FF6B35]">AI 做：</span>船期/库存/补货<br><span class="text-[#FF6B35]">人做：</span>异常清关 + 谈大宗</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-1.5"><div class="font-semibold text-sm">中央厨房</div><span class="pill pill-ai">中厨调度 Agent</span></div>
+          <div class="text-[11px] text-[#FF6B35] mb-1.5">用人：<b>FT 总厨 + 1-2 厨师 + PT 高峰工</b></div>
+          <div class="text-[11.5px]"><span class="text-[#FF6B35]">AI 做：</span>排程/IoT 监控/产量<br><span class="text-[#FF6B35]">人做：</span>研发/抽检</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-1.5"><div class="font-semibold text-sm">门店运营</div><span class="pill pill-ai">门店 + 客户 Agent</span></div>
+          <div class="text-[11px] text-[#FF6B35] mb-1.5">用人：<b>FT 店长 1 + PT 服务/厨师 8-10</b></div>
+          <div class="text-[11.5px]"><span class="text-[#FF6B35]">AI 做：</span>排班/备货/差评分析<br><span class="text-[#FF6B35]">人做：</span>店长决策 + 顾客面对面</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-1.5"><div class="font-semibold text-sm">外卖业务</div><span class="pill pill-ai">外卖 Agent</span></div>
+          <div class="text-[11px] text-[#FF6B35] mb-1.5">用人：<b>0 FT</b> / 前期代运营外包 → 跑通后 AI 接管</div>
+          <div class="text-[11.5px]"><span class="text-[#FF6B35]">AI 做：</span>菜单/定价/抽佣监控<br><span class="text-[#FF6B35]">人做：</span>平台谈判（CMO 兼）</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-1.5"><div class="font-semibold text-sm">人力 / 招聘</div><span class="pill pill-ai">招聘 + HR Agent</span></div>
+          <div class="text-[11px] text-[#FF6B35] mb-1.5">用人：<b>0 FT</b> / 猎头按职位付费 + 移民律师 PT</div>
+          <div class="text-[11.5px]"><span class="text-[#FF6B35]">AI 做：</span>简历筛选/纪要/培训生成<br><span class="text-[#FF6B35]">人做：</span>关键岗面试（CEO/COO）</div>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-1.5"><div class="font-semibold text-sm">法务 / 合规</div><span class="pill pill-ai">法务 Agent</span></div>
+          <div class="text-[11px] text-[#FF6B35] mb-1.5">用人：<b>0 FT</b> / 律所月度 retainer（PT）</div>
+          <div class="text-[11.5px]"><span class="text-[#FF6B35]">AI 做：</span>合同扫描/合规清单/续期日历<br><span class="text-[#FF6B35]">人做：</span>关键签字/政府关系</div>
+        </div>
+      </div>
+
+      <!-- 编制规模随业务弹性 -->
+      <div class="card p-5 mt-5">
+        <div class="text-sm font-semibold mb-3">📈 编制随业务弹性扩张</div>
+        <div class="grid grid-cols-4 gap-3 text-[12px]">
+          <div class="card-2 p-3">
+            <div class="text-[#FF6B35] font-semibold mb-1">阶段 1 · 单店</div>
+            <div class="text-slate-500">FT 5 + PT 8 + 外包 12</div>
+            <div class="text-[10px] text-white mt-1">月人力总成本 CA$ 95K</div>
+          </div>
+          <div class="card-2 p-3">
+            <div class="text-[#FF6B35] font-semibold mb-1">阶段 2 · 3 店 + 中厨</div>
+            <div class="text-slate-500">FT 12 + PT 18 + 外包 14</div>
+            <div class="text-[10px] text-white mt-1">月人力总成本 CA$ 195K</div>
+          </div>
+          <div class="card-2 p-3">
+            <div class="text-[#FF6B35] font-semibold mb-1">阶段 3 · 8 店 + 跨市场</div>
+            <div class="text-slate-500">FT 22 + PT 28 + 外包 18</div>
+            <div class="text-[10px] text-white mt-1">月人力总成本 CA$ 380K</div>
+          </div>
+          <div class="card-2 p-3">
+            <div class="text-[#FF6B35] font-semibold mb-1">未来 · 加盟 + AI</div>
+            <div class="text-slate-500">总部 FT 18 + 加盟商自营</div>
+            <div class="text-[10px] text-white mt-1">总部人头随店数线性 ↘</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 3. AI Agent 矩阵 ========== -->
+    <section id="agents" class="module">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold mb-1">AI Agent 矩阵 <span class="grad-red-text">/ 14 个智能体</span></h1>
+        <p class="text-sm text-slate-500">每个业务条线配 1 个专属 Agent · 2 个 Master Agent 做总协调与风险闸门</p>
+      </div>
+
+      <!-- Master Agents -->
+      <div class="text-sm font-semibold mb-2"><span class="grad-red-text">Master 层</span> · 总指挥 / 总闸门</div>
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="agent-card">
+          <div class="flex items-start justify-between mb-2">
+            <div class="font-semibold">🎯 协调调度 Agent（Orchestrator）</div>
+            <span class="pill pill-info">Master</span>
+          </div>
+          <div class="text-[12px] text-slate-500 mb-2">所有跨部门任务的总入口 · 拆解 → 派单 → 跟进 → 汇总</div>
+          <div class="text-[11px]"><b class="text-[#FF6B35]">触发：</b>杨总指令 · 重大事件 · 跨多个 Agent 任务<br><b class="text-[#FF6B35]">输出：</b>任务编排 + 各 Agent 调度计划 + 进度回报</div>
+        </div>
+        <div class="agent-card">
+          <div class="flex items-start justify-between mb-2">
+            <div class="font-semibold">⚠️ 风险预警 Agent（Risk Sentinel）</div>
+            <span class="pill pill-bad">Master</span>
+          </div>
+          <div class="text-[12px] text-slate-500 mb-2">7×24 巡查 · 财务/进度/合规/市场 4 维度风险 · 触发联动响应</div>
+          <div class="text-[11px]"><b class="text-[#FF6B35]">规则：</b>30+ 条预设红线 + LLM 异常发现<br><b class="text-[#FF6B35]">动作：</b>红/黄/绿分级告警 · 自动调用相关 Agent 处置</div>
+        </div>
+      </div>
+
+      <!-- 业务 Agents -->
+      <div class="text-sm font-semibold mb-2"><span class="grad-red-text">业务层</span> · 12 个专业 Agent</div>
+      <div class="grid grid-cols-3 gap-3">
+        <div class="agent-card">
+          <div class="font-semibold mb-1">📊 市场情报 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：市场调研部 · CMO</div>
+          <div class="text-[11px]"><b>输入：</b>本地新闻/Yelp/Google 评论/外卖榜/政府数据 API<br><b>输出：</b>周报 · 商圈打分 · 竞品价格表 · 消费趋势</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">💰 财务监控 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：财务规划部 · CFO</div>
+          <div class="text-[11px]"><b>输入：</b>POS · ERP · 银行流水 · 发票 · 工资单<br><b>输出：</b>日费用核算 · 预算偏差 · 现金流预测 · 汇率提示</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">📍 选址 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：选址装修部</div>
+          <div class="text-[11px]"><b>输入：</b>人口/收入/竞品/客流/租金/物业数据库<br><b>输出：</b>商圈热力图 · 候选铺位打分 · ROI 测算</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">🔨 装修管理 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：项目经理</div>
+          <div class="text-[11px]"><b>输入：</b>施工日报照片 · 物料发票 · 工期甘特图<br><b>输出：</b>进度自动核对 · 超支预警 · 验收清单</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">📦 供应链 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：采购经理</div>
+          <div class="text-[11px]"><b>输入：</b>门店销售 · 库存 · 供应商目录 · 价格<br><b>输出：</b>需求预测 · 自动补货单 · 替代供应商建议</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">🚢 海运 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：物流</div>
+          <div class="text-[11px]"><b>输入：</b>船公司 API · 港口数据 · 海关申报<br><b>输出：</b>船期预警 · 清关进度 · 异常处理流程</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">🍳 中厨调度 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：中央厨房</div>
+          <div class="text-[11px]"><b>输入：</b>门店预测销量 · 设备 IoT · 人员排班<br><b>输出：</b>每日生产排程 · 设备故障预警 · 配送路线</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">🏪 门店运营 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：店长</div>
+          <div class="text-[11px]"><b>输入：</b>POS · 监控视频客流 · 排班 · 库存<br><b>输出：</b>智能排班 · 备货量 · 桌台周转分析</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">🛵 外卖 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：外卖经理</div>
+          <div class="text-[11px]"><b>输入：</b>各平台后台 · 抽佣明细 · 评分<br><b>输出：</b>菜单/价格 A/B · 满减策略 · 抽佣异常监控</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">😊 客户洞察 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：CMO · 店长</div>
+          <div class="text-[11px]"><b>输入：</b>Google/Yelp 评论 · 小红书 · 投诉 · 会员<br><b>输出：</b>情感分析 · 高频差评归因 · NPS 趋势</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">🧑‍💼 招聘 / HR Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：HR</div>
+          <div class="text-[11px]"><b>输入：</b>简历库 · LinkedIn · Indeed · 培训资料<br><b>输出：</b>简历评分 · 面试题 · 培训课件 · 离职预测</div>
+        </div>
+        <div class="agent-card">
+          <div class="font-semibold mb-1">⚖️ 法务合规 Agent</div>
+          <div class="text-[11px] text-slate-500 mb-2">服务：法务</div>
+          <div class="text-[11px]"><b>输入：</b>合同 · 法规库 · 许可证清单<br><b>输出：</b>合同风险点 · 合规缺口提醒 · 续期日历</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 3.5 部门工作台 ========== -->
+    <section id="workbench" class="module">
+      <div class="mb-4">
+        <h1 class="text-2xl font-bold mb-1">部门工作台 <span class="grad-red-text">/ Dept. Workbench</span></h1>
+        <p class="text-sm text-slate-500">每个职能一个工作界面 · AI 助手就在右侧 · 9 个部门点击切换</p>
+      </div>
+
+      <div class="dept-tabs">
+        <button class="dept-tab active" data-dept="market">📊 市场调研</button>
+        <button class="dept-tab" data-dept="finance">💰 财务规划</button>
+        <button class="dept-tab" data-dept="site">📍 选址装修</button>
+        <button class="dept-tab" data-dept="supply">📦 供应链/海运</button>
+        <button class="dept-tab" data-dept="kitchen">🍳 中央厨房</button>
+        <button class="dept-tab" data-dept="store">🏪 门店运营</button>
+        <button class="dept-tab" data-dept="delivery">🛵 外卖业务</button>
+        <button class="dept-tab" data-dept="hr">🧑‍💼 人力资源</button>
+        <button class="dept-tab" data-dept="legal">⚖️ 法务合规</button>
+      </div>
+
+      <!-- 市场调研 -->
+      <div class="dept-mockup active" data-dept="market">
+        <div class="mockup-frame">
+          <div class="mockup-bar"><div class="font-semibold">📊 市场调研工作台</div><div class="text-slate-500">AI 助手：市场情报 Agent · 国内远程调研员 · 本地 PT 走访</div></div>
+          <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本周市场报告</div><div class="kpi-num">2 <span class="text-xs text-slate-500">份</span></div><div class="text-[11px] text-slate-500">多伦多 + 越南</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">竞品监控</div><div class="kpi-num">14 <span class="text-xs text-slate-500">家</span></div><div class="text-[11px] text-slate-500">价格变动 3 起</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">商圈打分</div><div class="kpi-num">8 <span class="text-xs text-slate-500">候选</span></div><div class="text-[11px] text-slate-500">2 号店选址中</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">社媒声量</div><div class="kpi-num text-emerald-600">+18%</div><div class="text-[11px] text-slate-500">小红书 / TikTok</div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 p-4">
+            <div class="col-span-2">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">📋 今日任务</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> 完成 Mr. Goose 周三新菜单价格采集 <span class="text-slate-400">(AI 自动抓)</span></span><span class="pill pill-ai">AI 进行中</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> Markham 商圈周末客流采样 <span class="text-slate-400">(PT 调研员)</span></span><span class="pill pill-warn">明天截止</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> 越南春卷三家品牌口味试吃报告</span><span class="pill pill-ok">已完成</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>4.</b> 双周市场扫描报告 v23 撰写</span><span class="pill pill-ai">AI 撰写</span></div>
+              </div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📌 最近发现</div>
+              <ul class="text-[12px] space-y-1 list-disc list-inside text-slate-600">
+                <li>Mandy's 新推「川式沙拉碗」试销 - 客单价 CA$ 18</li>
+                <li>多伦多冬季川菜外卖 +24% YoY（Uber 数据）</li>
+                <li>列治文山新华人小区 5 月入住 - 1.2 km 内无川菜</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
+              <div class="card-2 p-3 mb-2">
+                <div class="text-[11.5px] mb-2">💡 <b>AI 推荐：</b>本周关注列治文山，新华人小区入住 + 1.2km 无川菜，可以做选址候补点。</div>
+                <button class="ai-btn-mini ai-btn-on-light">展开分析 →</button>
+              </div>
+              <div class="card-2 p-3">
+                <div class="text-[11.5px] mb-2">⚠️ <b>预警：</b>Foody Mart 上架同类川菜半成品，价格比锅圈低 12%。</div>
+                <button class="ai-btn-mini ai-btn-on-light">查看应对方案</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 财务规划 -->
+      <div class="dept-mockup" data-dept="finance">
+        <div class="mockup-frame">
+          <div class="mockup-bar"><div class="font-semibold">💰 财务规划工作台</div><div class="text-slate-500">AI 助手：财务监控 Agent · Fractional CFO（PT）· 国内远程会计</div></div>
+          <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本月花费</div><div class="kpi-num">487K <span class="text-xs text-slate-500">/ 510K</span></div><div class="text-[11px] text-emerald-600">✓ 低于预算 4.5%</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">现金流安全垫</div><div class="kpi-num text-emerald-600">4.2 <span class="text-xs text-slate-500">月</span></div><div class="text-[11px] text-slate-500">vs 红线 3 月</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">综合毛利率</div><div class="kpi-num text-amber-600">31.2%</div><div class="text-[11px] text-amber-600">⚠ vs 上月 -1.8pp</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">汇率敞口</div><div class="kpi-num">CNY 2.1M</div><div class="text-[11px] text-slate-500">已对冲 65%</div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 p-4">
+            <div class="col-span-2">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">📋 今日财务任务</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> 1 号店 5 月 P&L 自动归集（AI）</span><span class="pill pill-ai">AI 完成 92%</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> 装修发票审核 8 张（金额 CA$ 47K）</span><span class="pill pill-warn">待 CFO 批</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> 2 号店投资追加申请 CA$ 50K</span><span class="pill pill-bad">需杨总批</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>4.</b> 月度税务申报 GST/HST</span><span class="pill pill-ok">已外包给 KPMG</span></div>
+              </div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📊 异常花费 Top 3</div>
+              <ul class="text-[12px] space-y-1 list-disc list-inside text-slate-600">
+                <li>2 号店装修材料超 18%（AI 已找替代供应商节省 4.2%）</li>
+                <li>外卖平台抽佣 +3pp（毛利红线告警，方案已生成）</li>
+                <li>Sysco 牛肉报价 +6%（切 GFS 可省 4.2%，AI 已下试单）</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
+              <div class="card-2 p-3 mb-2">
+                <div class="text-[11.5px] mb-2">💡 现金流推演：当前节奏下 M9 现金流最低点 = CA$ 580K，仍有 4.1 月安全垫。</div>
+              </div>
+              <div class="card-2 p-3">
+                <div class="text-[11.5px] mb-2">⚠️ 紧急：1 号店毛利掉至 18%，3 套救援方案已就绪。</div>
+                <button class="ai-btn-mini ai-btn-on-light">查看方案</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 选址装修 -->
+      <div class="dept-mockup" data-dept="site">
+        <div class="mockup-frame">
+          <div class="mockup-bar"><div class="font-semibold">📍 选址装修工作台</div><div class="text-slate-500">AI 助手：选址 + 装修 Agent · PT 商业经纪 · 装修外包总包</div></div>
+          <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">候选铺位</div><div class="kpi-num">8</div><div class="text-[11px] text-slate-500">3 号店选址中</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">2 号店装修</div><div class="kpi-num text-amber-600">74%</div><div class="text-[11px] text-amber-600">⚠ 延期 7 天</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">中厨筹建</div><div class="kpi-num">25%</div><div class="text-[11px] text-slate-500">设计中 · 按计划</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">已花/预算</div><div class="kpi-num">CA$ 287K</div><div class="text-[11px] text-emerald-600">vs 320K ✓</div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 p-4">
+            <div class="col-span-2">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">📋 今日任务</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> 2 号店厨房排烟系统验收</span><span class="pill pill-warn">今天</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> Etobicoke 商圈 3 个铺位实地看</span><span class="pill pill-info">PT 经纪</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> 中厨设计图 v3 评审</span><span class="pill pill-ai">AI 已审</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>4.</b> 卫生检查申请提交</span><span class="pill pill-ok">已提交</span></div>
+              </div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">🏗️ 候选铺位 ROI 排名（AI 打分）</div>
+              <table class="w-full text-[12px]">
+                <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider"><tr><th class="text-left py-1">商圈</th><th class="text-right">面积</th><th class="text-right">月租</th><th class="text-right">客流</th><th class="text-right">AI 评分</th></tr></thead>
+                <tbody class="text-slate-700">
+                  <tr><td>Richmond Hill 主街</td><td class="text-right">2,200 sqft</td><td class="text-right">$12.5K</td><td class="text-right">高</td><td class="text-right text-emerald-600 font-bold">92</td></tr>
+                  <tr><td>Etobicoke Plaza</td><td class="text-right">1,800 sqft</td><td class="text-right">$9.8K</td><td class="text-right">中</td><td class="text-right text-emerald-600">85</td></tr>
+                  <tr><td>Vaughan Mills 旁</td><td class="text-right">2,000 sqft</td><td class="text-right">$11K</td><td class="text-right">中高</td><td class="text-right">79</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
+              <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">💡 2 号店延期 7 天：根因 = 市政电力升级，已推迟开业到 6/15。损失估 CA$ 18K。</div></div>
+              <div class="card-2 p-3"><div class="text-[11.5px]">📌 推荐：3 号店选 Richmond Hill 主街（评分 92）· 谈判免租期 3 月可期。</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 供应链 -->
+      <div class="dept-mockup" data-dept="supply">
+        <div class="mockup-frame">
+          <div class="mockup-bar"><div class="font-semibold">📦 供应链 / 海运工作台</div><div class="text-slate-500">AI 助手：供应链 + 海运 Agent · 国内总部采购 · 货代外包</div></div>
+          <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">在途集装箱</div><div class="kpi-num">3 <span class="text-xs text-slate-500">柜</span></div><div class="text-[11px] text-slate-500">2 上海→温哥华</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本地库存（天）</div><div class="kpi-num text-emerald-600">23</div><div class="text-[11px] text-slate-500">料包 + 干货</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本月采购单</div><div class="kpi-num">42</div><div class="text-[11px] text-slate-500">AI 自动 38</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">异常事件</div><div class="kpi-num text-amber-600">1 <span class="text-xs text-slate-500">⚠</span></div><div class="text-[11px] text-amber-600">温哥华港延期</div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 p-4">
+            <div class="col-span-2">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🚢 在途集装箱</div>
+              <table class="w-full text-[12px]">
+                <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider"><tr><th class="text-left py-1">柜号</th><th class="text-left">起→到</th><th class="text-right">货值</th><th class="text-right">ETA</th><th class="text-right">状态</th></tr></thead>
+                <tbody class="text-slate-700">
+                  <tr><td class="font-mono">GQT-204</td><td>上海 → 温哥华</td><td class="text-right">CA$ 86K</td><td class="text-right">5/12</td><td class="text-right"><span class="pill pill-warn">+5 天 ⚠</span></td></tr>
+                  <tr><td class="font-mono">GQT-205</td><td>上海 → 温哥华</td><td class="text-right">CA$ 92K</td><td class="text-right">5/22</td><td class="text-right"><span class="pill pill-ok">在途</span></td></tr>
+                  <tr><td class="font-mono">GQT-206</td><td>上海 → 多伦多</td><td class="text-right">CA$ 78K</td><td class="text-right">6/03</td><td class="text-right"><span class="pill pill-info">起航</span></td></tr>
+                </tbody>
+              </table>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📋 任务 / 异常</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> GQT-204 港口延期 - AI 已联系 GFS 备份供应</span><span class="pill pill-ai">AI 处理</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> 6 月料包预测 - 备货建议</span><span class="pill pill-ai">AI 算 = 1.4×</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> Sysco 价格谈判（第 2 轮）</span><span class="pill pill-warn">需 COO</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
+              <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">⚠️ GQT-204 延期 5 天，本地库存可撑 9 天 - 不会断货，无需介入。</div></div>
+              <div class="card-2 p-3"><div class="text-[11.5px]">💡 推荐：双供应商策略已激活 GFS 备份。下次主动列入常备路径。</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中央厨房 -->
+      <div class="dept-mockup" data-dept="kitchen">
+        <div class="mockup-frame">
+          <div class="mockup-bar"><div class="font-semibold">🍳 中央厨房工作台</div><div class="text-slate-500">AI 助手：中厨调度 Agent · 5 台机器人 · FT 总厨 + 1-2 副厨 + PT</div></div>
+          <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">今日产能</div><div class="kpi-num">2,840 <span class="text-xs text-slate-500">份</span></div><div class="text-[11px] text-slate-500">vs 计划 2,500</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">机器人在线</div><div class="kpi-num text-emerald-600">4 / 5</div><div class="text-[11px] text-amber-600">T03 维修中</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">SKU 偏差率</div><div class="kpi-num text-emerald-600">1.8%</div><div class="text-[11px] text-slate-500">vs 红线 3%</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">单份成本</div><div class="kpi-num">$2.18</div><div class="text-[11px] text-emerald-600">vs 全人工 $5.40</div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 p-4">
+            <div class="col-span-2">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 机器人 + 厨师 排程（AI 调度）</div>
+              <table class="w-full text-[12px]">
+                <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider"><tr><th class="text-left py-1">时段</th><th class="text-left">SKU</th><th class="text-right">机器人</th><th class="text-right">数量</th><th class="text-right">送达</th></tr></thead>
+                <tbody class="text-slate-700">
+                  <tr><td>06:00</td><td>麻婆豆腐</td><td class="text-right">T04+T05</td><td class="text-right">320</td><td class="text-right">1+2 号店</td></tr>
+                  <tr><td>10:00</td><td>水煮牛肉</td><td class="text-right">T04</td><td class="text-right">180</td><td class="text-right">1 号店午市</td></tr>
+                  <tr><td>14:00</td><td>鱼香肉丝</td><td class="text-right">T05+T06</td><td class="text-right">450</td><td class="text-right">外卖 + 堂食</td></tr>
+                  <tr><td>16:30</td><td>回锅肉</td><td class="text-right">T06</td><td class="text-right">280</td><td class="text-right">1 号店晚市</td></tr>
+                </tbody>
+              </table>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📋 今日任务</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> T03 维修工单跟进（油温传感器）</span><span class="pill pill-warn">外包来 14:30</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> 新菜「夫妻肺片」试制 - 总厨负责</span><span class="pill pill-info">研发</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> 周品控抽检 50 份（5 SKU × 10）</span><span class="pill pill-ok">已完成</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
+              <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">💡 1 号店午市单暴增 25 单，已临时调度 T05 加炒 50 份。</div></div>
+              <div class="card-2 p-3"><div class="text-[11.5px]">📊 本周高利润 SKU：水煮牛肉（毛利 42%）。建议外卖菜单顶置。</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 门店运营 -->
+      <div class="dept-mockup" data-dept="store">
+        <div class="mockup-frame">
+          <div class="mockup-bar"><div class="font-semibold">🏪 门店运营工作台 · 1 号店（Markham）</div><div class="text-slate-500">AI 助手：门店 + 客户 Agent · FT 店长 + PT 服务/厨师 8-10</div></div>
+          <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">今日 GMV</div><div class="kpi-num">CA$ 12.4K</div><div class="text-[11px] text-emerald-600">+8% vs 昨日</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">堂食 / 外卖</div><div class="kpi-num">62 / 38</div><div class="text-[11px] text-slate-500">单数 187</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">桌台周转</div><div class="kpi-num">4.2</div><div class="text-[11px] text-slate-500">vs 行业 3.5</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">Google 评分</div><div class="kpi-num text-emerald-600">4.7</div><div class="text-[11px] text-emerald-600">+0.1 本周</div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 p-4">
+            <div class="col-span-2">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">📋 店长今日</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span><b>10:00</b> · AI 排班今日已生成（17 人时）</span><span class="pill pill-ai">AI 完成</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>11:30</b> · 备货确认（中厨送 320 份麻婆 + 280 份回锅）</span><span class="pill pill-ok">已到</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>14:00</b> · 周差评回复 5 条（AI 草拟，店长审）</span><span class="pill pill-warn">待审</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>17:00</b> · 周三新菜上架试销「夫妻肺片」</span><span class="pill pill-info">即将</span></div>
+              </div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">💬 客户洞察 - 本周差评归因（AI 分析）</div>
+              <ul class="text-[12px] space-y-1 list-disc list-inside text-slate-600">
+                <li>「等位太久」3 条 - AI 建议：高峰期开第 3 号桌台分流</li>
+                <li>「外卖凉了」2 条 - AI 建议：外卖打包温度袋 + 配送时间预警</li>
+                <li>「停车难」1 条 - 通知合作 lot 同时段折扣</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
+              <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">⚠️ 周毛利 18% 红线 - 3 套救援方案已上桌（外卖调价 + 切牛肉供应商）</div></div>
+              <div class="card-2 p-3"><div class="text-[11.5px]">💡 周末天气晴朗，预计客流 +25%，已提前调班 2 个 PT。</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 外卖业务 -->
+      <div class="dept-mockup" data-dept="delivery">
+        <div class="mockup-frame">
+          <div class="mockup-bar"><div class="font-semibold">🛵 外卖业务工作台</div><div class="text-slate-500">AI 助手：外卖 Agent · 前期外包代运营 → 跑通后 AI 接管</div></div>
+          <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">3 平台 GMV</div><div class="kpi-num">CA$ 4.7K</div><div class="text-[11px] text-slate-500">Uber 52% Skip 28% DD 20%</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">综合抽佣</div><div class="kpi-num text-amber-600">26.5%</div><div class="text-[11px] text-amber-600">⚠ Uber +3pp</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">客单价</div><div class="kpi-num">CA$ 28.5</div><div class="text-[11px] text-emerald-600">+CA$ 2 vs 上月</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">差评率</div><div class="kpi-num">2.1%</div><div class="text-[11px] text-slate-500">vs 红线 5%</div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 p-4">
+            <div class="col-span-2">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🍔 菜单 A/B 测试结果（本周）</div>
+              <table class="w-full text-[12px]">
+                <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider"><tr><th class="text-left py-1">SKU</th><th class="text-right">A 版价</th><th class="text-right">B 版价</th><th class="text-right">销量差</th><th class="text-right">毛利差</th></tr></thead>
+                <tbody class="text-slate-700">
+                  <tr><td>水煮牛肉套餐</td><td class="text-right">$22.99</td><td class="text-right">$24.99</td><td class="text-right">-4%</td><td class="text-right text-emerald-600">+12% ✓</td></tr>
+                  <tr><td>麻婆豆腐双拼</td><td class="text-right">$18.99</td><td class="text-right">$19.99</td><td class="text-right">-1%</td><td class="text-right text-emerald-600">+8% ✓</td></tr>
+                  <tr><td>夫妻肺片</td><td class="text-right">$12.99</td><td class="text-right">$13.99</td><td class="text-right">-9%</td><td class="text-right text-amber-600">+3%</td></tr>
+                </tbody>
+              </table>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📋 今日动作</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> Uber 抽佣 +3pp 应对：A/B 通过 → 全菜单 +4%</span><span class="pill pill-ai">AI 已上线</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> 满减改 $30→$35</span><span class="pill pill-ai">AI 已上线</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> Skip 周末活动报名（CA$ 5K 推广）</span><span class="pill pill-warn">待 CMO</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
+              <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">💡 三平台抽佣对比：DD 25.5%，Skip 24.5%，Uber 28%。可考虑加大 Skip 投入。</div></div>
+              <div class="card-2 p-3"><div class="text-[11.5px]">⚡ 外卖凉车评分 -0.2 - 建议加保温袋 + 配送时间提示。</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HR -->
+      <div class="dept-mockup" data-dept="hr">
+        <div class="mockup-frame">
+          <div class="mockup-bar"><div class="font-semibold">🧑‍💼 人力资源工作台</div><div class="text-slate-500">AI 助手：招聘 + HR Agent · 国内远程 HR + 本地猎头外包 + 移民律师 PT</div></div>
+          <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">在招职位</div><div class="kpi-num">5</div><div class="text-[11px] text-slate-500">2 号店厨师 3 / 服务 2</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本周简历</div><div class="kpi-num">82</div><div class="text-[11px] text-slate-500">AI 筛选过 12</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">已发 Offer</div><div class="kpi-num text-emerald-600">3</div><div class="text-[11px] text-slate-500">2 接受 1 待回</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">工签到期</div><div class="kpi-num text-amber-600">2 ⚠</div><div class="text-[11px] text-slate-500">90 天内续</div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 p-4">
+            <div class="col-span-2">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">👥 在招漏斗（AI 筛选）</div>
+              <table class="w-full text-[12px]">
+                <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider"><tr><th class="text-left py-1">职位</th><th class="text-right">投递</th><th class="text-right">AI 通过</th><th class="text-right">面试</th><th class="text-right">Offer</th></tr></thead>
+                <tbody class="text-slate-700">
+                  <tr><td>2 号店厨师 × 3</td><td class="text-right">38</td><td class="text-right">7</td><td class="text-right">5</td><td class="text-right text-emerald-600">3 ✓</td></tr>
+                  <tr><td>2 号店服务 × 2</td><td class="text-right">26</td><td class="text-right">4</td><td class="text-right">2</td><td class="text-right text-amber-600">0 → 招</td></tr>
+                  <tr><td>中厨技师</td><td class="text-right">18</td><td class="text-right">1</td><td class="text-right">1</td><td class="text-right">谈中</td></tr>
+                </tbody>
+              </table>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📋 今日</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> 2 号店 PT 服务面试 × 3（AI 题库已生成）</span><span class="pill pill-info">下午</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> 厨师培训课件 v2 - 双语</span><span class="pill pill-ai">AI 撰写中</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> 王厨工签续期 - 律师对接</span><span class="pill pill-warn">PT 律师</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
+              <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">💡 服务岗位 0 录用 - AI 建议放宽语言要求 + 加 $1/h，预计 7 天可到岗。</div></div>
+              <div class="card-2 p-3"><div class="text-[11.5px]">📚 培训：AI 已生成川菜 SOP 视频脚本 12 段，国内拍摄 3 天可交付。</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 法务 -->
+      <div class="dept-mockup" data-dept="legal">
+        <div class="mockup-frame">
+          <div class="mockup-bar"><div class="font-semibold">⚖️ 法务合规工作台</div><div class="text-slate-500">AI 助手：法务 Agent · 本地律所 PT retainer · 国内合规专员远程</div></div>
+          <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">在管合同</div><div class="kpi-num">23</div><div class="text-[11px] text-slate-500">租约 + 供应商 + 雇佣</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">近 30 天到期</div><div class="kpi-num text-amber-600">3 ⚠</div><div class="text-[11px] text-slate-500">1 号店保险等</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">合规清单</div><div class="kpi-num text-emerald-600">28/30</div><div class="text-[11px] text-slate-500">2 项进行中</div></div>
+            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">许可证状态</div><div class="kpi-num text-emerald-600">全绿</div><div class="text-[11px] text-slate-500">1 号店 / 中厨在批</div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 p-4">
+            <div class="col-span-2">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">📅 续期 / 申请日历</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span>5/18 · 1 号店保险续期</span><span class="pill pill-warn">12 天后</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span>5/22 · 食品搬运证 4 人续期</span><span class="pill pill-warn">16 天后</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span>6/01 · 2 号店卫生检查申请</span><span class="pill pill-info">已提交</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span>6/15 · 中厨 CFIA 注册批文</span><span class="pill pill-info">审批中</span></div>
+              </div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📋 今日</div>
+              <div class="space-y-2 text-[12.5px]">
+                <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> 2 号店租约修订（AI 已扫描风险条款 3 处）</span><span class="pill pill-ai">AI 完成</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> Sysco 新合同条款审核</span><span class="pill pill-warn">PT 律师</span></div>
+                <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> 商标 「锅圈小炒」加拿大注册跟进</span><span class="pill pill-info">国内远程</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
+              <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">⚠️ 2 号店租约第 14.3 条「营业时间限制」可能影响晚间外卖，建议谈判修改。</div></div>
+              <div class="card-2 p-3"><div class="text-[11.5px]">📌 PIPEDA 合规：会员个人数据存储已加密 ✓ 跨境传输需签 DPA。</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 4. 端到端流程 ========== -->
+    <section id="flow" class="module">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold mb-1">端到端流程 <span class="grad-red-text">/ 出海全链路</span></h1>
+        <p class="text-sm text-slate-500">从市场调研到日常运营 · 7 个阶段 · 每步都有 AI 介入</p>
+      </div>
+
+      <div class="grid grid-cols-7 gap-2 mb-6">
+        <div class="flow-step text-center"><div class="text-[11px] text-[#FF6B35] font-bold">PHASE 1</div><div class="text-[12.5px] font-semibold">市场调研</div><div class="text-[10px] text-slate-500 mt-1">2-3 月</div></div>
+        <div class="flow-step text-center"><div class="text-[11px] text-[#FF6B35] font-bold">PHASE 2</div><div class="text-[12.5px] font-semibold">财务规划</div><div class="text-[10px] text-slate-500 mt-1">1 月</div></div>
+        <div class="flow-step text-center"><div class="text-[11px] text-[#FF6B35] font-bold">PHASE 3</div><div class="text-[12.5px] font-semibold">选址</div><div class="text-[10px] text-slate-500 mt-1">1-2 月</div></div>
+        <div class="flow-step active text-center"><div class="text-[11px] text-[#FF6B35] font-bold">PHASE 4</div><div class="text-[12.5px] font-semibold">装修筹建</div><div class="text-[10px] text-slate-500 mt-1">3-4 月</div></div>
+        <div class="flow-step text-center"><div class="text-[11px] text-[#FF6B35] font-bold">PHASE 5</div><div class="text-[12.5px] font-semibold">供应链建立</div><div class="text-[10px] text-slate-500 mt-1">同步</div></div>
+        <div class="flow-step text-center"><div class="text-[11px] text-[#FF6B35] font-bold">PHASE 6</div><div class="text-[12.5px] font-semibold">开业筹备</div><div class="text-[10px] text-slate-500 mt-1">1 月</div></div>
+        <div class="flow-step text-center"><div class="text-[11px] text-[#FF6B35] font-bold">PHASE 7</div><div class="text-[12.5px] font-semibold">日常运营</div><div class="text-[10px] text-slate-500 mt-1">持续</div></div>
+      </div>
+
+      <!-- 各阶段详情 -->
+      <div class="space-y-3">
+        <details class="card p-4" open>
+          <summary class="flex items-center justify-between">
+            <div><span class="text-[#FF6B35] font-bold">P1 ·</span> <span class="font-semibold">市场调研</span> <span class="text-[11px] text-slate-500 ml-2">输入：城市候选清单 → 输出：进入决策报告</span></div>
+            <span class="pill pill-ai">市场情报 Agent</span>
+          </summary>
+          <div class="grid grid-cols-2 gap-4 mt-3 text-[12.5px]">
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">AI 自动做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>每周抓取本地新闻、餐饮榜单、外卖排行</li>
+                <li>同类竞品（Mandy's、Mr. Goose、Fou-Tou-Lou）价格 / 菜单监控</li>
+                <li>政府开放数据：人口、收入、消费支出</li>
+                <li>社交媒体（小红书、TikTok、Reddit）声量分析</li>
+                <li>自动产出双周市场扫描报告</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">人做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>实地走访 5-8 个商圈、试吃竞品</li>
+                <li>访谈本地华人 / 主流人群 30+</li>
+                <li>与本地餐饮顾问、地产中介、移民律师对接</li>
+                <li>判断文化匹配度、做最终市场决策</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details class="card p-4">
+          <summary class="flex items-center justify-between">
+            <div><span class="text-[#FF6B35] font-bold">P2 ·</span> <span class="font-semibold">财务规划</span> <span class="text-[11px] text-slate-500 ml-2">输出：3 年现金流模型 + 单店盈亏平衡测算</span></div>
+            <span class="pill pill-ai">财务监控 Agent</span>
+          </summary>
+          <div class="grid grid-cols-2 gap-4 mt-3 text-[12.5px]">
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">AI 自动做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>基于市场报告生成投资测算模型</li>
+                <li>3 套场景（保守/基准/进取）现金流预测</li>
+                <li>汇率波动敏感性分析</li>
+                <li>对照同行业海外案例做基准比对</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">人做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>融资决策（自有 vs JV vs 加盟）</li>
+                <li>税务架构（公司主体/SR&ED/转移定价）</li>
+                <li>境内外资金通道、银行账户</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details class="card p-4">
+          <summary class="flex items-center justify-between">
+            <div><span class="text-[#FF6B35] font-bold">P3 ·</span> <span class="font-semibold">选址</span> <span class="text-[11px] text-slate-500 ml-2">输出：3 个候选铺位 + ROI 排名</span></div>
+            <span class="pill pill-ai">选址 Agent</span>
+          </summary>
+          <div class="grid grid-cols-2 gap-4 mt-3 text-[12.5px]">
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">AI 自动做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>多伦多 6 大商圈热力图（人口/收入/华人浓度/竞品密度）</li>
+                <li>candidate 铺位打分模型（10+ 因子）</li>
+                <li>租金回收期 / 客流模型 / 同区域历史餐饮成功率</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">人做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>带选址顾问实地看 8-12 个铺位</li>
+                <li>谈租约（免租期、TI 装修补贴、续约条件）</li>
+                <li>与物业法律团队过合同条款</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details class="card p-4">
+          <summary class="flex items-center justify-between">
+            <div><span class="text-[#FF6B35] font-bold">P4 ·</span> <span class="font-semibold">装修筹建</span> <span class="text-[11px] text-slate-500 ml-2">输出：可营业门店 + 设备调试完成</span></div>
+            <span class="pill pill-ai">装修管理 + 法务 Agent</span>
+          </summary>
+          <div class="grid grid-cols-2 gap-4 mt-3 text-[12.5px]">
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">AI 自动做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>每日施工日报照片识别 → 进度核对</li>
+                <li>物料发票自动归档 + 与预算对账</li>
+                <li>许可证 / 检查节点倒计时</li>
+                <li>VFD/排烟/水电规范自动核查</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">人做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>设计方案最终拍板</li>
+                <li>施工方协调、变更签证</li>
+                <li>市政 / 卫生 / 消防部门关系</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details class="card p-4">
+          <summary class="flex items-center justify-between">
+            <div><span class="text-[#FF6B35] font-bold">P5 ·</span> <span class="font-semibold">供应链建立</span> <span class="text-[11px] text-slate-500 ml-2">输出：稳定的料包/食材双供应链</span></div>
+            <span class="pill pill-ai">供应链 + 海运 Agent</span>
+          </summary>
+          <div class="grid grid-cols-2 gap-4 mt-3 text-[12.5px]">
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">AI 自动做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>国内料包 → 多伦多海运排程跟踪</li>
+                <li>本地食材供应商比价（Sysco / GFS / 华人供应商）</li>
+                <li>关税 / FDA / CFIA 申报自动核对</li>
+                <li>双供应商策略：核心料包国内 + 本地替代</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">人做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>与国内总部料包工厂签长约</li>
+                <li>本地供应商谈判、试样、品质测试</li>
+                <li>建立中央厨房本地分装能力</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details class="card p-4">
+          <summary class="flex items-center justify-between">
+            <div><span class="text-[#FF6B35] font-bold">P6 ·</span> <span class="font-semibold">开业筹备</span> <span class="text-[11px] text-slate-500 ml-2">输出：完成软开业 + 团队就位</span></div>
+            <span class="pill pill-ai">招聘 + 外卖 Agent</span>
+          </summary>
+          <div class="grid grid-cols-2 gap-4 mt-3 text-[12.5px]">
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">AI 自动做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>员工招聘漏斗管理（Indeed/LinkedIn）</li>
+                <li>培训课件、SOP 视频自动生成（中英双语）</li>
+                <li>外卖平台开店资料、菜单本地化</li>
+                <li>开业营销活动（小红书 / IG / 本地华人群）排期</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">人做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>面试关键岗位（店长、总厨）</li>
+                <li>跑工签 / LMIA 流程</li>
+                <li>软开业试运营 + 实地调试</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details class="card p-4">
+          <summary class="flex items-center justify-between">
+            <div><span class="text-[#FF6B35] font-bold">P7 ·</span> <span class="font-semibold">日常运营</span> <span class="text-[11px] text-slate-500 ml-2">持续 · 运营即数据 · AI 闭环优化</span></div>
+            <span class="pill pill-ai">门店 + 客户 + 财务 Agent</span>
+          </summary>
+          <div class="grid grid-cols-2 gap-4 mt-3 text-[12.5px]">
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">AI 每日做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>智能排班（按客流预测）</li>
+                <li>每日成本归集 + 毛利计算</li>
+                <li>差评秒级监控 + 自动回复草稿</li>
+                <li>外卖平台动态定价、菜品上下架</li>
+                <li>风险 Agent 巡查 → 异常立即触发联动</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[#FF6B35] font-semibold mb-1.5">人做</div>
+              <ul class="space-y-1 text-slate-700 list-disc list-inside">
+                <li>店长每日 15 分钟看驾驶舱</li>
+                <li>城市经理每周决策会（看 AI 周报）</li>
+                <li>杨总每月战略复盘</li>
+                <li>新菜研发、社区活动、危机公关</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ========== 5. 技术架构 ========== -->
+    <section id="stack" class="module">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold mb-1">技术架构 <span class="grad-red-text">/ 4 层体系</span></h1>
+        <p class="text-sm text-slate-500">数据层 → 智能体层 → 决策层 → 展示层 · 每层可独立替换升级</p>
+      </div>
+
+      <!-- L4 展示层 -->
+      <div class="stack-layer" style="background:linear-gradient(90deg,rgba(229,57,53,.15),rgba(255,107,53,.05));border:1px solid rgba(255,107,53,.3);">
+        <div class="layer-name">L4 展</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2"><span class="text-sm font-bold text-[#FF6B35]">展示层 · Presentation</span><span class="text-[11px] text-slate-500">谁看 / 在哪看 / 看什么</span></div>
+          <div class="grid grid-cols-4 gap-2 text-[11.5px]">
+            <div class="card-2 p-2"><b>CEO 驾驶舱</b><div class="text-slate-500">Web · 杨总专属 · 一屏看全局</div></div>
+            <div class="card-2 p-2"><b>各部门工作台</b><div class="text-slate-500">Web · 财务/选址/供应链/HR…</div></div>
+            <div class="card-2 p-2"><b>店长 App</b><div class="text-slate-500">移动端 · 排班/库存/差评/成本</div></div>
+            <div class="card-2 p-2"><b>对话入口</b><div class="text-slate-500">企微/Teams/Slack 自然语言提问</div></div>
+          </div>
+          <div class="text-[10.5px] text-slate-500 mt-2"><b>选型：</b>Next.js + Tailwind + WebSocket 实时推送 · 移动端 React Native · BI: Metabase / Superset</div>
+        </div>
+      </div>
+
+      <!-- L3 决策层 -->
+      <div class="stack-layer" style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);">
+        <div class="layer-name" style="color:#c084fc;">L3 决</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2"><span class="text-sm font-bold" style="color:#c084fc;">决策层 · Decision Brain</span><span class="text-[11px] text-slate-500">大脑 · 推理 / 规划 / 工具调用</span></div>
+          <div class="grid grid-cols-4 gap-2 text-[11.5px]">
+            <div class="card-2 p-2"><b>大模型</b><div class="text-slate-500">Claude Sonnet 4.6（主） + Haiku（轻量任务） + GPT-4o（备份）</div></div>
+            <div class="card-2 p-2"><b>规则引擎</b><div class="text-slate-500">财务红线 / 合规清单 / SOP · 硬规则不交给 LLM</div></div>
+            <div class="card-2 p-2"><b>知识库 / RAG</b><div class="text-slate-500">海外法规、菜谱 SOP、历史决策 · pgvector / Pinecone</div></div>
+            <div class="card-2 p-2"><b>Agent 框架</b><div class="text-slate-500">Claude Agent SDK / LangGraph · MCP 工具协议</div></div>
+          </div>
+          <div class="text-[10.5px] text-slate-500 mt-2"><b>原则：</b>数值类必走规则引擎 · 创造类走 LLM · 关键决策必有人复核 · 所有决策可审计回放</div>
+        </div>
+      </div>
+
+      <!-- L2 智能体层 -->
+      <div class="stack-layer" style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.3);">
+        <div class="layer-name" style="color:#4ade80;">L2 智</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2"><span class="text-sm font-bold" style="color:#4ade80;">智能体层 · Agents</span><span class="text-[11px] text-slate-500">14 个 Agent + Master 编排</span></div>
+          <div class="grid grid-cols-7 gap-1.5 text-[10.5px]">
+            <div class="card-2 p-1.5 text-center">协调调度</div>
+            <div class="card-2 p-1.5 text-center">风险预警</div>
+            <div class="card-2 p-1.5 text-center">市场情报</div>
+            <div class="card-2 p-1.5 text-center">财务监控</div>
+            <div class="card-2 p-1.5 text-center">选址</div>
+            <div class="card-2 p-1.5 text-center">装修管理</div>
+            <div class="card-2 p-1.5 text-center">供应链</div>
+            <div class="card-2 p-1.5 text-center">海运</div>
+            <div class="card-2 p-1.5 text-center">中厨调度</div>
+            <div class="card-2 p-1.5 text-center">门店运营</div>
+            <div class="card-2 p-1.5 text-center">外卖</div>
+            <div class="card-2 p-1.5 text-center">客户洞察</div>
+            <div class="card-2 p-1.5 text-center">招聘 HR</div>
+            <div class="card-2 p-1.5 text-center">法务合规</div>
+          </div>
+          <div class="text-[10.5px] text-slate-500 mt-2"><b>规范：</b>每个 Agent 必须明确（输入数据源 / 输出动作 / 决策权限 / 升级路径 / 审计日志）</div>
+        </div>
+      </div>
+
+      <!-- L1 数据层 -->
+      <div class="stack-layer" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.3);">
+        <div class="layer-name" style="color:#60a5fa;">L1 数</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2"><span class="text-sm font-bold" style="color:#60a5fa;">数据层 · Data</span><span class="text-[11px] text-slate-500">所有数据汇入数据仓库 · Single Source of Truth</span></div>
+          <div class="grid grid-cols-6 gap-1.5 text-[10.5px]">
+            <div class="card-2 p-1.5"><b>POS / 收银</b><div class="text-slate-500">Toast / Square</div></div>
+            <div class="card-2 p-1.5"><b>外卖平台</b><div class="text-slate-500">Uber/DD/Skip API</div></div>
+            <div class="card-2 p-1.5"><b>ERP / 财务</b><div class="text-slate-500">QuickBooks / NetSuite</div></div>
+            <div class="card-2 p-1.5"><b>HR / 排班</b><div class="text-slate-500">7shifts / Deputy</div></div>
+            <div class="card-2 p-1.5"><b>供应链 / 库存</b><div class="text-slate-500">MarketMan / xtraCHEF</div></div>
+            <div class="card-2 p-1.5"><b>海运 / 物流</b><div class="text-slate-500">船公司 API · Flexport</div></div>
+            <div class="card-2 p-1.5"><b>IoT 设备</b><div class="text-slate-500">中厨设备温度/能耗</div></div>
+            <div class="card-2 p-1.5"><b>视频 / 客流</b><div class="text-slate-500">门店摄像头分析</div></div>
+            <div class="card-2 p-1.5"><b>评论 / 社媒</b><div class="text-slate-500">Yelp/Google/小红书</div></div>
+            <div class="card-2 p-1.5"><b>政府 / 公开</b><div class="text-slate-500">人口/收入/许可证</div></div>
+            <div class="card-2 p-1.5"><b>合同 / 文件</b><div class="text-slate-500">Box / SharePoint</div></div>
+            <div class="card-2 p-1.5"><b>沟通 / 协作</b><div class="text-slate-500">微信/邮件/会议纪要</div></div>
+          </div>
+          <div class="text-[10.5px] text-slate-500 mt-2"><b>选型：</b>数据湖 = S3 + Iceberg · 数据仓库 = BigQuery / Snowflake · 流处理 = Kafka · 同步 = Fivetran/Airbyte</div>
+        </div>
+      </div>
+
+      <!-- 跨层关键能力 -->
+      <div class="grid grid-cols-3 gap-3 mt-5">
+        <div class="card p-4">
+          <div class="text-sm font-semibold mb-1.5">🔒 安全与合规</div>
+          <div class="text-[12px] text-slate-500">PIPEDA / GDPR 合规 · 数据本地化（加拿大数据留加） · 行级权限 · 全量审计日志 · 关键操作双人复核</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-sm font-semibold mb-1.5">🌐 可观测性</div>
+          <div class="text-[12px] text-slate-500">OpenTelemetry 追踪每个 Agent 调用 · LLM 调用成本监控 · 错误率/延迟/Token 消耗 · 月度 AI 体系账单</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-sm font-semibold mb-1.5">♻️ 可复制性</div>
+          <div class="text-[12px] text-slate-500">体系参数化（市场/币种/法规/语言） · 多伦多样板 → 温哥华 / 越南 / 美西 一键克隆 · 知识库版本化</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 6. 风险监控 ========== -->
+    <section id="risk" class="module">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold mb-1">风险监控中心 <span class="grad-red-text">/ Risk Center</span></h1>
+        <p class="text-sm text-slate-500">4 维度 · 32 条预设红线 · AI 7×24 巡查 · 触发即响应</p>
+      </div>
+
+      <!-- 风险象限 -->
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2"><div class="font-semibold text-sm">💰 财务风险（成本/利润）</div><span class="pill pill-bad">2 红</span></div>
+          <ul class="text-[12px] space-y-1 text-slate-700">
+            <li>• 单店毛利 < 22% 触发红线 <span class="text-slate-500">→ 1 号店当前 18% ❌</span></li>
+            <li>• 月度花费偏离预算 ±10% <span class="text-slate-500">→ 当前 -4.5% ✓</span></li>
+            <li>• 现金流安全垫 < 3 个月 <span class="text-slate-500">→ 4.2 月 ✓</span></li>
+            <li>• 单一供应商占比 > 60% <span class="text-slate-500">→ 国内料包 72% ❌</span></li>
+            <li>• 应收账款逾期 > 60 天</li>
+          </ul>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2"><div class="font-semibold text-sm">🚧 进度风险（项目/装修）</div><span class="pill pill-warn">1 黄</span></div>
+          <ul class="text-[12px] space-y-1 text-slate-700">
+            <li>• 关键里程碑延期 > 5 天 <span class="text-slate-500">→ 2 号店延期 7 天 ⚠</span></li>
+            <li>• 装修花费超预算 > 8%</li>
+            <li>• 许可证续期窗口 < 30 天</li>
+            <li>• 关键岗位空缺 > 14 天</li>
+            <li>• 海运到港延期 > 3 天</li>
+          </ul>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2"><div class="font-semibold text-sm">⚖️ 合规风险（法务/食品）</div><span class="pill pill-ok">全绿</span></div>
+          <ul class="text-[12px] space-y-1 text-slate-700">
+            <li>• Health Inspection 评分 < A</li>
+            <li>• CFIA / FDA 申报缺失</li>
+            <li>• 工签/LMIA 即将到期 < 60 天</li>
+            <li>• 商标 / 知识产权侵权监控</li>
+            <li>• 数据合规（PIPEDA）</li>
+          </ul>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2"><div class="font-semibold text-sm">🎯 市场风险（声誉/竞争）</div><span class="pill pill-warn">1 黄</span></div>
+          <ul class="text-[12px] space-y-1 text-slate-700">
+            <li>• 差评率 > 8% <span class="text-slate-500">→ 当前 5.2% ✓</span></li>
+            <li>• Google 评分 < 4.3 <span class="text-slate-500">→ 4.7 ✓</span></li>
+            <li>• 外卖平台抽佣突变 > 2pp <span class="text-slate-500">→ Uber +3pp ⚠</span></li>
+            <li>• 竞品 1km 内开新店</li>
+            <li>• 社媒负面声量突增</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 风险趋势 -->
+      <div class="card p-5">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-sm font-semibold">综合风险指数趋势（近 12 周）</div>
+          <div class="text-[11px] text-slate-500">指数 = f(财务×0.4 + 进度×0.3 + 合规×0.2 + 市场×0.1) · 满分 100</div>
+        </div>
+        <div style="height:200px;position:relative;"><canvas id="riskChart"></canvas></div>
+      </div>
+    </section>
+
+    <!-- ========== 7. 场景演示 ========== -->
+    <section id="scenario" class="module">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold mb-1">场景演示 <span class="grad-red-text">/ AI 体系实战</span></h1>
+        <p class="text-sm text-slate-500">「多伦多 1 号店本周毛利掉到 18%」· AI 体系如何 step-by-step 响应</p>
+      </div>
+
+      <div class="card p-5 mb-4 border-l-4" style="border-left-color:#ef4444;">
+        <div class="flex items-center gap-3">
+          <div class="text-2xl">🚨</div>
+          <div>
+            <div class="text-base font-semibold">触发事件</div>
+            <div class="text-[13px] text-slate-500">2026-05-06 14:55 · 财务监控 Agent 完成本周成本归集，发现 1 号店周毛利率 = 18%（红线 22%）</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-6">
+        <div class="space-y-0">
+          <div class="scenario-step">
+            <div class="scenario-dot">1</div>
+            <div class="font-semibold mb-1">14:55 · 财务监控 Agent 上报</div>
+            <div class="text-[12.5px] text-slate-700">完成本周成本归集 → 检测到 1 号店周毛利掉至 18%（红线 22%）→ 触发风险 Agent</div>
+            <div class="card-2 p-2 text-[11px] text-slate-500 mt-1.5"><b class="text-[#FF6B35]">输出：</b>偏差归因初判（外卖抽佣 +3pp 贡献 -2.1pp，肉类成本上涨 +0.5pp 贡献 -0.6pp，剩余其他 -0.3pp）</div>
+          </div>
+          <div class="scenario-step">
+            <div class="scenario-dot">2</div>
+            <div class="font-semibold mb-1">14:55 · 风险 Agent 升级为红色告警</div>
+            <div class="text-[12.5px] text-slate-700">查表 → 财务红线 → 自动调用协调调度 Agent · 同时推送告警到杨总驾驶舱（不打断）+ COO 微信</div>
+          </div>
+          <div class="scenario-step">
+            <div class="scenario-dot">3</div>
+            <div class="font-semibold mb-1">14:56 · 协调调度 Agent 拆解任务</div>
+            <div class="text-[12.5px] text-slate-700">识别需要 4 个 Agent 协同：外卖 / 供应链 / 客户洞察 / 财务监控 · 并行下发子任务</div>
+          </div>
+          <div class="scenario-step">
+            <div class="scenario-dot">4</div>
+            <div class="font-semibold mb-1">14:58 · 各 Agent 并行响应</div>
+            <div class="grid grid-cols-2 gap-2 text-[11.5px] mt-2">
+              <div class="card-2 p-2"><b class="text-[#FF6B35]">外卖 Agent：</b>核实 Uber 抽佣从 25% → 28%（5/1 起） · 计算受影响订单占比 38% · 提议菜单价 +4% / 满减改 $30→$35</div>
+              <div class="card-2 p-2"><b class="text-[#FF6B35]">供应链 Agent：</b>本地肉类供应商 Sysco 报价 +6% · 已比价 GFS / 华人供应商 · 推荐切换牛肉至 GFS 节省 4.2%</div>
+              <div class="card-2 p-2"><b class="text-[#FF6B35]">客户洞察 Agent：</b>近 7 天 Google 评论无负面 · 涨价风险评估：低 · 建议主推「锅圈套餐」对冲价格敏感</div>
+              <div class="card-2 p-2"><b class="text-[#FF6B35]">财务监控 Agent：</b>合并方案模拟 → 预计可恢复至 23.5% 毛利 · 净利月增 CA$ 8.6K</div>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="scenario-dot">5</div>
+            <div class="font-semibold mb-1">15:02 · 协调调度 Agent 汇总方案</div>
+            <div class="text-[12.5px] text-slate-700">3 套方案打包推送给 COO + 杨总：</div>
+            <div class="space-y-1.5 mt-2 text-[11.5px]">
+              <div class="card-2 p-2"><b>A 保守：</b>仅切换牛肉供应商 → 毛利回升至 21%（仍未达标）<span class="pill pill-warn ml-2">不推荐</span></div>
+              <div class="card-2 p-2"><b>B 平衡：</b>切换牛肉 + 外卖菜单调价 +4% → 毛利 23.5% ✓ · 客流影响预估 -2%<span class="pill pill-ok ml-2">推荐</span></div>
+              <div class="card-2 p-2"><b>C 进取：</b>方案 B + 主推套餐 + 抖音/小红书广告 CA$ 3K → 毛利 24.8% · 客流 +5%</div>
+            </div>
+          </div>
+          <div class="scenario-step">
+            <div class="scenario-dot">6</div>
+            <div class="font-semibold mb-1">15:30 · 杨总在驾驶舱点击「采纳方案 B」</div>
+            <div class="text-[12.5px] text-slate-700">协调调度 Agent 自动派发执行子任务：外卖 Agent 改菜单价格、供应链 Agent 下采购单切换 GFS、店长 App 收到调价说明 SOP · 全过程审计日志留档</div>
+          </div>
+          <div class="scenario-step">
+            <div class="scenario-dot">✓</div>
+            <div class="font-semibold mb-1 text-emerald-600">闭环 · AI 跟进 7 天</div>
+            <div class="text-[12.5px] text-slate-700">7 天后财务 Agent 自动复盘：实际毛利 23.7%（vs 预测 23.5%） · 客流 -1.2%（vs 预测 -2%） · 报告自动归档进知识库，下次同类事件直接命中</div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 card p-4 text-[12.5px] text-slate-500">
+        <b class="text-white">⏱ 全程时间</b>：从异常检测到方案上桌 = <b class="text-[#FF6B35]">7 分钟</b> · 传统人工流程通常 <b>2-5 天</b> · 体系价值在「问题发生 → 决策上桌」的速度，而非取代人的拍板。
+      </div>
+    </section>
+
+    <!-- ========== 8. 18 个月路线图 ========== -->
+    <section id="roadmap" class="module">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold mb-1">18 个月落地路线图 <span class="grad-red-text">/ Roadmap</span></h1>
+        <p class="text-sm text-slate-500">3 个阶段 · 多伦多样板 → 多店复制 → 跨市场扩张</p>
+      </div>
+
+      <div class="space-y-3">
+        <div class="phase phase-1 card pl-6">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <div class="text-[11px] text-emerald-600 font-bold tracking-widest">PHASE 1 · M1 - M6</div>
+              <div class="text-lg font-bold">体系搭建 + 1 号样板店上线</div>
+              <div class="text-[12px] text-slate-500">里程碑：1 号店开业 · AI 体系 v1.0 · 杨总驾驶舱跑通</div>
+            </div>
+            <div class="text-right text-[11px] text-slate-500">投入估算<br><b class="text-base text-white">CA$ 2.4M</b></div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-[12px]">
+            <div class="card-2 p-3">
+              <b>M1 - M2 · 立项 + 调研</b>
+              <ul class="list-disc list-inside text-slate-500 mt-1 space-y-0.5">
+                <li>市场情报 Agent v0.1</li>
+                <li>多伦多双周市场报告</li>
+                <li>财务模型 / 投资测算</li>
+              </ul>
+            </div>
+            <div class="card-2 p-3">
+              <b>M3 - M4 · 选址 + 装修启动</b>
+              <ul class="list-disc list-inside text-slate-500 mt-1 space-y-0.5">
+                <li>选址 + 装修 Agent 上线</li>
+                <li>1 号店签约 + 设计</li>
+                <li>数据中台 v0.5</li>
+              </ul>
+            </div>
+            <div class="card-2 p-3">
+              <b>M5 - M6 · 开业冲刺</b>
+              <ul class="list-disc list-inside text-slate-500 mt-1 space-y-0.5">
+                <li>供应链 / 海运 / HR Agent 上线</li>
+                <li>1 号店软开 → 正式开业</li>
+                <li>杨总驾驶舱 v1.0 发布</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="phase phase-2 card pl-6">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <div class="text-[11px] text-[#FF6B35] font-bold tracking-widest">PHASE 2 · M7 - M12</div>
+              <div class="text-lg font-bold">2 - 3 号店 + 多伦多中央厨房</div>
+              <div class="text-[12px] text-slate-500">里程碑：单店模型跑通 · 中央厨房投产 · 体系验证可复制</div>
+            </div>
+            <div class="text-right text-[11px] text-slate-500">投入估算<br><b class="text-base text-white">CA$ 4.8M</b></div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-[12px]">
+            <div class="card-2 p-3">
+              <b>M7 - M8 · 2 号店</b>
+              <ul class="list-disc list-inside text-slate-500 mt-1 space-y-0.5">
+                <li>1 号店模型抽象成 Playbook</li>
+                <li>2 号店选址 + 装修</li>
+                <li>外卖 / 客户 Agent 优化</li>
+              </ul>
+            </div>
+            <div class="card-2 p-3">
+              <b>M9 - M10 · 中央厨房</b>
+              <ul class="list-disc list-inside text-slate-500 mt-1 space-y-0.5">
+                <li>中厨调度 Agent 上线</li>
+                <li>设备 IoT 接入</li>
+                <li>双供应链稳定</li>
+              </ul>
+            </div>
+            <div class="card-2 p-3">
+              <b>M11 - M12 · 3 号店</b>
+              <ul class="list-disc list-inside text-slate-500 mt-1 space-y-0.5">
+                <li>体系参数化封装</li>
+                <li>3 号店开业（验证克隆）</li>
+                <li>财务自动月结</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="phase phase-3 card pl-6">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <div class="text-[11px] font-bold tracking-widest" style="color:#a855f7;">PHASE 3 · M13 - M18</div>
+              <div class="text-lg font-bold">跨市场复制 · 温哥华 / 越南 / 美西</div>
+              <div class="text-[12px] text-slate-500">里程碑：体系一键克隆 · 第二个海外市场开业 · 加盟体系准备就绪</div>
+            </div>
+            <div class="text-right text-[11px] text-slate-500">投入估算<br><b class="text-base text-white">CA$ 6 - 9M</b></div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-[12px]">
+            <div class="card-2 p-3">
+              <b>M13 - M14 · 体系克隆</b>
+              <ul class="list-disc list-inside text-slate-500 mt-1 space-y-0.5">
+                <li>市场参数库（货币/法规/语言）</li>
+                <li>新市场知识库一键初始化</li>
+                <li>本地化 SOP 自动生成</li>
+              </ul>
+            </div>
+            <div class="card-2 p-3">
+              <b>M15 - M16 · 第二市场入场</b>
+              <ul class="list-disc list-inside text-slate-500 mt-1 space-y-0.5">
+                <li>温哥华 or 胡志明市启动</li>
+                <li>本地团队 + 远程 AI 协同</li>
+                <li>跨市场驾驶舱聚合</li>
+              </ul>
+            </div>
+            <div class="card-2 p-3">
+              <b>M17 - M18 · 加盟体系</b>
+              <ul class="list-disc list-inside text-slate-500 mt-1 space-y-0.5">
+                <li>加盟商驾驶舱（缩水版）</li>
+                <li>总部 AI 风控审批</li>
+                <li>第三个海外市场预备</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 关键成功因子 -->
+      <div class="card p-5 mt-5">
+        <div class="text-sm font-semibold mb-3">🎯 体系成功的 5 个关键</div>
+        <div class="grid grid-cols-5 gap-2 text-[12px]">
+          <div class="card-2 p-3"><b class="grad-red-text">① 数据先行</b><div class="text-slate-500 mt-1">所有业务系统接入数据中台，数据 = 生产资料</div></div>
+          <div class="card-2 p-3"><b class="grad-red-text">② 杨总参与</b><div class="text-slate-500 mt-1">每周 30 分钟看驾驶舱 · 给反馈 · 推动业务用 AI</div></div>
+          <div class="card-2 p-3"><b class="grad-red-text">③ AI + 人</b><div class="text-slate-500 mt-1">AI 不取代决策者 · AI 让决策者快 100 倍</div></div>
+          <div class="card-2 p-3"><b class="grad-red-text">④ 红线明确</b><div class="text-slate-500 mt-1">硬规则 + 升级路径 · 不让 AI 在金钱/合规上自作主张</div></div>
+          <div class="card-2 p-3"><b class="grad-red-text">⑤ 复制为王</b><div class="text-slate-500 mt-1">第一家店即按可复制设计 · 每一步问「下一家怎么用」</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 9. 全球布局地图 ========== -->
+    <section id="globe" class="module">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold mb-1">全球布局地图 <span class="grad-red-text">/ Global Map</span></h1>
+        <p class="text-sm text-slate-500">中国大本营 → 多伦多样板 → 北美 / 东南亚 / 大洋洲 三线扩张 · 18-36 个月路径</p>
+      </div>
+
+      <!-- 三线扩张概览 -->
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="card p-4 border-l-4" style="border-left-color:#FF6B35;">
+          <div class="flex items-center justify-between mb-1">
+            <div class="font-semibold text-sm">🇨🇦 北美线</div>
+            <span class="pill" style="background:rgba(255,107,53,.18);color:#FF6B35;">主战场</span>
+          </div>
+          <div class="text-[12px] text-slate-500">多伦多 → 温哥华 → 美西 · 华人密度高 + 法规清晰 + 支付便利</div>
+          <div class="text-[11px] mt-2"><b class="text-white">目标：</b>36 个月开 8-12 家直营 + 加盟体系</div>
+        </div>
+        <div class="card p-4 border-l-4" style="border-left-color:#22c55e;">
+          <div class="flex items-center justify-between mb-1">
+            <div class="font-semibold text-sm">🇻🇳 东南亚线</div>
+            <span class="pill pill-ok">高性价比</span>
+          </div>
+          <div class="text-[12px] text-slate-500">越南胡志明 → 新加坡 → 泰国 · 口味相近 + 成本低 + 增长快</div>
+          <div class="text-[11px] mt-2"><b class="text-white">目标：</b>JV 模式入场 · 36 个月 5-8 家</div>
+        </div>
+        <div class="card p-4 border-l-4" style="border-left-color:#a855f7;">
+          <div class="flex items-center justify-between mb-1">
+            <div class="font-semibold text-sm">🇦🇺 大洋洲/欧洲线</div>
+            <span class="pill" style="background:rgba(168,85,247,.18);color:#c084fc;">远期</span>
+          </div>
+          <div class="text-[12px] text-slate-500">悉尼 / 墨尔本 / 伦敦 · 华人聚集 + 高客单价 · 进入门槛较高</div>
+          <div class="text-[11px] mt-2"><b class="text-white">目标：</b>第二阶段评估 · 36 个月后试点</div>
+        </div>
+      </div>
+
+      <!-- 世界地图 -->
+      <div class="card p-5 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="text-sm font-semibold">全球门店与扩张路径地图</div>
+            <div class="text-[11px] text-slate-500">中国总部辐射全球 · 红色 = 在营/在建 · 黄色 = 18 个月内启动 · 紫色 = 远期评估</div>
+          </div>
+          <div class="flex gap-2 text-[11px]">
+            <span class="pill" style="background:rgba(229,57,53,.18);color:#f87171;">●在营/在建</span>
+            <span class="pill pill-warn">●近期</span>
+            <span class="pill" style="background:rgba(168,85,247,.18);color:#c084fc;">●远期</span>
+          </div>
+        </div>
+
+        <div id="bigMap" style="height:520px;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--line);"></div>
+      </div>
+
+      <!-- 各市场详情 -->
+      <div class="grid grid-cols-3 gap-3">
+        <!-- 中国 -->
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold flex items-center gap-2">🇨🇳 中国总部</div>
+            <span class="pill" style="background:rgba(229,57,53,.2);color:#f87171;">基地</span>
+          </div>
+          <div class="text-[11.5px] text-slate-500 space-y-1">
+            <div><b class="text-white">角色：</b>料包研发与生产 · 出海决策中枢</div>
+            <div><b class="text-white">国内门店：</b>10000+ 家（基础盘）</div>
+            <div><b class="text-white">出海资源：</b>中央厨房产能 / 品牌势能 / 资金</div>
+            <div><b class="text-white">AI 介入：</b>全球数据汇聚 + 杨总驾驶舱</div>
+          </div>
+        </div>
+
+        <!-- 多伦多 -->
+        <div class="card p-4 border-2" style="border-color:rgba(255,107,53,0.5);">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold flex items-center gap-2">🇨🇦 多伦多 ★</div>
+            <span class="pill pill-info">在营 + 在建</span>
+          </div>
+          <div class="text-[11.5px] text-slate-500 space-y-1">
+            <div><b class="text-white">阶段：</b>Phase 1-2 · 首发样板市场</div>
+            <div><b class="text-white">店数：</b>1 在营 · 1 装修中 · 1 中央厨房筹建</div>
+            <div><b class="text-white">投入：</b>CA$ 7.2M / 18 个月</div>
+            <div><b class="text-white">华人人口：</b>~70 万 · 第一商圈：Markham/RH</div>
+            <div><b class="text-white">AI 全套：</b>14 Agent 全开 · 数据闭环跑通</div>
+          </div>
+        </div>
+
+        <!-- 温哥华 -->
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold flex items-center gap-2">🇨🇦 温哥华</div>
+            <span class="pill pill-warn">M13 启动</span>
+          </div>
+          <div class="text-[11.5px] text-slate-500 space-y-1">
+            <div><b class="text-white">阶段：</b>Phase 3 · 体系克隆首站</div>
+            <div><b class="text-white">店数：</b>计划 1-2 家直营</div>
+            <div><b class="text-white">华人人口：</b>~50 万 · 列治文 / Burnaby</div>
+            <div><b class="text-white">差异：</b>港台移民为主 · 口味偏粤</div>
+            <div><b class="text-white">AI：</b>多伦多体系参数化复制</div>
+          </div>
+        </div>
+
+        <!-- 美西 -->
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold flex items-center gap-2">🇺🇸 洛杉矶 / 美西</div>
+            <span class="pill pill-warn">M17+ 评估</span>
+          </div>
+          <div class="text-[11.5px] text-slate-500 space-y-1">
+            <div><b class="text-white">候选：</b>洛杉矶 / 旧金山 / 西雅图</div>
+            <div><b class="text-white">挑战：</b>美国劳动法 · 食品法规更严</div>
+            <div><b class="text-white">机会：</b>圣盖博/亚凯迪亚华人聚集</div>
+            <div><b class="text-white">前置：</b>美国主体注册 · 工签筹划</div>
+          </div>
+        </div>
+
+        <!-- 越南 -->
+        <div class="card p-4 border-2" style="border-color:rgba(34,197,94,0.4);">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold flex items-center gap-2">🇻🇳 胡志明市</div>
+            <span class="pill pill-warn">M15 JV</span>
+          </div>
+          <div class="text-[11.5px] text-slate-500 space-y-1">
+            <div><b class="text-white">阶段：</b>Phase 3 · 东南亚切入点</div>
+            <div><b class="text-white">模式：</b>合资（已有 JV 商业计划书）</div>
+            <div><b class="text-white">优势：</b>口味相近 · 食材便宜 · 增长快</div>
+            <div><b class="text-white">投入：</b>USD 800K - 1.2M（轻资产）</div>
+            <div><b class="text-white">AI：</b>体系本地化（越南语 · 越南盾）</div>
+          </div>
+        </div>
+
+        <!-- 新加坡 -->
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold flex items-center gap-2">🇸🇬 新加坡</div>
+            <span class="pill" style="background:rgba(168,85,247,0.18);color:#c084fc;">远期</span>
+          </div>
+          <div class="text-[11.5px] text-slate-500 space-y-1">
+            <div><b class="text-white">定位：</b>东南亚旗舰示范</div>
+            <div><b class="text-white">优势：</b>客单高 · 法规清晰 · 英语方便</div>
+            <div><b class="text-white">挑战：</b>租金贵 · 人力贵</div>
+            <div><b class="text-white">触发条件：</b>越南跑通后启动</div>
+          </div>
+        </div>
+
+        <!-- 曼谷 -->
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold flex items-center gap-2">🇹🇭 曼谷</div>
+            <span class="pill" style="background:rgba(168,85,247,0.18);color:#c084fc;">远期</span>
+          </div>
+          <div class="text-[11.5px] text-slate-500 space-y-1">
+            <div><b class="text-white">机会：</b>潮州人聚集 · 川菜接受度高</div>
+            <div><b class="text-white">通路：</b>Central / Siam 等大商圈</div>
+            <div><b class="text-white">建议：</b>越南成功 6 个月后入</div>
+          </div>
+        </div>
+
+        <!-- 悉尼 -->
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold flex items-center gap-2">🇦🇺 悉尼 / 墨尔本</div>
+            <span class="pill" style="background:rgba(168,85,247,0.18);color:#c084fc;">远期</span>
+          </div>
+          <div class="text-[11.5px] text-slate-500 space-y-1">
+            <div><b class="text-white">市场：</b>华人聚集 · 高客单价 · 留学生多</div>
+            <div><b class="text-white">挑战：</b>食品检疫严 · 海运周期长</div>
+            <div><b class="text-white">建议：</b>多伦多模型成熟后克隆</div>
+          </div>
+        </div>
+
+        <!-- 伦敦 -->
+        <div class="card p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold flex items-center gap-2">🇬🇧 伦敦</div>
+            <span class="pill" style="background:rgba(168,85,247,0.18);color:#c084fc;">远期</span>
+          </div>
+          <div class="text-[11.5px] text-slate-500 space-y-1">
+            <div><b class="text-white">市场：</b>欧洲华人最大聚集地</div>
+            <div><b class="text-white">挑战：</b>VAT/品牌注册/Brexit 后供应链</div>
+            <div><b class="text-white">建议：</b>第二阶段后期 · 探索旗舰店</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 全球扩张原则 -->
+      <div class="card p-5 mt-4 mb-2">
+        <div class="text-sm font-semibold mb-3">🧭 全球扩张 5 个原则</div>
+        <div class="grid grid-cols-5 gap-2 text-[11.5px]">
+          <div class="card-2 p-3"><b class="grad-red-text">① 一城一样板</b><div class="text-slate-500 mt-1">每个新市场 1 家店跑通模型，再开第 2 家</div></div>
+          <div class="card-2 p-3"><b class="grad-red-text">② 体系先行</b><div class="text-slate-500 mt-1">AI 体系先在多伦多打磨，再克隆，绝不重复造轮子</div></div>
+          <div class="card-2 p-3"><b class="grad-red-text">③ 当地合伙人</b><div class="text-slate-500 mt-1">每个市场至少 1 位本地资深合伙人 + 总部派驻</div></div>
+          <div class="card-2 p-3"><b class="grad-red-text">④ 双供应链</b><div class="text-slate-500 mt-1">国内料包 + 当地中央厨房分装 · 抗海运/关税风险</div></div>
+          <div class="card-2 p-3"><b class="grad-red-text">⑤ 数据回流</b><div class="text-slate-500 mt-1">所有海外数据流回总部驾驶舱 · 杨总一屏看全球</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 10. 小炒机器人 ========== -->
+    <section id="robot" class="module">
+      <div class="mb-5">
+        <h1 class="text-2xl font-bold mb-1">锅圈小炒机器人 <span class="grad-red-text">/ Smart Wok Fleet</span></h1>
+        <p class="text-sm text-slate-500">炒菜机器人 = 标准化引擎 · 把每一盘川菜变成可监控、可复制、可优化的「数字工序」</p>
+      </div>
+
+      <!-- 队列总览 -->
+      <div class="grid grid-cols-5 gap-3 mb-4">
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">部署机器人</div>
+          <div class="kpi-num">8 <span class="text-sm font-normal text-slate-500">台</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">中厨 5 + 1 号店 2 + 备机 1</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">在线运行</div>
+          <div class="kpi-num text-emerald-600">7 / 8</div>
+          <div class="text-[11px] text-slate-500 mt-1">利用率 79.4%</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">今日出餐</div>
+          <div class="kpi-num">1,847</div>
+          <div class="text-[11px] text-slate-500 mt-1">vs 昨日 +6.8%</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">单份人工成本</div>
+          <div class="kpi-num">$2.18</div>
+          <div class="text-[11px] text-emerald-600 mt-1">vs 全人工 $5.40 ↓</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-[11px] text-slate-500 mb-1">SKU 标准化率</div>
+          <div class="kpi-num text-emerald-600">98.2<span class="text-base">%</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">每盘菜口味偏差 < 2%</div>
+        </div>
+      </div>
+
+      <!-- 机器人在体系中的位置（架构图） -->
+      <div class="card p-5 mb-4">
+        <div class="text-sm font-semibold mb-3">🔗 机器人如何嵌入 AI 体系</div>
+        <div class="grid grid-cols-5 gap-2 text-[11.5px]">
+          <div class="card-2 p-3" style="border-left:3px solid #60a5fa;">
+            <b>① IoT 上报</b>
+            <div class="text-slate-500 mt-1">每 5 秒：油温、火力、当前菜品 ID、剩余产能、设备状态、用油量</div>
+          </div>
+          <div class="card-2 p-3" style="border-left:3px solid #4ade80;">
+            <b>② Agent 接管</b>
+            <div class="text-slate-500 mt-1">中厨调度 Agent + 门店 Agent 实时读取 · 对照排程</div>
+          </div>
+          <div class="card-2 p-3" style="border-left:3px solid #FF6B35;">
+            <b>③ 智能派单</b>
+            <div class="text-slate-500 mt-1">AI 按订单+库存动态分配机器 · 高峰期开多锅</div>
+          </div>
+          <div class="card-2 p-3" style="border-left:3px solid #fbbf24;">
+            <b>④ 风险闭环</b>
+            <div class="text-slate-500 mt-1">异常（油温/振动/电流）→ 风险 Agent 立即派单维修</div>
+          </div>
+          <div class="card-2 p-3" style="border-left:3px solid #c084fc;">
+            <b>⑤ 数据沉淀</b>
+            <div class="text-slate-500 mt-1">每盘菜成本/时长入仓库 · 反哺定价/排班/SKU 优化</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 机器人详情 + 实时监控 -->
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="card p-5 col-span-2">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-sm font-semibold">🔴 实时机器人状态（IoT 流）</div>
+            <span class="text-[11px] text-slate-500">每 5 秒刷新 · 点单台进入详情</span>
+          </div>
+          <table class="w-full text-[12px]">
+            <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider border-b border-[#2d3651]">
+              <tr><th class="text-left py-2">编号</th><th class="text-left">位置</th><th class="text-left">当前菜品</th><th class="text-right">油温℃</th><th class="text-right">完成%</th><th class="text-right">利用率</th><th class="text-right">状态</th></tr>
+            </thead>
+            <tbody class="divide-y divide-[#2d3651]">
+              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T01</td><td>1 号店 · A 锅</td><td>麻婆豆腐</td><td class="text-right">218°</td><td class="text-right">62%</td><td class="text-right text-emerald-600">82%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T02</td><td>1 号店 · B 锅</td><td>宫保鸡丁</td><td class="text-right">235°</td><td class="text-right">38%</td><td class="text-right text-emerald-600">76%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono text-amber-600">GQ-T03</td><td>中央厨房 · A</td><td>—</td><td class="text-right text-amber-600">158° ⚠</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right"><span class="pill pill-warn">维修</span></td></tr>
+              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T04</td><td>中央厨房 · B</td><td>水煮牛肉</td><td class="text-right">240°</td><td class="text-right">81%</td><td class="text-right text-emerald-600">94%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T05</td><td>中央厨房 · C</td><td>鱼香肉丝</td><td class="text-right">222°</td><td class="text-right">15%</td><td class="text-right text-emerald-600">88%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T06</td><td>中央厨房 · D</td><td>回锅肉</td><td class="text-right">228°</td><td class="text-right">52%</td><td class="text-right">71%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T07</td><td>中央厨房 · E</td><td>清洗中</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right">68%</td><td class="text-right"><span class="pill pill-info">清洗</span></td></tr>
+              <tr class="hover:bg-[#1c2438] text-slate-500"><td class="py-2 font-mono">GQ-T08</td><td>2 号店</td><td>—</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right"><span class="pill" style="background:#374151;color:#94a3b8;">待装</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 机器人调度 Agent -->
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="font-semibold text-sm">🤖 机器人调度 Agent</div>
+            <span class="pill pill-ai">第 15 个 Agent</span>
+          </div>
+          <div class="text-[12px] text-slate-700 mb-3">专属 Agent 控制全部机器人 · 每秒级决策 · 与中厨 / 门店 / 风险 / 财务 Agent 联动</div>
+          <div class="text-[11px] space-y-2">
+            <div><b class="text-[#FF6B35]">输入：</b><br><span class="text-slate-500">机器 IoT 流 + 订单流 + 库存 + 排程 + 故障日志</span></div>
+            <div><b class="text-[#FF6B35]">每秒决策：</b><br><span class="text-slate-500">- 哪台炒哪盘<br>- 油温 / 火力 / 时长微调<br>- 高峰期产能调度<br>- 故障切换 / 备机激活</span></div>
+            <div><b class="text-[#FF6B35]">联动触发：</b><br><span class="text-slate-500">- 油量低 → 供应链 Agent 补货<br>- 故障 → 维修工单 + 风险预警<br>- 高峰来不及 → 门店 Agent 调整菜单</span></div>
+            <div><b class="text-[#FF6B35]">权限：</b><br><span class="text-slate-500">日常运行可全自动 · 升级到「换油/参数变更」必须店长 / 总厨二次确认</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 业务价值 -->
+      <div class="grid grid-cols-4 gap-3 mb-4">
+        <div class="card p-4">
+          <div class="font-semibold mb-1">🎯 标准化</div>
+          <div class="text-[12px] text-slate-500">每盘麻婆豆腐口味偏差 < 2% · 多伦多吃到的味道与上海一致</div>
+        </div>
+        <div class="card p-4">
+          <div class="font-semibold mb-1">💰 降本</div>
+          <div class="text-[12px] text-slate-500">单份人工成本 $5.40 → $2.18 · 一台机器替代 1.5-2 个川菜大厨</div>
+        </div>
+        <div class="card p-4">
+          <div class="font-semibold mb-1">🚀 提速</div>
+          <div class="text-[12px] text-slate-500">单盘出餐时间 90s → 75s · 高峰期产能 +40%</div>
+        </div>
+        <div class="card p-4">
+          <div class="font-semibold mb-1">📊 数据化</div>
+          <div class="text-[12px] text-slate-500">每盘菜的成本/时间/温度全留痕 · 反哺 SKU 定价、新菜研发、毛利分析</div>
+        </div>
+      </div>
+
+      <!-- 机器人布局：单店 vs 中央厨房 -->
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="card p-5">
+          <div class="font-semibold mb-2">🏪 单店模式（多伦多 1 号店）</div>
+          <div class="text-[12px] text-slate-500 mb-3">2 台机器人 + 1 个店长 + 2 PT 厨师 + 3 PT 服务</div>
+          <ul class="text-[12px] space-y-1 list-disc list-inside">
+            <li>机器人现场炒制（顾客可见，体验感）</li>
+            <li>每分钟最高 1.6 盘 · 双锅并行</li>
+            <li>厨师只负责备菜 + 出锅装盘 + 兜底应急</li>
+            <li>店长 App 实时看炒锅 KPI · 接故障告警</li>
+          </ul>
+        </div>
+        <div class="card p-5">
+          <div class="font-semibold mb-2">🏭 中央厨房模式（Mississauga）</div>
+          <div class="text-[12px] text-slate-500 mb-3">5 台机器人 + 1 总厨 + 1 副厨 + 2 PT</div>
+          <ul class="text-[12px] space-y-1 list-disc list-inside">
+            <li>批量炒制半成品 · 真空包装配送各店</li>
+            <li>5 锅并行 · 一日产能 ~3000 份</li>
+            <li>夜间也可运行（无人值守 + 远程监控）</li>
+            <li>新菜在中厨先跑数据，再放门店</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 机器人 + AI 综合场景 -->
+      <div class="card p-5 mb-2">
+        <div class="text-sm font-semibold mb-3">🎬 一个场景：高峰订单暴增 → 机器人体系如何反应</div>
+        <div class="grid grid-cols-5 gap-2 text-[11.5px]">
+          <div class="card-2 p-3"><b class="text-[#FF6B35]">18:32</b> 外卖 Agent 检测到 1 号店当前 25 单待处理（vs 平均 8）</div>
+          <div class="card-2 p-3"><b class="text-[#FF6B35]">18:32</b> 机器人 Agent 切换 GQ-T01 / T02 至「高峰模式」<br>预热油温 +5°，出餐时间 -8s</div>
+          <div class="card-2 p-3"><b class="text-[#FF6B35]">18:33</b> 协调 Agent 通知中厨：临时加炒 50 份成品送 1 号店</div>
+          <div class="card-2 p-3"><b class="text-[#FF6B35]">18:33</b> 中厨 Agent 调度 GQ-T05 / T06 优先处理 1 号店补给单</div>
+          <div class="card-2 p-3"><b class="text-[#FF6B35]">18:35</b> 门店 Agent 推送店长：「队列恢复正常」 · 全程无人工干预</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 11. 末端视频监控（可选） ========== -->
+    <section id="cctv" class="module">
+      <div class="mb-5 flex items-end justify-between">
+        <div>
+          <h1 class="text-2xl font-bold mb-1">末端视频监控 <span class="grad-red-text">/ Edge CCTV</span> <span class="pill" style="background:#f1f5f9;color:#64748b;margin-left:8px;font-size:10px;">可选模块</span></h1>
+          <p class="text-sm text-slate-500">门店 + 中央厨房视频接入 AI 体系 · 可后期增配 · 单店 +CA$ 6-8K · 不影响主体系运行</p>
+        </div>
+        <span class="pill pill-info">8 路摄像头 · 模拟数据</span>
+      </div>
+
+      <!-- 是否上的判断 -->
+      <div class="card p-4 mb-4" style="background:linear-gradient(90deg,rgba(96,165,250,.06),rgba(96,165,250,.02));border-left:3px solid #60a5fa;">
+        <div class="grid grid-cols-2 gap-4 text-[12px]">
+          <div>
+            <b class="text-slate-800">📌 推荐启用条件</b>
+            <ul class="list-disc list-inside text-slate-600 mt-1 space-y-0.5">
+              <li>已开 ≥ 2 家门店且开始有客流量化需求</li>
+              <li>中央厨房需要对机器人 / 出餐做品控抽检</li>
+              <li>差评率上升，需要根因分析（等位时间/服务态度）</li>
+              <li>合规：当地法规明确允许（北美需贴告示）</li>
+            </ul>
+          </div>
+          <div>
+            <b class="text-slate-800">⚠️ 暂缓启用条件</b>
+            <ul class="list-disc list-inside text-slate-600 mt-1 space-y-0.5">
+              <li>样板店期内 AI 体系还未跑通，先简化</li>
+              <li>预算紧张，单店额外 6-8K 不划算</li>
+              <li>当地隐私法规（如 GDPR / PIPEDA）合规未做</li>
+              <li>已通过 POS + 排班 + 评分获得足够数据</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 概览 KPI -->
+      <div class="grid grid-cols-4 gap-3 mb-4">
+        <div class="card p-4"><div class="text-[11px] text-slate-500 mb-1">在线摄像头</div><div class="kpi-num">8 / 8</div><div class="text-[11px] text-emerald-600">全在线 ✓</div></div>
+        <div class="card p-4"><div class="text-[11px] text-slate-500 mb-1">今日客流（1 号店）</div><div class="kpi-num">312 <span class="text-xs text-slate-500">人</span></div><div class="text-[11px] text-emerald-600">+8% vs 昨</div></div>
+        <div class="card p-4"><div class="text-[11px] text-slate-500 mb-1">桌台平均周转</div><div class="kpi-num">42 <span class="text-xs text-slate-500">分钟</span></div><div class="text-[11px] text-slate-500">vs 行业 55 分</div></div>
+        <div class="card p-4"><div class="text-[11px] text-slate-500 mb-1">品控异常</div><div class="kpi-num text-amber-600">2 ⚠</div><div class="text-[11px] text-slate-500">中厨抽检 5 次</div></div>
+      </div>
+
+      <!-- 4 路摄像头模拟视图 -->
+      <div class="grid grid-cols-4 gap-2 mb-4">
+        <div class="card p-0 overflow-hidden" style="aspect-ratio:16/10;position:relative;background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);">
+          <div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.55);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;">CAM-01 · 1 号店入口</div>
+          <div style="position:absolute;top:6px;right:6px;background:rgba(220,38,38,.85);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;display:flex;align-items:center;gap:3px;"><span style="width:5px;height:5px;background:#fff;border-radius:50%;animation:blink 1.5s infinite;"></span>REC</div>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);padding:14px 8px 6px;color:#fff;font-size:10px;">
+            <div>🚶 检测到人流 · 排队 3 人</div>
+            <div class="text-[#94A3B8] text-[9px] mt-0.5">15:32:14 · 1080p</div>
+          </div>
+          <!-- 模拟视频画面（深色背景 + 一些识别框） -->
+          <svg viewBox="0 0 200 125" style="width:100%;height:100%;">
+            <rect x="40" y="55" width="22" height="50" fill="none" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="42" y="52" fill="#22c55e" font-size="6">person 0.94</text>
+            <rect x="80" y="60" width="20" height="48" fill="none" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="82" y="58" fill="#22c55e" font-size="6">person 0.91</text>
+            <rect x="120" y="58" width="22" height="48" fill="none" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="122" y="56" fill="#22c55e" font-size="6">person 0.89</text>
+          </svg>
+        </div>
+        <div class="card p-0 overflow-hidden" style="aspect-ratio:16/10;position:relative;background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);">
+          <div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.55);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;">CAM-02 · 1 号店餐区</div>
+          <div style="position:absolute;top:6px;right:6px;background:rgba(220,38,38,.85);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;display:flex;align-items:center;gap:3px;"><span style="width:5px;height:5px;background:#fff;border-radius:50%;animation:blink 1.5s infinite;"></span>REC</div>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);padding:14px 8px 6px;color:#fff;font-size:10px;">
+            <div>🪑 12 桌 · 9 占用</div>
+            <div class="text-[#94A3B8] text-[9px] mt-0.5">15:32:14 · 周转 38min</div>
+          </div>
+          <svg viewBox="0 0 200 125" style="width:100%;height:100%;">
+            <rect x="20" y="40" width="35" height="22" fill="none" stroke="#FF6B35" stroke-width="1" opacity=".7"/>
+            <rect x="80" y="40" width="35" height="22" fill="none" stroke="#FF6B35" stroke-width="1" opacity=".7"/>
+            <rect x="20" y="80" width="35" height="22" fill="none" stroke="#22c55e" stroke-width="1"/>
+            <rect x="80" y="80" width="35" height="22" fill="none" stroke="#FF6B35" stroke-width="1" opacity=".7"/>
+            <rect x="140" y="40" width="35" height="22" fill="none" stroke="#22c55e" stroke-width="1"/>
+            <rect x="140" y="80" width="35" height="22" fill="none" stroke="#FF6B35" stroke-width="1" opacity=".7"/>
+          </svg>
+        </div>
+        <div class="card p-0 overflow-hidden" style="aspect-ratio:16/10;position:relative;background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);">
+          <div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.55);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;">CAM-05 · 中厨 · GQ-T04</div>
+          <div style="position:absolute;top:6px;right:6px;background:rgba(220,38,38,.85);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;display:flex;align-items:center;gap:3px;"><span style="width:5px;height:5px;background:#fff;border-radius:50%;animation:blink 1.5s infinite;"></span>REC</div>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);padding:14px 8px 6px;color:#fff;font-size:10px;">
+            <div>🍳 水煮牛肉 · 81%</div>
+            <div class="text-[#94A3B8] text-[9px] mt-0.5">15:32:14 · 油温 240°</div>
+          </div>
+          <svg viewBox="0 0 200 125" style="width:100%;height:100%;">
+            <circle cx="100" cy="62" r="38" fill="none" stroke="#E53935" stroke-width="2"/>
+            <circle cx="100" cy="62" r="36" fill="rgba(229,57,53,.12)"/>
+            <text x="100" y="65" text-anchor="middle" fill="#FF6B35" font-size="8">炒锅 IoT 同步</text>
+          </svg>
+        </div>
+        <div class="card p-0 overflow-hidden" style="aspect-ratio:16/10;position:relative;background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);">
+          <div style="position:absolute;top:6px;left:6px;background:rgba(0,0,0,.55);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;">CAM-08 · 中厨 · 出货台</div>
+          <div style="position:absolute;top:6px;right:6px;background:rgba(217,119,6,.85);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;">⚠ 检测异常</div>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);padding:14px 8px 6px;color:#fff;font-size:10px;">
+            <div>📦 鱼香肉丝 #2 颜色偏深</div>
+            <div class="text-[#94A3B8] text-[9px] mt-0.5">15:32:14 · 已通知总厨抽检</div>
+          </div>
+          <svg viewBox="0 0 200 125" style="width:100%;height:100%;">
+            <rect x="50" y="50" width="40" height="25" fill="rgba(217,119,6,.25)" stroke="#d97706" stroke-width="1.5"/>
+            <text x="92" y="58" fill="#d97706" font-size="6">color anomaly</text>
+            <rect x="105" y="55" width="35" height="22" fill="rgba(34,197,94,.18)" stroke="#22c55e" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 价值矩阵 -->
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="card p-4">
+          <div class="font-semibold mb-2">👥 客流分析</div>
+          <ul class="text-[12px] text-slate-600 list-disc list-inside space-y-0.5">
+            <li>进店人数 · 高峰时段</li>
+            <li>排队等位时长（差评归因）</li>
+            <li>新客 vs 回头客（人脸去重）</li>
+            <li>桌台周转分钟级精度</li>
+          </ul>
+          <div class="text-[10px] text-slate-400 mt-2">→ 反哺门店 + 排班 Agent</div>
+        </div>
+        <div class="card p-4">
+          <div class="font-semibold mb-2">🍳 中厨品控</div>
+          <ul class="text-[12px] text-slate-600 list-disc list-inside space-y-0.5">
+            <li>每盘菜成色识别（颜色/分量偏差）</li>
+            <li>机器人异常物料抛洒</li>
+            <li>员工操作合规（戴帽/戴手套）</li>
+            <li>清洁班次（地面/台面）</li>
+          </ul>
+          <div class="text-[10px] text-slate-400 mt-2">→ 反哺中厨调度 Agent + 品控</div>
+        </div>
+        <div class="card p-4">
+          <div class="font-semibold mb-2">🛡 安全 / 合规</div>
+          <ul class="text-[12px] text-slate-600 list-disc list-inside space-y-0.5">
+            <li>异常事件（争吵/跌倒）实时告警</li>
+            <li>关店后非法入侵</li>
+            <li>财务 / 收银现金核对</li>
+            <li>保险事故举证留档</li>
+          </ul>
+          <div class="text-[10px] text-slate-400 mt-2">→ 反哺风险 Agent + 法务</div>
+        </div>
+      </div>
+
+      <!-- 隐私 / 合规 / 技术 -->
+      <div class="card p-5">
+        <div class="text-sm font-semibold mb-3">🔒 隐私 / 合规 / 技术规格（北美场景）</div>
+        <div class="grid grid-cols-4 gap-3 text-[12px]">
+          <div class="card-2 p-3">
+            <b class="text-slate-800">隐私保护</b>
+            <ul class="text-slate-600 mt-1 list-disc list-inside space-y-0.5">
+              <li>原始视频本地 NVR 7 天滚动覆盖</li>
+              <li>云端只上传元数据（人数 / 时长 / 异常）</li>
+              <li>入店告示「本店有 AI 视频分析」</li>
+              <li>不存人脸特征 / 不识别身份</li>
+            </ul>
+          </div>
+          <div class="card-2 p-3">
+            <b class="text-slate-800">合规清单</b>
+            <ul class="text-slate-600 mt-1 list-disc list-inside space-y-0.5">
+              <li>PIPEDA（加拿大）✓</li>
+              <li>BIPA（美国部分州）需评估</li>
+              <li>GDPR（欧洲）严格 → 远期再评</li>
+              <li>员工知情同意书</li>
+            </ul>
+          </div>
+          <div class="card-2 p-3">
+            <b class="text-slate-800">硬件清单（单店）</b>
+            <ul class="text-slate-600 mt-1 list-disc list-inside space-y-0.5">
+              <li>4-6 路 4K POE 摄像头</li>
+              <li>1 台 8 通道 NVR（本地存储）</li>
+              <li>边缘 AI 盒（Jetson Orin）</li>
+              <li>预算约 CA$ 6-8K · 中厨 +50%</li>
+            </ul>
+          </div>
+          <div class="card-2 p-3">
+            <b class="text-slate-800">AI 模型</b>
+            <ul class="text-slate-600 mt-1 list-disc list-inside space-y-0.5">
+              <li>YOLO / DeepSORT 实时人体检测+跟踪</li>
+              <li>Vision LLM 异常事件描述</li>
+              <li>云端：客流数仓 + 异常审计</li>
+              <li>边缘推理（保护隐私 + 降本）</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // 导航切换
+  const items = document.querySelectorAll('.nav-item');
+  const modules = document.querySelectorAll('.module');
+  items.forEach(it=>{
+    it.addEventListener('click',()=>{
+      items.forEach(x=>x.classList.remove('active'));
+      modules.forEach(x=>x.classList.remove('active'));
+      it.classList.add('active');
+      document.getElementById(it.dataset.target).classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+      // 移动端关闭侧边栏
+      document.getElementById('sidebar').classList.remove('open');
+      // 触发地图 / 图表 resize
+      setTimeout(()=>{
+        if(window.miniMap)window.miniMap.invalidateSize();
+        if(window.bigMap)window.bigMap.invalidateSize();
+        if(window.Chart && Chart.instances)Object.values(Chart.instances).forEach(c=>c.resize());
+      },120);
+    });
+  });
+
+  // 汉堡菜单
+  const menuBtn=document.getElementById('menuBtn');
+  const sidebar=document.getElementById('sidebar');
+  const sideOverlay=document.getElementById('sideOverlay');
+  if(menuBtn){
+    menuBtn.addEventListener('click',()=>sidebar.classList.toggle('open'));
+    sideOverlay.addEventListener('click',()=>sidebar.classList.remove('open'));
+  }
+
+  // 浅色主题图表通用配色
+  const chartGrid='#e2e8f0', chartTick='#64748b';
+
+  // 花费曲线
+  const ctx = document.getElementById('expChart');
+  if(ctx){
+    const labels = Array.from({length:30},(_,i)=>`D${i+1}`);
+    const budget = labels.map((_,i)=>15000 + (i%7<5?2000:0) + Math.sin(i/3)*900);
+    const actual = budget.map(v=>v + (Math.random()-0.5)*2400);
+    new Chart(ctx,{
+      type:'line',
+      data:{
+        labels,
+        datasets:[
+          {label:'实际花费',data:actual,borderColor:'#FF6B35',backgroundColor:'rgba(255,107,53,.12)',fill:true,tension:.35,borderWidth:2,pointRadius:0,pointHoverRadius:4},
+          {label:'预算基线',data:budget,borderColor:'#94A3B8',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false,tension:.35},
+        ]
+      },
+      options:{
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{grid:{color:chartGrid},ticks:{color:chartTick,font:{size:10}}},
+          y:{grid:{color:chartGrid},ticks:{color:chartTick,font:{size:10},callback:v=>(v/1000).toFixed(0)+'K'}}
+        },
+        responsive:true,maintainAspectRatio:false
+      }
+    });
+  }
+
+  // 风险趋势
+  const ctxR = document.getElementById('riskChart');
+  if(ctxR){
+    const labels = Array.from({length:12},(_,i)=>`W${i+1}`);
+    const risk = [25,28,22,35,40,38,45,52,48,55,42,42];
+    new Chart(ctxR,{
+      type:'line',
+      data:{labels,datasets:[{label:'风险指数',data:risk,borderColor:'#d97706',backgroundColor:'rgba(217,119,6,.15)',fill:true,tension:.4,borderWidth:2,pointRadius:3,pointBackgroundColor:'#d97706'}]},
+      options:{
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{grid:{color:chartGrid},ticks:{color:chartTick,font:{size:10}}},
+          y:{min:0,max:100,grid:{color:chartGrid},ticks:{color:chartTick,font:{size:10}}}
+        },
+        responsive:true,maintainAspectRatio:false
+      }
+    });
+  }
+
+  // ============ Leaflet 真实世界地图 ============
+  // 城市数据
+  const cities = [
+    {key:'shanghai',name:'中国总部 · 上海',sub:'出海大本营 · 料包工厂',lat:31.23,lng:121.47,level:'base'},
+    {key:'toronto',name:'多伦多 ★',sub:'M1-M12 · 1+2+CK',lat:43.65,lng:-79.38,level:'active'},
+    {key:'vancouver',name:'温哥华',sub:'M13-M16 · 计划 1-2 家',lat:49.28,lng:-123.12,level:'soon'},
+    {key:'la',name:'洛杉矶 · 美西',sub:'M17+ · 评估中',lat:34.05,lng:-118.24,level:'soon'},
+    {key:'hcm',name:'胡志明 · 越南',sub:'M15-M18 · JV 入场',lat:10.78,lng:106.70,level:'soon'},
+    {key:'ny',name:'纽约（远期）',sub:'',lat:40.71,lng:-74.00,level:'future'},
+    {key:'sg',name:'新加坡（远期）',sub:'',lat:1.35,lng:103.82,level:'future'},
+    {key:'bk',name:'曼谷（远期）',sub:'',lat:13.76,lng:100.50,level:'future'},
+    {key:'syd',name:'悉尼（远期）',sub:'',lat:-33.87,lng:151.21,level:'future'},
+    {key:'mel',name:'墨尔本（远期）',sub:'',lat:-37.81,lng:144.96,level:'future'},
+    {key:'london',name:'伦敦（远期）',sub:'',lat:51.51,lng:-0.13,level:'future'},
+  ];
+
+  // 航线（曲线）
+  const routes = [
+    {from:'shanghai',to:'toronto',type:'main'},
+    {from:'shanghai',to:'hcm',type:'main'},
+    {from:'toronto',to:'vancouver',type:'main'},
+    {from:'toronto',to:'la',type:'main'},
+    {from:'shanghai',to:'london',type:'future'},
+    {from:'shanghai',to:'syd',type:'future'},
+    {from:'shanghai',to:'sg',type:'future'},
+  ];
+
+  function makeMarker(city,withLabel=true){
+    const html = `<div class="gq-marker lvl-${city.level}"><div class="ring"></div><div class="dot"></div>${withLabel && city.sub?`<div class="label">${city.name}<span class="sub">${city.sub}</span></div>`:withLabel?`<div class="label">${city.name}</div>`:''}</div>`;
+    return L.divIcon({html,className:'',iconSize:[34,34],iconAnchor:[17,17]});
+  }
+
+  // 简单贝塞尔曲线（在地图上画弧线连接两点）
+  function drawCurve(map,fromLatLng,toLatLng,color,dash){
+    const offsetX = toLatLng[1]-fromLatLng[1];
+    const offsetY = toLatLng[0]-fromLatLng[0];
+    const r = Math.sqrt(offsetX*offsetX+offsetY*offsetY);
+    const theta = Math.atan2(offsetY,offsetX);
+    const thetaOffset = 0.55;
+    const r2 = (r/2)/Math.cos(thetaOffset);
+    const theta2 = theta + thetaOffset;
+    const midX = (r2*Math.cos(theta2)) + fromLatLng[1];
+    const midY = (r2*Math.sin(theta2)) + fromLatLng[0];
+    const curve = L.curve(['M',fromLatLng,'Q',[midY,midX],toLatLng],{color,weight:2,dashArray:dash,opacity:.65}).addTo(map);
+    return curve;
+  }
+
+  function initLeafletMap(elId,zoom,center){
+    if(!document.getElementById(elId))return null;
+    const map = L.map(elId,{zoomControl:true,scrollWheelZoom:false,worldCopyJump:true,attributionControl:false}).setView(center,zoom);
+    // CartoDB Voyager - 干净浅色底图
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+      maxZoom:8,minZoom:1,
+      attribution:'© OpenStreetMap © CARTO'
+    }).addTo(map);
+    // 标记
+    cities.forEach(c=>{
+      L.marker([c.lat,c.lng],{icon:makeMarker(c,true)}).addTo(map);
+    });
+    return map;
+  }
+
+  // 简化版曲线（无 leaflet-curve 插件依赖时用 polyline 近似）
+  function drawArcs(map){
+    const cityMap=Object.fromEntries(cities.map(c=>[c.key,c]));
+    routes.forEach(r=>{
+      const a=cityMap[r.from],b=cityMap[r.to];
+      if(!a||!b)return;
+      // 用多段线模拟弧线
+      const steps=24;
+      const pts=[];
+      for(let i=0;i<=steps;i++){
+        const t=i/steps;
+        const lat=a.lat+(b.lat-a.lat)*t;
+        const lng=a.lng+(b.lng-a.lng)*t;
+        // 弧度偏移（让线条向北弯曲，模拟航线）
+        const arc=Math.sin(t*Math.PI)*Math.min(20,Math.abs(b.lng-a.lng)/4);
+        pts.push([lat+arc,lng]);
+      }
+      L.polyline(pts,{
+        color:r.type==='main'?'#FF6B35':'#A855F7',
+        weight:r.type==='main'?2:1.5,
+        opacity:r.type==='main'?.6:.4,
+        dashArray:r.type==='main'?'6,4':'2,5'
+      }).addTo(map);
+    });
+  }
+
+  // 初始化两张地图
+  window.miniMap = initLeafletMap('miniMap',1,[28,40]);
+  if(window.miniMap){drawArcs(window.miniMap);}
+  window.bigMap = initLeafletMap('bigMap',2,[25,30]);
+  if(window.bigMap){drawArcs(window.bigMap);}
+
+  // ============ AI 总裁辅助决策助手 ============
+  const aiPanel = document.createElement('div');
+  aiPanel.id='aiPanel';
+  aiPanel.innerHTML=`
+    <div class="ai-fab" id="aiFab" title="AI 总裁辅助决策">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a3 3 0 013 3v1a3 3 0 01-3 3 3 3 0 01-3-3V5a3 3 0 013-3z"/><path d="M5 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/><circle cx="18.5" cy="5.5" r="1.5" fill="currentColor"/><path d="M15 8l3-3"/></svg>
+      <span class="lbl">AI 决策</span>
+    </div>
+    <div class="ai-backdrop" id="aiBackdrop"></div>
+    <div class="ai-drawer" id="aiDrawer">
+      <div class="ai-head">
+        <div class="flex items-center gap-2.5">
+          <div class="gq-logo-mark" style="width:32px;height:32px;padding:2px;">
+            <span style="font-size:9px;">锅</span><span style="font-size:9px;">圈</span>
+            <span style="font-size:9px;">食</span><span style="font-size:9px;">汇</span>
+          </div>
+          <div>
+            <div class="font-semibold text-[14px] text-slate-800">AI 总裁辅助决策</div>
+            <div class="text-[11px] text-slate-500">基于 15 Agent 实时数据 · 给杨总的决策建议</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1">
+          <button class="ai-min" id="aiMin" title="收起到边角">−</button>
+          <button class="ai-close" id="aiClose" title="关闭">×</button>
+        </div>
+      </div>
+      <div class="ai-body">
+        <div class="ai-suggest">
+          <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">📋 今日推荐决策</div>
+          <div class="ai-card urgent">
+            <div class="flex items-start justify-between mb-1">
+              <div class="font-semibold">⚠️ 1 号店毛利率告警 — 建议今日内决策</div>
+              <span class="pill pill-bad">紧急</span>
+            </div>
+            <div class="text-[12px] text-slate-600 mb-2">外卖抽佣 +3pp 致毛利掉至 18%。AI 已并行评估 3 套方案。</div>
+            <div class="flex gap-2 text-[11px]"><button class="ai-btn">查看 3 套方案</button><button class="ai-btn-secondary">让 COO 决策</button></div>
+          </div>
+          <div class="ai-card">
+            <div class="font-semibold mb-1">🚢 海运延期 — 建议接受 AI 已采取的行动</div>
+            <div class="text-[12px] text-slate-600 mb-2">温哥华港拥堵延期 5 天，AI 已联系本地备份供应商，库存可撑 9 天，无需杨总介入。</div>
+            <div class="flex gap-2 text-[11px]"><button class="ai-btn-secondary">查看处置过程</button></div>
+          </div>
+          <div class="ai-card">
+            <div class="font-semibold mb-1">🎯 战略建议 — 越南 JV 启动节奏</div>
+            <div class="text-[12px] text-slate-600 mb-2">基于多伦多 1 号店现金流、越南合伙人就绪度、料包产能，AI 推荐越南启动延后 1 个月（M16），将释放 CA$ 1.2M 现金垫。</div>
+            <div class="flex gap-2 text-[11px]"><button class="ai-btn">查看完整推演</button></div>
+          </div>
+        </div>
+
+        <div class="ai-quick">
+          <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-3">⚡ 一键提问</div>
+          <button class="ai-q">今天最大的风险是什么？</button>
+          <button class="ai-q">下周哪个项目需要我重点关注？</button>
+          <button class="ai-q">1 号店毛利怎么救？</button>
+          <button class="ai-q">推荐下一个开店城市</button>
+          <button class="ai-q">本月花费 vs 预算 偏差归因</button>
+          <button class="ai-q">外卖平台抽佣会带来多少影响？</button>
+          <button class="ai-q">现金流安全垫还有几个月？</button>
+          <button class="ai-q">8 台机器人哪台 ROI 最高？</button>
+        </div>
+
+        <div class="ai-input-wrap">
+          <input class="ai-input" placeholder="向 AI 总裁助手提问 …" id="aiInput"/>
+          <button class="ai-send" id="aiSend">问</button>
+        </div>
+        <div class="text-[10px] text-slate-400 mt-1.5 px-1">回答基于：实时 KPI · 14 Agents 数据流 · 决策审计日志 · 知识库 RAG</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(aiPanel);
+  const aiCss=document.createElement('style');
+  aiCss.textContent=`
+    .ai-fab{position:fixed;right:24px;bottom:24px;z-index:60;display:flex;align-items:center;gap:8px;padding:14px 22px;border-radius:999px;background:linear-gradient(135deg,#E53935,#FF6B35);color:#fff;cursor:pointer;box-shadow:0 8px 24px rgba(229,57,53,.45),0 2px 6px rgba(0,0,0,.1);font-weight:600;font-size:14px;transition:transform .15s,box-shadow .15s,opacity .2s;border:none;}
+    .ai-fab:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(229,57,53,.55);}
+    .ai-fab svg{width:22px;height:22px;}
+    .ai-fab.hidden{opacity:0;pointer-events:none;transform:scale(.6);}
+    .ai-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.18);z-index:65;opacity:0;pointer-events:none;transition:opacity .2s;}
+    .ai-backdrop.show{opacity:1;pointer-events:auto;}
+    .ai-drawer{position:fixed;right:-500px;bottom:0;top:57px;width:420px;max-width:calc(100vw - 24px);background:#fff;border-left:1px solid var(--line);box-shadow:-12px 0 32px rgba(15,23,42,.12);z-index:70;transition:right .25s;display:flex;flex-direction:column;}
+    .ai-drawer.open{right:0;}
+    .ai-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .ai-min,.ai-close{background:transparent;border:0;line-height:1;color:#64748b;cursor:pointer;width:32px;height:32px;border-radius:8px;font-size:20px;display:flex;align-items:center;justify-content:center;}
+    .ai-min{font-size:24px;font-weight:700;}
+    .ai-close{font-size:24px;}
+    .ai-min:hover,.ai-close:hover{background:#f1f5f9;color:#0f172a;}
+    .ai-body{flex:1;overflow-y:auto;padding:16px 18px;}
+    .ai-card{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;}
+    .ai-card.urgent{background:linear-gradient(135deg,rgba(220,38,38,.06),rgba(255,107,53,.04));border-color:rgba(220,38,38,.25);}
+    .ai-btn{padding:6px 12px;border-radius:6px;background:linear-gradient(90deg,#E53935,#FF6B35);color:#fff;border:0;cursor:pointer;font-size:11px;font-weight:600;}
+    .ai-btn-secondary{padding:6px 12px;border-radius:6px;background:#fff;color:#475569;border:1px solid var(--line);cursor:pointer;font-size:11px;}
+    .ai-q{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 12px;margin-bottom:6px;font-size:12.5px;cursor:pointer;color:#334155;transition:all .15s;}
+    .ai-q:hover{border-color:#FF6B35;background:#fff7f3;color:#B71C1C;}
+    .ai-input-wrap{display:flex;gap:6px;margin-top:14px;}
+    .ai-input{flex:1;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font-size:13px;background:#fff;color:#0f172a;outline:none;}
+    .ai-input:focus{border-color:#FF6B35;}
+    .ai-send{padding:0 18px;border-radius:8px;background:linear-gradient(90deg,#E53935,#FF6B35);color:#fff;border:0;cursor:pointer;font-weight:600;font-size:13px;}
+    @media (max-width:600px){.ai-fab .lbl{display:none;}.ai-fab{padding:14px;}.ai-drawer{width:100vw;}}
+  `;
+  document.head.appendChild(aiCss);
+  // AI 抽屉：开 / 关 / 收起 / 点击外侧关闭 / ESC 关闭
+  const aiFab=document.getElementById('aiFab');
+  const aiDrawer=document.getElementById('aiDrawer');
+  const aiBackdrop=document.getElementById('aiBackdrop');
+  function openAI(){aiDrawer.classList.add('open');aiBackdrop.classList.add('show');aiFab.classList.add('hidden');}
+  function closeAI(){aiDrawer.classList.remove('open');aiBackdrop.classList.remove('show');aiFab.classList.remove('hidden');}
+  aiFab.addEventListener('click',openAI);
+  document.getElementById('aiClose').addEventListener('click',closeAI);
+  document.getElementById('aiMin').addEventListener('click',closeAI); // 收起 = 关闭抽屉但保留状态，点 fab 再开
+  aiBackdrop.addEventListener('click',closeAI);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAI();});
+  document.querySelectorAll('.ai-q').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.getElementById('aiInput').value=btn.textContent;
+    });
+  });
+
+  // ============ 自动注入「层级 AI 分析」按钮 ============
+  function injectAIButtons(){
+    // 金字塔每个 cell
+    document.querySelectorAll('.pyramid-cell').forEach(cell=>{
+      if(cell.querySelector('.ai-btn-mini'))return;
+      const btn=document.createElement('button');
+      btn.className='ai-btn-mini';
+      btn.innerHTML='✨ AI';
+      btn.title='让 AI 分析这个角色 / 层级';
+      btn.style.position='absolute';
+      btn.style.top='4px';
+      btn.style.right='4px';
+      btn.onclick=(e)=>{e.stopPropagation();openAIWithContext('层级：'+cell.textContent.replace(/✨ AI/g,'').trim().substring(0,50));};
+      cell.style.position='relative';
+      cell.style.paddingTop=(parseInt(getComputedStyle(cell).paddingTop)||10)+'px';
+      cell.appendChild(btn);
+    });
+    // AI Agent 矩阵卡片
+    document.querySelectorAll('.agent-card').forEach(card=>{
+      if(card.querySelector('.ai-btn-on-light'))return;
+      const btn=document.createElement('button');
+      btn.className='ai-btn-mini ai-btn-on-light';
+      btn.innerHTML='✨ 让此 Agent 工作';
+      btn.style.marginTop='8px';
+      btn.style.fontSize='10.5px';
+      const titleEl=card.querySelector('.font-semibold')||card.firstElementChild;
+      const ctx = titleEl?titleEl.textContent.trim():'';
+      btn.onclick=(e)=>{e.stopPropagation();openAIWithContext('调度 Agent：'+ctx);};
+      card.appendChild(btn);
+    });
+    // 部门职责卡片
+    document.querySelectorAll('#org .grid > .card').forEach(card=>{
+      if(card.querySelector('.dept-ai-btn'))return;
+      const heading=card.querySelector('.font-semibold');
+      if(!heading)return;
+      const btn=document.createElement('button');
+      btn.className='ai-btn-mini ai-btn-on-light dept-ai-btn';
+      btn.innerHTML='✨ AI 分析';
+      btn.style.marginLeft='auto';
+      btn.style.fontSize='10px';
+      const headingRow=heading.parentElement;
+      if(headingRow && headingRow.classList.contains('flex')){
+        headingRow.appendChild(btn);
+      }else{
+        const wrap=document.createElement('div');
+        wrap.style.marginTop='6px';
+        wrap.appendChild(btn);
+        card.appendChild(wrap);
+      }
+      btn.onclick=(e)=>{e.stopPropagation();openAIWithContext('部门：'+heading.textContent.trim());};
+    });
+  }
+  function openAIWithContext(ctx){
+    const drawer=document.getElementById('aiDrawer');
+    const inp=document.getElementById('aiInput');
+    drawer.classList.add('open');
+    if(inp){inp.value='请分析：'+ctx+'。今日表现 / 风险 / 改进建议。';inp.focus();}
+  }
+  setTimeout(injectAIButtons,200);
+
+  // ============ 部门工作台 tab 切换 ============
+  document.querySelectorAll('.dept-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      const dept=tab.dataset.dept;
+      document.querySelectorAll('.dept-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.dept-mockup').forEach(m=>m.classList.remove('active'));
+      tab.classList.add('active');
+      const target=document.querySelector(`.dept-mockup[data-dept="${dept}"]`);
+      if(target)target.classList.add('active');
+    });
+  });
+
+  // 地图在窗口 resize 时重绘
+  window.addEventListener('resize',()=>{
+    if(window.miniMap)setTimeout(()=>window.miniMap.invalidateSize(),60);
+    if(window.bigMap)setTimeout(()=>window.bigMap.invalidateSize(),60);
+  });
+</script>
+</body>
+</html>
