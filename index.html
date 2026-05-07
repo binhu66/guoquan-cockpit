@@ -951,7 +951,7 @@
         <button class="dept-tab active" data-dept="market">📊 市场调研</button>
         <button class="dept-tab" data-dept="finance">💰 财务规划</button>
         <button class="dept-tab" data-dept="site">📍 选址装修</button>
-        <button class="dept-tab" data-dept="supply">📦 供应链/海运</button>
+        <button class="dept-tab" data-dept="supply">📦 供应链</button>
         <button class="dept-tab" data-dept="kitchen">🍳 中央厨房</button>
         <button class="dept-tab" data-dept="store">🏪 门店运营</button>
         <button class="dept-tab" data-dept="delivery">🛵 外卖业务</button>
@@ -1078,38 +1078,253 @@
         </div>
       </div>
 
-      <!-- 供应链 -->
+      <!-- 供应链 (4 路并行：海运 / 本地 / 第三方 / GPS 追踪) -->
       <div class="dept-mockup" data-dept="supply">
         <div class="mockup-frame">
-          <div class="mockup-bar"><div class="font-semibold">📦 供应链 / 海运工作台</div><div class="text-slate-500">AI 助手：供应链 + 海运 Agent · 国内总部采购 · 货代外包</div></div>
+          <div class="mockup-bar"><div class="font-semibold">📦 供应链工作台</div><div class="text-slate-500">4 路并行 · 月级海运 + 日级本地 + 合同制第三方 + 实时 GPS</div></div>
+
+          <!-- 三路成本占比 KPI（首屏看穿）-->
           <div class="grid grid-cols-4 gap-3 p-4 border-b border-slate-200">
-            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">在途集装箱</div><div class="kpi-num">3 <span class="text-xs text-slate-500">柜</span></div><div class="text-[11px] text-slate-500">2 上海→温哥华</div></div>
-            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本地库存（天）</div><div class="kpi-num text-emerald-600">23</div><div class="text-[11px] text-slate-500">料包 + 干货</div></div>
-            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本月采购单</div><div class="kpi-num">42</div><div class="text-[11px] text-slate-500">AI 自动 38</div></div>
-            <div class="card-2 p-3"><div class="text-[11px] text-slate-500">异常事件</div><div class="kpi-num text-amber-600">1 <span class="text-xs text-slate-500">⚠</span></div><div class="text-[11px] text-amber-600">温哥华港延期</div></div>
+            <div class="card-2 p-3" style="border-left:3px solid #E53935;">
+              <div class="text-[11px] text-slate-500">🇨🇳 海运料包</div>
+              <div class="kpi-num">CA$ 256K</div>
+              <div class="text-[11px] text-slate-500">月度 · 6-8 周节奏 · 占 62%</div>
+            </div>
+            <div class="card-2 p-3" style="border-left:3px solid #16a34a;">
+              <div class="text-[11px] text-slate-500">🇨🇦 本地采购</div>
+              <div class="kpi-num text-emerald-600">CA$ 118K</div>
+              <div class="text-[11px] text-slate-500">日级 · 每周 3-5 次补货 · 占 28%</div>
+            </div>
+            <div class="card-2 p-3" style="border-left:3px solid #0ea5e9;">
+              <div class="text-[11px] text-slate-500">🤝 第三方</div>
+              <div class="kpi-num" style="color:#0ea5e9;">CA$ 42K</div>
+              <div class="text-[11px] text-slate-500">月费 · 7 家合作方 · 占 10%</div>
+            </div>
+            <div class="card-2 p-3" style="border-left:3px solid #f59e0b;">
+              <div class="text-[11px] text-slate-500">⚠ 异常事件</div>
+              <div class="kpi-num text-amber-600">2</div>
+              <div class="text-[11px] text-amber-600">温哥华港延期 · GFS 备份</div>
+            </div>
           </div>
-          <div class="grid grid-cols-3 gap-3 p-4">
-            <div class="col-span-2">
-              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🚢 在途集装箱</div>
-              <table class="w-full text-[12px]">
-                <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider"><tr><th class="text-left py-1">柜号</th><th class="text-left">起→到</th><th class="text-right">货值</th><th class="text-right">ETA</th><th class="text-right">状态</th></tr></thead>
-                <tbody class="text-slate-700">
-                  <tr><td class="font-mono">GQT-204</td><td>上海 → 温哥华</td><td class="text-right">CA$ 86K</td><td class="text-right">5/12</td><td class="text-right"><span class="pill pill-warn">+5 天 ⚠</span></td></tr>
-                  <tr><td class="font-mono">GQT-205</td><td>上海 → 温哥华</td><td class="text-right">CA$ 92K</td><td class="text-right">5/22</td><td class="text-right"><span class="pill pill-ok">在途</span></td></tr>
-                  <tr><td class="font-mono">GQT-206</td><td>上海 → 多伦多</td><td class="text-right">CA$ 78K</td><td class="text-right">6/03</td><td class="text-right"><span class="pill pill-info">起航</span></td></tr>
-                </tbody>
-              </table>
-              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📋 任务 / 异常</div>
-              <div class="space-y-2 text-[12.5px]">
-                <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> GQT-204 港口延期 - AI 已联系 GFS 备份供应</span><span class="pill pill-ai">AI 处理</span></div>
-                <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> 6 月料包预测 - 备货建议</span><span class="pill pill-ai">AI 算 = 1.4×</span></div>
-                <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> Sysco 价格谈判（第 2 轮）</span><span class="pill pill-warn">需 COO</span></div>
+
+          <!-- 子 tab 切换 -->
+          <div class="supply-tabs flex gap-2 p-3 border-b border-slate-200" style="background:#f8fafc;flex-wrap:wrap;">
+            <button class="supply-tab active" data-supply="hq" style="padding:6px 14px;border-radius:6px;background:#fff;border:1px solid #E53935;color:#B71C1C;font-size:12px;font-weight:600;cursor:pointer;">🇨🇳 海运料包（月度）</button>
+            <button class="supply-tab" data-supply="local" style="padding:6px 14px;border-radius:6px;background:#fff;border:1px solid var(--line);color:#64748b;font-size:12px;cursor:pointer;">🇨🇦 本地采购（日级）</button>
+            <button class="supply-tab" data-supply="3rd" style="padding:6px 14px;border-radius:6px;background:#fff;border:1px solid var(--line);color:#64748b;font-size:12px;cursor:pointer;">🤝 第三方协作</button>
+            <button class="supply-tab" data-supply="gps" style="padding:6px 14px;border-radius:6px;background:#fff;border:1px solid var(--line);color:#64748b;font-size:12px;cursor:pointer;">📍 物流 GPS</button>
+          </div>
+
+          <!-- 海运子页 -->
+          <div class="supply-panel" data-supply="hq" style="display:block;">
+            <div class="grid grid-cols-3 gap-3 p-4 border-b border-slate-200" style="background:#fef9f7;">
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">在途集装箱</div><div class="kpi-num">3 柜</div><div class="text-[11px] text-slate-500">2 上海→温哥华 · 1 上海→多伦多</div></div>
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本地仓库存</div><div class="kpi-num text-emerald-600">23 天</div><div class="text-[11px] text-slate-500">料包 + 干货 · 安全线 14 天</div></div>
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本月采购</div><div class="kpi-num">CA$ 256K</div><div class="text-[11px] text-slate-500">已下单 220K · 待下 36K</div></div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 p-4">
+              <div class="col-span-2">
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🚢 在途集装箱（国内 → 加拿大）</div>
+                <table class="w-full text-[12px]">
+                  <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider"><tr><th class="text-left py-1">柜号</th><th class="text-left">起→到</th><th class="text-right">货值</th><th class="text-right">ETA</th><th class="text-right">状态</th></tr></thead>
+                  <tbody class="text-slate-700">
+                    <tr><td class="font-mono">GQT-204</td><td>上海 → 温哥华</td><td class="text-right">CA$ 86K</td><td class="text-right">5/12</td><td class="text-right"><span class="pill pill-warn">+5 天 ⚠</span></td></tr>
+                    <tr><td class="font-mono">GQT-205</td><td>上海 → 温哥华</td><td class="text-right">CA$ 92K</td><td class="text-right">5/22</td><td class="text-right"><span class="pill pill-ok">在途</span></td></tr>
+                    <tr><td class="font-mono">GQT-206</td><td>上海 → 多伦多</td><td class="text-right">CA$ 78K</td><td class="text-right">6/03</td><td class="text-right"><span class="pill pill-info">起航</span></td></tr>
+                  </tbody>
+                </table>
+
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📦 国内总部采购清单（月度）</div>
+                <table class="w-full text-[12px]">
+                  <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider"><tr><th class="text-left py-1">SKU 类目</th><th class="text-right">月需求</th><th class="text-right">工厂单价</th><th class="text-right">月成本</th></tr></thead>
+                  <tbody class="text-slate-700">
+                    <tr><td>核心料包（麻婆/水煮/鱼香 等 8 SKU）</td><td class="text-right">12,000 包</td><td class="text-right">¥6.8</td><td class="text-right">CA$ 156K</td></tr>
+                    <tr><td>调料 / 干货（豆豉、花椒、辣椒）</td><td class="text-right">2,500 kg</td><td class="text-right">¥38/kg</td><td class="text-right">CA$ 49K</td></tr>
+                    <tr><td>包装 / 一次性餐盒</td><td class="text-right">15,000 件</td><td class="text-right">¥0.85</td><td class="text-right">CA$ 31K</td></tr>
+                    <tr><td>设备配件 / 易耗品</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right">CA$ 20K</td></tr>
+                  </tbody>
+                </table>
+
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📋 月度任务 / 异常</div>
+                <div class="space-y-2 text-[12.5px]">
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> GQT-204 温哥华港延期 5 天 — AI 已激活 GFS 备份</span><span class="pill pill-ai">AI 处理</span></div>
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> 6 月料包预测 1.4× — 已下单加量给国内工厂</span><span class="pill pill-ai">AI 算</span></div>
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> 国内料包工厂年度大单合同续签</span><span class="pill pill-warn">需杨总</span></div>
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手（海运）</div>
+                <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">⚠️ GQT-204 延期 5 天，本地库存撑 9 天，结合本地采购可平稳过渡</div></div>
+                <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">💡 港口拥堵高峰 5/8-12，建议下批改走 Prince Rupert（省 3 天）</div></div>
+                <div class="card-2 p-3"><div class="text-[11.5px]">📊 国内工厂 6 月排产已确认 — 出厂 6/15，温哥华港预计 7/30</div></div>
+                <div class="text-[10px] text-slate-400 mt-3">⏱ 节奏：6-8 周从下单到上架 · 月度规划</div>
               </div>
             </div>
-            <div>
-              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手</div>
-              <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">⚠️ GQT-204 延期 5 天，本地库存可撑 9 天 - 不会断货，无需介入。</div></div>
-              <div class="card-2 p-3"><div class="text-[11.5px]">💡 推荐：双供应商策略已激活 GFS 备份。下次主动列入常备路径。</div></div>
+          </div>
+
+          <!-- 本地采购子页 -->
+          <div class="supply-panel" data-supply="local" style="display:none;">
+            <div class="grid grid-cols-3 gap-3 p-4 border-b border-slate-200" style="background:#f0fdf4;">
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">本周补货次数</div><div class="kpi-num text-emerald-600">12 次</div><div class="text-[11px] text-slate-500">3 家供应商 · AI 自动 10 次</div></div>
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">日均现金支出</div><div class="kpi-num">CA$ 3,933</div><div class="text-[11px] text-slate-500">月度 CA$ 118K</div></div>
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">三家比价节省</div><div class="kpi-num text-emerald-600">+11%</div><div class="text-[11px] text-emerald-600">AI 自动选最低 · 月省 CA$ 8.2K</div></div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 p-4">
+              <div class="col-span-2">
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🛒 三家供应商比价（核心 SKU · 实时同步）</div>
+                <table class="w-full text-[12px]">
+                  <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                    <tr><th class="text-left py-1">SKU</th><th class="text-right">Sysco</th><th class="text-right">GFS</th><th class="text-right">华人 Foody</th><th class="text-right">AI 选</th></tr>
+                  </thead>
+                  <tbody class="text-slate-700">
+                    <tr><td>牛肉（AAA）/lb</td><td class="text-right">$8.42 ⚠</td><td class="text-right text-emerald-600 font-bold">$7.96</td><td class="text-right">$8.10</td><td class="text-right"><span class="pill pill-ok">GFS</span></td></tr>
+                    <tr><td>猪五花 /lb</td><td class="text-right">$4.15</td><td class="text-right">$4.08</td><td class="text-right text-emerald-600 font-bold">$3.65</td><td class="text-right"><span class="pill pill-ok">华人</span></td></tr>
+                    <tr><td>鸡腿肉 /lb</td><td class="text-right">$3.20</td><td class="text-right text-emerald-600 font-bold">$2.95</td><td class="text-right">$3.10</td><td class="text-right"><span class="pill pill-ok">GFS</span></td></tr>
+                    <tr><td>豆腐（板）</td><td class="text-right">—</td><td class="text-right">$2.50</td><td class="text-right text-emerald-600 font-bold">$1.85</td><td class="text-right"><span class="pill pill-ok">华人</span></td></tr>
+                    <tr><td>青菜 / 配菜 /lb</td><td class="text-right">$1.90</td><td class="text-right">$1.85</td><td class="text-right text-emerald-600 font-bold">$1.45</td><td class="text-right"><span class="pill pill-ok">华人</span></td></tr>
+                    <tr><td>大米（25 lb）</td><td class="text-right">$22</td><td class="text-right text-emerald-600 font-bold">$19.5</td><td class="text-right">$20</td><td class="text-right"><span class="pill pill-ok">GFS</span></td></tr>
+                    <tr><td>食用油（16L）</td><td class="text-right text-emerald-600 font-bold">$32.5</td><td class="text-right">$33.8</td><td class="text-right">$35</td><td class="text-right"><span class="pill pill-ok">Sysco</span></td></tr>
+                  </tbody>
+                </table>
+
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📊 三家综合对比</div>
+                <div class="grid grid-cols-3 gap-2 text-[11px]">
+                  <div class="card-2 p-3">
+                    <div class="font-semibold mb-1.5 flex items-center justify-between">Sysco <span class="pill pill-info">主流</span></div>
+                    <ul class="space-y-0.5 text-slate-600">
+                      <li>• 起送 $1500 · 账期 Net 30</li>
+                      <li>• 配送：每日</li>
+                      <li>• 品控：⭐⭐⭐⭐⭐</li>
+                      <li>• 价格：偏高 +5%</li>
+                      <li class="text-amber-600">优势：标准化、稳定</li>
+                    </ul>
+                  </div>
+                  <div class="card-2 p-3" style="border:1px solid rgba(22,163,74,.4);">
+                    <div class="font-semibold mb-1.5 flex items-center justify-between">GFS <span class="pill pill-ok">主推</span></div>
+                    <ul class="space-y-0.5 text-slate-600">
+                      <li>• 起送 $1000 · 账期 Net 30</li>
+                      <li>• 配送：每日</li>
+                      <li>• 品控：⭐⭐⭐⭐⭐</li>
+                      <li>• 价格：中等</li>
+                      <li class="text-emerald-600">优势：肉类便宜、加拿大本土</li>
+                    </ul>
+                  </div>
+                  <div class="card-2 p-3">
+                    <div class="font-semibold mb-1.5 flex items-center justify-between">华人 Foody <span class="pill pill-warn">专项</span></div>
+                    <ul class="space-y-0.5 text-slate-600">
+                      <li>• 起送 $500 · 账期 现结/Net 7</li>
+                      <li>• 配送：3 次/周</li>
+                      <li>• 品控：⭐⭐⭐⭐</li>
+                      <li>• 价格：最低 -10-20%</li>
+                      <li class="text-emerald-600">优势：豆腐/调料/青菜</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📋 今日补货任务</div>
+                <div class="space-y-2 text-[12.5px]">
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> GFS 周三补货：牛肉 200lb + 鸡腿 150lb（CA$ 2.1K）</span><span class="pill pill-ai">AI 自动下单</span></div>
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> Foody 周四补货：豆腐 80 板 + 青菜 50lb（CA$ 350）</span><span class="pill pill-ok">已确认</span></div>
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> Sysco 食用油月度集采（80L · CA$ 162）</span><span class="pill pill-info">月底</span></div>
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手（本地）</div>
+                <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">💰 切牛肉到 GFS = 月省 CA$ 4,200（已生效）</div></div>
+                <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">💡 增加华人渠道豆制品 — 月可再省 CA$ 1,800</div></div>
+                <div class="card-2 p-3"><div class="text-[11.5px]">⚠️ Sysco 牛肉本月 +6%，AI 已自动迁移到 GFS</div></div>
+                <div class="text-[10px] text-slate-400 mt-3">⏱ 节奏：日级补货 · 当日下单当日到</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 第三方子页 -->
+          <div class="supply-panel" data-supply="3rd" style="display:none;">
+            <div class="grid grid-cols-3 gap-3 p-4 border-b border-slate-200" style="background:#f0f9ff;">
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">合作方</div><div class="kpi-num" style="color:#0ea5e9;">7 家</div><div class="text-[11px] text-slate-500">货代/仓储/配送/质检</div></div>
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">月度合同费</div><div class="kpi-num">CA$ 7.5K</div><div class="text-[11px] text-slate-500">外加按次/抽佣</div></div>
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">SLA 达标率</div><div class="kpi-num text-emerald-600">96%</div><div class="text-[11px] text-slate-500">本月 1 次延期（Flexport）</div></div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 p-4">
+              <div class="col-span-2">
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤝 合作方矩阵 + 一键联系</div>
+                <table class="w-full text-[12px]">
+                  <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                    <tr><th class="text-left py-1">服务</th><th class="text-left">合作方</th><th class="text-right">月费</th><th class="text-right">SLA</th><th class="text-right">联系人</th></tr>
+                  </thead>
+                  <tbody class="text-slate-700">
+                    <tr><td>🚢 海运货代</td><td>Flexport</td><td class="text-right">$2.4K</td><td class="text-right">±3 天到港</td><td class="text-right text-blue-600">📞 王经理 · 152****8901</td></tr>
+                    <tr><td>🛃 报关清关</td><td>Livingston</td><td class="text-right">$0.8K</td><td class="text-right">2 天放行</td><td class="text-right text-blue-600">📞 Jane Wu · 416-555-0142</td></tr>
+                    <tr><td>📦 本地仓储</td><td>Mississauga 3PL</td><td class="text-right">$1.6K</td><td class="text-right">同日入库</td><td class="text-right text-blue-600">📞 Chen 经理 · 905-555-0167</td></tr>
+                    <tr><td>🚛 干线配送</td><td>Day & Ross</td><td class="text-right">$1.2K</td><td class="text-right">次日达</td><td class="text-right text-blue-600">📞 dispatch · 1-800-661-8730</td></tr>
+                    <tr><td>🛵 外卖末端</td><td>Uber/DD/Skip</td><td class="text-right">抽佣 25%</td><td class="text-right">30 min</td><td class="text-right">—</td></tr>
+                    <tr><td>📱 外卖代运营</td><td>万有引力 GMS</td><td class="text-right">$1.5K</td><td class="text-right">+3% GMV</td><td class="text-right text-blue-600">📞 张姐 · 微信 zhangjie2024</td></tr>
+                    <tr><td>🔬 食品质检</td><td>SGS Canada</td><td class="text-right">按次 $400</td><td class="text-right">5 天报告</td><td class="text-right text-blue-600">📞 lab · sgs.ca/contact</td></tr>
+                  </tbody>
+                </table>
+
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">📋 本周第三方协作</div>
+                <div class="space-y-2 text-[12.5px]">
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>1.</b> Flexport 跟进 GQT-204 港口拥堵 ETA 调整</span><span class="pill pill-ai">AI 跟进</span></div>
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>2.</b> Livingston 提交 GQT-205 报关材料（CFIA）</span><span class="pill pill-warn">3 天内</span></div>
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>3.</b> 万有引力 4 月外卖代运营复盘（GMV +3.2%）</span><span class="pill pill-ok">已收</span></div>
+                  <div class="card-2 p-2.5 flex justify-between"><span><b>4.</b> SGS 月度食品品控抽检（5 SKU · 下周三）</span><span class="pill pill-info">下周</span></div>
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">🤖 AI 助手（第三方）</div>
+                <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">⚠️ Flexport 监测：温哥华港 5/8-12 拥堵，建议下批走 Prince Rupert</div></div>
+                <div class="card-2 p-3 mb-2"><div class="text-[11.5px]">💡 万有引力跑通 6 个月后建议自营外卖，省月费 + 提 5% GMV</div></div>
+                <div class="card-2 p-3"><div class="text-[11.5px]">📞 一键拨打：所有联系人已收录企业微信通讯录</div></div>
+                <div class="text-[10px] text-slate-400 mt-3">⏱ 节奏：合同制 + 事件触发</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 物流 GPS 子页 -->
+          <div class="supply-panel" data-supply="gps" style="display:none;">
+            <div class="grid grid-cols-3 gap-3 p-4 border-b border-slate-200" style="background:#fefce8;">
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">追踪货物</div><div class="kpi-num">3 柜 + 8 卡车</div><div class="text-[11px] text-slate-500">含本地配送干线</div></div>
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">实时同步</div><div class="kpi-num text-emerald-600">每 15min</div><div class="text-[11px] text-slate-500">Flexport / Day&Ross API</div></div>
+              <div class="card-2 p-3"><div class="text-[11px] text-slate-500">预警次数（本月）</div><div class="kpi-num text-amber-600">3 次</div><div class="text-[11px] text-slate-500">GQT-204 延期 + 2 次绕行</div></div>
+            </div>
+            <div class="p-4">
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">📍 GQT-204 集装箱实时链路</div>
+              <div class="card-2 p-4 mb-4">
+                <div class="grid grid-cols-6 gap-2 text-[10.5px] text-center">
+                  <div><div class="text-emerald-600 text-2xl">●</div><div class="font-semibold">起航</div><div class="text-slate-500">5/2 上海港</div><div class="text-emerald-600">✓ 完成</div></div>
+                  <div><div class="text-emerald-600 text-2xl">●</div><div class="font-semibold">海运中</div><div class="text-slate-500">5/2-5/12</div><div class="text-emerald-600">✓ 11 天</div></div>
+                  <div><div class="text-amber-600 text-2xl">●</div><div class="font-semibold">到港</div><div class="text-slate-500">5/17 温哥华</div><div class="text-amber-600">+5 天 ⚠</div></div>
+                  <div><div class="text-slate-300 text-2xl">○</div><div class="font-semibold">报关</div><div class="text-slate-500">Livingston</div><div class="text-slate-400">待启动</div></div>
+                  <div><div class="text-slate-300 text-2xl">○</div><div class="font-semibold">陆运</div><div class="text-slate-500">Day & Ross</div><div class="text-slate-400">—</div></div>
+                  <div><div class="text-slate-300 text-2xl">○</div><div class="font-semibold">入仓</div><div class="text-slate-500">Mississauga</div><div class="text-slate-400">—</div></div>
+                </div>
+                <div class="mt-3 text-[10.5px] text-slate-500 flex justify-between">
+                  <span>🔗 Flexport API · AI 每 15 分钟刷新</span>
+                  <span>📍 当前位置：北纬 49.30° 西经 -123.18°（温哥华港外锚地）</span>
+                </div>
+              </div>
+
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">📍 本地干线配送（同时追踪 8 辆卡车）</div>
+              <table class="w-full text-[12px]">
+                <thead class="text-[10.5px] text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                  <tr><th class="text-left py-1">车牌</th><th class="text-left">货物</th><th class="text-left">起→终</th><th class="text-right">距离</th><th class="text-right">ETA</th><th class="text-right">司机</th><th class="text-right">状态</th></tr>
+                </thead>
+                <tbody class="text-slate-700">
+                  <tr><td class="font-mono">D&R-487</td><td>料包 · 800 包</td><td>Mississauga → 1 号店</td><td class="text-right">42 km</td><td class="text-right">14:25</td><td class="text-right text-blue-600">📞 Mike</td><td class="text-right"><span class="pill pill-ok">在途 5 km</span></td></tr>
+                  <tr><td class="font-mono">D&R-512</td><td>料包 · 600 包</td><td>Mississauga → 2 号店</td><td class="text-right">38 km</td><td class="text-right">15:10</td><td class="text-right text-blue-600">📞 Tony</td><td class="text-right"><span class="pill pill-info">出发</span></td></tr>
+                  <tr><td class="font-mono">GFS-A41</td><td>牛肉 200 lb</td><td>GFS仓 → 1 号店</td><td class="text-right">28 km</td><td class="text-right">11:30</td><td class="text-right text-blue-600">📞 Sara</td><td class="text-right"><span class="pill pill-ok">已送达</span></td></tr>
+                  <tr><td class="font-mono">SY-X12</td><td>食用油 80L</td><td>Sysco → 中央厨房</td><td class="text-right">15 km</td><td class="text-right">10:50</td><td class="text-right">—</td><td class="text-right"><span class="pill pill-ok">已送达</span></td></tr>
+                </tbody>
+              </table>
+
+              <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2 mt-4">🤖 AI 智能预警</div>
+              <div class="grid grid-cols-2 gap-2 text-[12px]">
+                <div class="card-2 p-3"><div>🚨 D&R-487 距 1 号店 5 km · 预计准点 14:25 ✓</div></div>
+                <div class="card-2 p-3"><div>⚠️ GQT-204 港外等泊位（已 18 小时）· 排在第 4 位</div></div>
+                <div class="card-2 p-3"><div>💡 5/8-12 拥堵高峰预测：未来 3 班船改 Prince Rupert 可省 3 天</div></div>
+                <div class="card-2 p-3"><div>📞 触发任一异常 → AI 自动列出对应联系人 + 一键拨号</div></div>
+              </div>
             </div>
           </div>
         </div>
@@ -2764,6 +2979,26 @@
       tab.classList.add('active');
       const target=document.querySelector(`.dept-mockup[data-dept="${dept}"]`);
       if(target)target.classList.add('active');
+    });
+  });
+
+  // ============ 供应链子 tab 切换（海运/本地/第三方/GPS） ============
+  document.querySelectorAll('.supply-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      const which=tab.dataset.supply;
+      document.querySelectorAll('.supply-tab').forEach(t=>{
+        t.classList.remove('active');
+        t.style.border='1px solid var(--line)';
+        t.style.color='#64748b';
+        t.style.fontWeight='400';
+      });
+      tab.classList.add('active');
+      tab.style.border='1px solid #E53935';
+      tab.style.color='#B71C1C';
+      tab.style.fontWeight='600';
+      document.querySelectorAll('.supply-panel').forEach(p=>{p.style.display='none';});
+      const target=document.querySelector(`.supply-panel[data-supply="${which}"]`);
+      if(target)target.style.display='block';
     });
   });
 
