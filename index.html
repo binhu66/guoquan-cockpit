@@ -463,41 +463,128 @@
       <!-- 底部：项目进度 + 异常事件流 -->
       <div class="grid grid-cols-3 gap-4">
         <div class="card p-5 col-span-2">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-3">
             <div class="text-sm font-semibold">在建/在营项目进度</div>
-            <span class="text-[11px] text-slate-500">点击项目可下钻至单店驾驶舱</span>
+            <div class="flex items-center gap-3 text-[10.5px] text-slate-400">
+              <span class="flex items-center gap-1"><span style="display:inline-block;width:18px;height:4px;border-radius:2px;background:#cbd5e1;"></span>计划</span>
+              <span class="flex items-center gap-1"><span style="display:inline-block;width:18px;height:6px;border-radius:2px;background:linear-gradient(90deg,#E53935,#FF6B35);"></span>实际</span>
+              <span class="text-slate-300">|</span>
+              <span class="text-slate-500">点击下钻</span>
+            </div>
           </div>
           <div class="space-y-4">
+
+            <!-- 1 号店：在营，双轨切换为运营关键指标 -->
             <div class="drillable p-2 rounded-lg" onclick="openDetail('project_1')">
-              <div class="flex justify-between text-[12.5px] mb-1.5">
+              <div class="flex justify-between text-[12.5px] mb-2">
                 <div><span class="font-semibold">多伦多 1 号店</span> <span class="pill pill-ok ml-2">在营</span> <span class="text-slate-500">· Markham</span></div>
                 <div class="text-slate-500">运营 · 第 8 周</div>
               </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:100%;"></div></div>
-              <div class="flex justify-between text-[11px] text-slate-500 mt-1">
-                <span>开业 ✓</span><span>每日 GMV: CA$ 12.4K</span><span>毛利率 18% ⚠</span>
+              <!-- 双轨 A：GMV 达成率 -->
+              <div class="mb-2">
+                <div class="flex justify-between text-[10.5px] mb-0.5">
+                  <span class="text-slate-400">本日 GMV 目标 <b class="text-slate-600">CA$13.5K</b></span>
+                  <span class="font-semibold text-emerald-600">实际 CA$12.4K · 92% <span class="text-amber-500 ml-1">▼ 8%</span></span>
+                </div>
+                <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;margin-bottom:3px;">
+                  <div style="height:100%;width:100%;background:#94a3b8;border-radius:2px;"></div>
+                </div>
+                <div style="height:7px;background:#dcfce7;border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:92%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:3px;"></div>
+                </div>
+              </div>
+              <!-- 双轨 B：毛利达成率 -->
+              <div class="mb-1">
+                <div class="flex justify-between text-[10.5px] mb-0.5">
+                  <span class="text-slate-400">毛利率目标 <b class="text-slate-600">22%</b></span>
+                  <span class="font-semibold text-red-600">实际 18% · 82% <span class="text-red-500 ml-1">▼ 触发红线</span></span>
+                </div>
+                <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;margin-bottom:3px;">
+                  <div style="height:100%;width:100%;background:#94a3b8;border-radius:2px;"></div>
+                </div>
+                <div style="height:7px;background:#fee2e2;border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:82%;background:linear-gradient(90deg,#dc2626,#ef4444);border-radius:3px;"></div>
+                </div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-500 mt-1.5">
+                <span>开业 ✓ 第 8 周</span><span class="text-amber-600">⚠ 外卖抽佣 +3pp 是主因</span><span>AI 3 套方案待决策</span>
               </div>
             </div>
+
+            <!-- 2 号店：装修中，工程进度双轨 -->
             <div class="drillable p-2 rounded-lg" onclick="openDetail('project_2')">
-              <div class="flex justify-between text-[12.5px] mb-1.5">
+              <div class="flex justify-between text-[12.5px] mb-2">
                 <div><span class="font-semibold">多伦多 2 号店</span> <span class="pill pill-warn ml-2">装修</span> <span class="text-slate-500">· North York</span></div>
                 <div class="text-slate-500">第 14 周 / 16 周</div>
               </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:74%;"></div></div>
-              <div class="flex justify-between text-[11px] text-slate-500 mt-1">
-                <span>选址 ✓ 设计 ✓ 装修中</span><span>已花 CA$ 287K / 预算 320K</span><span>预计延期 7 天</span>
+              <!-- 双轨：工程进度 -->
+              <div class="mb-2">
+                <div class="flex justify-between text-[10.5px] mb-0.5">
+                  <span class="text-slate-400">计划进度 <b class="text-slate-600">88%</b>（第 14/16 周）</span>
+                  <span class="font-semibold text-amber-600">实际 74% <span class="text-red-500 ml-1">▼ -14pp · 市政许可卡</span></span>
+                </div>
+                <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;margin-bottom:3px;position:relative;">
+                  <div style="height:100%;width:88%;background:#94a3b8;border-radius:2px;"></div>
+                </div>
+                <div style="height:7px;background:#fff7ed;border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:74%;background:linear-gradient(90deg,#E53935,#FF6B35);border-radius:3px;"></div>
+                </div>
+              </div>
+              <!-- 双轨：预算执行 -->
+              <div class="mb-1">
+                <div class="flex justify-between text-[10.5px] mb-0.5">
+                  <span class="text-slate-400">预算执行 上限 <b class="text-slate-600">CA$320K</b></span>
+                  <span class="font-semibold text-emerald-600">已花 CA$287K · 90% <span class="text-emerald-600 ml-1">▼ 节余 CA$33K</span></span>
+                </div>
+                <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;margin-bottom:3px;">
+                  <div style="height:100%;width:100%;background:#94a3b8;border-radius:2px;"></div>
+                </div>
+                <div style="height:7px;background:#dcfce7;border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:90%;background:linear-gradient(90deg,#16a34a,#22c55e);border-radius:3px;"></div>
+                </div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-500 mt-1.5">
+                <span>工程 -14pp ⚠</span><span class="text-amber-600">预计开业推迟 7 天 → 6/28</span><span class="text-emerald-600">预算节余 ✓</span>
               </div>
             </div>
+
+            <!-- 中央厨房：筹备中，双轨按计划 -->
             <div class="drillable p-2 rounded-lg" onclick="openDetail('project_ck')">
-              <div class="flex justify-between text-[12.5px] mb-1.5">
+              <div class="flex justify-between text-[12.5px] mb-2">
                 <div><span class="font-semibold">多伦多中央厨房</span> <span class="pill pill-info ml-2">筹备</span> <span class="text-slate-500">· Mississauga</span></div>
                 <div class="text-slate-500">第 6 周 / 24 周</div>
               </div>
-              <div class="progress-bar"><div class="progress-fill" style="width:25%;"></div></div>
-              <div class="flex justify-between text-[11px] text-slate-500 mt-1">
-                <span>选址 ✓ 设计中</span><span>已花 CA$ 142K / 预算 1.85M</span><span>按计划</span>
+              <!-- 双轨：工程进度 -->
+              <div class="mb-2">
+                <div class="flex justify-between text-[10.5px] mb-0.5">
+                  <span class="text-slate-400">计划进度 <b class="text-slate-600">25%</b>（第 6/24 周）</span>
+                  <span class="font-semibold text-sky-600">实际 25% <span class="text-emerald-600 ml-1">= 准时</span></span>
+                </div>
+                <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;margin-bottom:3px;">
+                  <div style="height:100%;width:25%;background:#94a3b8;border-radius:2px;"></div>
+                </div>
+                <div style="height:7px;background:#e0f2fe;border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:25%;background:linear-gradient(90deg,#0284c7,#38bdf8);border-radius:3px;"></div>
+                </div>
+              </div>
+              <!-- 双轨：预算执行 -->
+              <div class="mb-1">
+                <div class="flex justify-between text-[10.5px] mb-0.5">
+                  <span class="text-slate-400">预算执行 上限 <b class="text-slate-600">CA$1.85M</b></span>
+                  <span class="font-semibold text-emerald-600">已花 CA$142K · 7.7% <span class="text-emerald-600 ml-1">▼ 低于阶段计划</span></span>
+                </div>
+                <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;margin-bottom:3px;">
+                  <div style="height:100%;width:10%;background:#94a3b8;border-radius:2px;"></div>
+                </div>
+                <div style="height:7px;background:#e0f2fe;border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:7.7%;background:linear-gradient(90deg,#0284c7,#38bdf8);border-radius:3px;"></div>
+                </div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-500 mt-1.5">
+                <span>选址 ✓ 设计进行中</span><span class="text-emerald-600">进度 / 预算双绿 ✓</span><span>M12 投产目标</span>
               </div>
             </div>
+
           </div>
         </div>
         <div class="card p-5">
