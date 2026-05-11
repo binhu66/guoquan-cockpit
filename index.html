@@ -215,6 +215,46 @@
     header{padding:0 !important;}
     header > div{padding:8px 12px !important;}
   }
+
+  /* ===== 下钻详情抽屉 ===== */
+  .drillable{cursor:pointer;transition:all .18s;}
+  .drillable:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(229,57,53,.14);border-color:rgba(255,107,53,.45) !important;}
+  .drillable:hover::after{content:"↗";position:absolute;top:8px;right:10px;font-size:12px;color:#FF6B35;opacity:.7;}
+  .drillable{position:relative;}
+  .drill-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.22);z-index:80;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .drill-backdrop.show{opacity:1;pointer-events:auto;}
+  .drill-panel{position:fixed;right:-620px;top:0;bottom:0;width:580px;max-width:calc(100vw - 16px);background:#fff;border-left:1px solid var(--line);box-shadow:-16px 0 40px rgba(15,23,42,.14);z-index:90;transition:right .26s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;}
+  .drill-panel.open{right:0;}
+  .drill-head{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(229,57,53,.05),transparent);flex-shrink:0;}
+  .drill-head-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#E53935,#FF6B35);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .drill-head-title{font-size:15px;font-weight:700;color:var(--text-main);}
+  .drill-head-sub{font-size:11px;color:var(--text-dim);}
+  .drill-close{margin-left:auto;background:transparent;border:0;width:32px;height:32px;border-radius:8px;font-size:20px;cursor:pointer;color:var(--text-dim);display:flex;align-items:center;justify-content:center;}
+  .drill-close:hover{background:#f1f5f9;color:var(--text-main);}
+  .drill-body{flex:1;overflow-y:auto;padding:20px 18px;}
+  .drill-body::-webkit-scrollbar{width:5px;}
+  .drill-body::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px;}
+  .drill-section{margin-bottom:18px;}
+  .drill-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);margin-bottom:8px;}
+  .drill-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+  .drill-kpi{background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
+  .drill-kpi-num{font-size:22px;font-weight:700;color:var(--text-main);}
+  .drill-kpi-label{font-size:10.5px;color:var(--text-dim);}
+  .drill-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px;}
+  .drill-row:last-child{border-bottom:0;}
+  .drill-row-label{color:var(--text-dim);flex-shrink:0;margin-right:8px;}
+  .drill-row-val{font-weight:600;text-align:right;}
+  .drill-tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;margin:3px 3px 3px 0;}
+  .drill-tag-blue{background:rgba(59,130,246,.12);color:#1d4ed8;}
+  .drill-tag-green{background:rgba(22,163,74,.12);color:#15803d;}
+  .drill-tag-orange{background:rgba(255,107,53,.12);color:#c2410c;}
+  .drill-tag-purple{background:rgba(168,85,247,.12);color:#7e22ce;}
+  .drill-tag-red{background:rgba(220,38,38,.12);color:#b91c1c;}
+  .drill-timeline{padding-left:20px;border-left:2px solid var(--line);margin-top:8px;}
+  .drill-timeline-item{position:relative;padding:0 0 14px 16px;font-size:12px;}
+  .drill-timeline-item::before{content:"";position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:#FF6B35;border:2px solid #fff;box-shadow:0 0 0 1px #FF6B35;}
+  .drill-timeline-time{font-size:10px;color:var(--text-dim);margin-bottom:2px;}
+  @media(max-width:640px){.drill-panel{width:100vw;}}
 </style>
 </head>
 <body class="min-h-screen">
@@ -345,22 +385,22 @@
 
       <!-- 4 个核心 KPI -->
       <div class="grid grid-cols-4 gap-4 mb-5">
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('kpi_projects')">
           <div class="text-[11px] text-slate-500 mb-1">在建/在营项目</div>
           <div class="kpi-num">3 <span class="text-sm text-slate-500 font-normal">家</span></div>
           <div class="text-[11px] text-slate-500 mt-1">1 中央厨房 · 2 直营店</div>
         </div>
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('kpi_spend')">
           <div class="text-[11px] text-slate-500 mb-1">本月花费 / 预算</div>
           <div class="kpi-num">487K <span class="text-sm text-slate-500 font-normal">/ 510K</span></div>
           <div class="text-[11px] text-emerald-600 mt-1">▼ 4.5% 低于预算</div>
         </div>
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('kpi_margin')">
           <div class="text-[11px] text-slate-500 mb-1">综合毛利率（运营店）</div>
           <div class="kpi-num">31.2<span class="text-base font-normal">%</span></div>
           <div class="text-[11px] text-amber-600 mt-1">⚠ 比上月 -1.8pp</div>
         </div>
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('kpi_risk')">
           <div class="text-[11px] text-slate-500 mb-1">综合风险指数</div>
           <div class="kpi-num text-amber-600">42 <span class="text-sm text-slate-500 font-normal">/ 100</span></div>
           <div class="text-[11px] text-slate-500 mt-1">中等 · 2 黄 · 1 红</div>
@@ -388,7 +428,7 @@
             <span class="pill pill-bad">3 待处理</span>
           </div>
           <div class="space-y-2 text-[12.5px]">
-            <div class="card-2 p-3 border-l-4" style="border-left-color:#ef4444;">
+            <div class="card-2 p-3 border-l-4 drillable" style="border-left-color:#ef4444;" onclick="openDetail('alert_margin')">
               <div class="flex items-start justify-between gap-2 mb-1">
                 <div class="font-semibold">1 号店周毛利掉至 18%</div>
                 <span class="pill pill-bad">红</span>
@@ -396,7 +436,7 @@
               <div class="text-slate-500 text-[11px]">外卖平台抽佣调整 +3pp，AI 已生成 3 套应对方案</div>
               <div class="text-[10px] text-[#FF6B35] mt-1.5">→ 财务 + 门店 + 外卖 Agent 联动中</div>
             </div>
-            <div class="card-2 p-3 border-l-4" style="border-left-color:#f59e0b;">
+            <div class="card-2 p-3 border-l-4 drillable" style="border-left-color:#f59e0b;" onclick="openDetail('alert_shipping')">
               <div class="flex items-start justify-between gap-2 mb-1">
                 <div class="font-semibold">海运料包到港延期 5 天</div>
                 <span class="pill pill-warn">黄</span>
@@ -404,7 +444,7 @@
               <div class="text-slate-500 text-[11px]">温哥华港拥堵 · AI 已联系本地备份供应商</div>
               <div class="text-[10px] text-[#FF6B35] mt-1.5">→ 海运 + 供应链 Agent 处理中</div>
             </div>
-            <div class="card-2 p-3 border-l-4" style="border-left-color:#f59e0b;">
+            <div class="card-2 p-3 border-l-4 drillable" style="border-left-color:#f59e0b;" onclick="openDetail('alert_reno')">
               <div class="flex items-start justify-between gap-2 mb-1">
                 <div class="font-semibold">2 号店装修超期 7 天</div>
                 <span class="pill pill-warn">黄</span>
@@ -424,7 +464,7 @@
             <span class="text-[11px] text-slate-500">点击项目可下钻至单店驾驶舱</span>
           </div>
           <div class="space-y-4">
-            <div>
+            <div class="drillable p-2 rounded-lg" onclick="openDetail('project_1')">
               <div class="flex justify-between text-[12.5px] mb-1.5">
                 <div><span class="font-semibold">多伦多 1 号店</span> <span class="pill pill-ok ml-2">在营</span> <span class="text-slate-500">· Markham</span></div>
                 <div class="text-slate-500">运营 · 第 8 周</div>
@@ -434,7 +474,7 @@
                 <span>开业 ✓</span><span>每日 GMV: CA$ 12.4K</span><span>毛利率 18% ⚠</span>
               </div>
             </div>
-            <div>
+            <div class="drillable p-2 rounded-lg" onclick="openDetail('project_2')">
               <div class="flex justify-between text-[12.5px] mb-1.5">
                 <div><span class="font-semibold">多伦多 2 号店</span> <span class="pill pill-warn ml-2">装修</span> <span class="text-slate-500">· North York</span></div>
                 <div class="text-slate-500">第 14 周 / 16 周</div>
@@ -444,7 +484,7 @@
                 <span>选址 ✓ 设计 ✓ 装修中</span><span>已花 CA$ 287K / 预算 320K</span><span>预计延期 7 天</span>
               </div>
             </div>
-            <div>
+            <div class="drillable p-2 rounded-lg" onclick="openDetail('project_ck')">
               <div class="flex justify-between text-[12.5px] mb-1.5">
                 <div><span class="font-semibold">多伦多中央厨房</span> <span class="pill pill-info ml-2">筹备</span> <span class="text-slate-500">· Mississauga</span></div>
                 <div class="text-slate-500">第 6 周 / 24 周</div>
@@ -856,7 +896,7 @@
       <!-- Master Agents -->
       <div class="text-sm font-semibold mb-2"><span class="grad-red-text">Master 层</span> · 总指挥 / 总闸门</div>
       <div class="grid grid-cols-2 gap-3 mb-5">
-        <div class="agent-card">
+        <div class="agent-card" onclick="openDetail('agent_orchestrator')">
           <div class="flex items-start justify-between mb-2">
             <div class="font-semibold">🎯 协调调度 Agent（Orchestrator）</div>
             <span class="pill pill-info">Master</span>
@@ -864,7 +904,7 @@
           <div class="text-[12px] text-slate-500 mb-2">所有跨部门任务的总入口 · 拆解 → 派单 → 跟进 → 汇总</div>
           <div class="text-[11px]"><b class="text-[#FF6B35]">触发：</b>杨总指令 · 重大事件 · 跨多个 Agent 任务<br><b class="text-[#FF6B35]">输出：</b>任务编排 + 各 Agent 调度计划 + 进度回报</div>
         </div>
-        <div class="agent-card">
+        <div class="agent-card" onclick="openDetail('agent_risk')">
           <div class="flex items-start justify-between mb-2">
             <div class="font-semibold">⚠️ 风险预警 Agent（Risk Sentinel）</div>
             <span class="pill pill-bad">Master</span>
@@ -877,32 +917,32 @@
       <!-- 业务 Agents -->
       <div class="text-sm font-semibold mb-2"><span class="grad-red-text">业务层</span> · 12 个专业 Agent</div>
       <div class="grid grid-cols-3 gap-3">
-        <div class="agent-card">
+        <div class="agent-card" onclick="openDetail('agent_market')">
           <div class="font-semibold mb-1">📊 市场情报 Agent</div>
           <div class="text-[11px] text-slate-500 mb-2">服务：市场调研部 · CMO</div>
           <div class="text-[11px]"><b>输入：</b>本地新闻/Yelp/Google 评论/外卖榜/政府数据 API<br><b>输出：</b>周报 · 商圈打分 · 竞品价格表 · 消费趋势</div>
         </div>
-        <div class="agent-card">
+        <div class="agent-card" onclick="openDetail('agent_finance')">
           <div class="font-semibold mb-1">💰 财务监控 Agent</div>
           <div class="text-[11px] text-slate-500 mb-2">服务：财务规划部 · CFO</div>
           <div class="text-[11px]"><b>输入：</b>POS · ERP · 银行流水 · 发票 · 工资单<br><b>输出：</b>日费用核算 · 预算偏差 · 现金流预测 · 汇率提示</div>
         </div>
-        <div class="agent-card">
+        <div class="agent-card" onclick="openDetail('agent_orchestrator')">
           <div class="font-semibold mb-1">📍 选址 Agent</div>
           <div class="text-[11px] text-slate-500 mb-2">服务：选址装修部</div>
           <div class="text-[11px]"><b>输入：</b>人口/收入/竞品/客流/租金/物业数据库<br><b>输出：</b>商圈热力图 · 候选铺位打分 · ROI 测算</div>
         </div>
-        <div class="agent-card">
+        <div class="agent-card" onclick="openDetail('agent_orchestrator')">
           <div class="font-semibold mb-1">🔨 装修管理 Agent</div>
           <div class="text-[11px] text-slate-500 mb-2">服务：项目经理</div>
           <div class="text-[11px]"><b>输入：</b>施工日报照片 · 物料发票 · 工期甘特图<br><b>输出：</b>进度自动核对 · 超支预警 · 验收清单</div>
         </div>
-        <div class="agent-card">
+        <div class="agent-card" onclick="openDetail('agent_supply')">
           <div class="font-semibold mb-1">📦 供应链 Agent</div>
           <div class="text-[11px] text-slate-500 mb-2">服务：采购经理</div>
           <div class="text-[11px]"><b>输入：</b>门店销售 · 库存 · 供应商目录 · 价格<br><b>输出：</b>需求预测 · 自动补货单 · 替代供应商建议</div>
         </div>
-        <div class="agent-card">
+        <div class="agent-card" onclick="openDetail('alert_shipping')">
           <div class="font-semibold mb-1">🚢 海运 Agent</div>
           <div class="text-[11px] text-slate-500 mb-2">服务：物流</div>
           <div class="text-[11px]"><b>输入：</b>船公司 API · 港口数据 · 海关申报<br><b>输出：</b>船期预警 · 清关进度 · 异常处理流程</div>
@@ -1721,7 +1761,7 @@
       </div>
 
       <!-- L4 展示层 -->
-      <div class="stack-layer" style="background:linear-gradient(90deg,rgba(229,57,53,.15),rgba(255,107,53,.05));border:1px solid rgba(255,107,53,.3);">
+      <div class="stack-layer drillable" onclick="openDetail('stack_l4')" style="background:linear-gradient(90deg,rgba(229,57,53,.15),rgba(255,107,53,.05));border:1px solid rgba(255,107,53,.3);">
         <div class="layer-name">L4 展</div>
         <div class="flex-1">
           <div class="flex items-center gap-2 mb-2"><span class="text-sm font-bold text-[#FF6B35]">展示层 · Presentation</span><span class="text-[11px] text-slate-500">谁看 / 在哪看 / 看什么</span></div>
@@ -1736,7 +1776,7 @@
       </div>
 
       <!-- L3 决策层 -->
-      <div class="stack-layer" style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);">
+      <div class="stack-layer drillable" onclick="openDetail('stack_l3')" style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);">
         <div class="layer-name" style="color:#c084fc;">L3 决</div>
         <div class="flex-1">
           <div class="flex items-center gap-2 mb-2"><span class="text-sm font-bold" style="color:#c084fc;">决策层 · Decision Brain</span><span class="text-[11px] text-slate-500">大脑 · 推理 / 规划 / 工具调用</span></div>
@@ -1751,7 +1791,7 @@
       </div>
 
       <!-- L2 智能体层 -->
-      <div class="stack-layer" style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.3);">
+      <div class="stack-layer drillable" onclick="openDetail('stack_l2')" style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.3);">
         <div class="layer-name" style="color:#4ade80;">L2 智</div>
         <div class="flex-1">
           <div class="flex items-center gap-2 mb-2"><span class="text-sm font-bold" style="color:#4ade80;">智能体层 · Agents</span><span class="text-[11px] text-slate-500">14 个 Agent + Master 编排</span></div>
@@ -1776,7 +1816,7 @@
       </div>
 
       <!-- L1 数据层 -->
-      <div class="stack-layer" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.3);">
+      <div class="stack-layer drillable" onclick="openDetail('stack_l1')" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.3);">
         <div class="layer-name" style="color:#60a5fa;">L1 数</div>
         <div class="flex-1">
           <div class="flex items-center gap-2 mb-2"><span class="text-sm font-bold" style="color:#60a5fa;">数据层 · Data</span><span class="text-[11px] text-slate-500">所有数据汇入数据仓库 · Single Source of Truth</span></div>
@@ -1824,7 +1864,7 @@
 
       <!-- 风险象限 -->
       <div class="grid grid-cols-2 gap-3 mb-4">
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('risk_finance')">
           <div class="flex justify-between items-center mb-2"><div class="font-semibold text-sm">💰 财务风险（成本/利润）</div><span class="pill pill-bad">2 红</span></div>
           <ul class="text-[12px] space-y-1 text-slate-700">
             <li>• 单店毛利 < 22% 触发红线 <span class="text-slate-500">→ 1 号店当前 18% ❌</span></li>
@@ -1834,7 +1874,7 @@
             <li>• 应收账款逾期 > 60 天</li>
           </ul>
         </div>
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('risk_schedule')">
           <div class="flex justify-between items-center mb-2"><div class="font-semibold text-sm">🚧 进度风险（项目/装修）</div><span class="pill pill-warn">1 黄</span></div>
           <ul class="text-[12px] space-y-1 text-slate-700">
             <li>• 关键里程碑延期 > 5 天 <span class="text-slate-500">→ 2 号店延期 7 天 ⚠</span></li>
@@ -1844,7 +1884,7 @@
             <li>• 海运到港延期 > 3 天</li>
           </ul>
         </div>
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('risk_compliance')">
           <div class="flex justify-between items-center mb-2"><div class="font-semibold text-sm">⚖️ 合规风险（法务/食品）</div><span class="pill pill-ok">全绿</span></div>
           <ul class="text-[12px] space-y-1 text-slate-700">
             <li>• Health Inspection 评分 < A</li>
@@ -1854,7 +1894,7 @@
             <li>• 数据合规（PIPEDA）</li>
           </ul>
         </div>
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('risk_market')">
           <div class="flex justify-between items-center mb-2"><div class="font-semibold text-sm">🎯 市场风险（声誉/竞争）</div><span class="pill pill-warn">1 黄</span></div>
           <ul class="text-[12px] space-y-1 text-slate-700">
             <li>• 差评率 > 8% <span class="text-slate-500">→ 当前 5.2% ✓</span></li>
@@ -1956,7 +1996,7 @@
       </div>
 
       <div class="space-y-3">
-        <div class="phase phase-1 card pl-6">
+        <div class="phase phase-1 card pl-6 drillable" onclick="openDetail('roadmap_p1')">
           <div class="flex items-start justify-between mb-3">
             <div>
               <div class="text-[11px] text-emerald-600 font-bold tracking-widest">PHASE 1 · M1 - M6</div>
@@ -1993,7 +2033,7 @@
           </div>
         </div>
 
-        <div class="phase phase-2 card pl-6">
+        <div class="phase phase-2 card pl-6 drillable" onclick="openDetail('roadmap_p2')">
           <div class="flex items-start justify-between mb-3">
             <div>
               <div class="text-[11px] text-[#FF6B35] font-bold tracking-widest">PHASE 2 · M7 - M12</div>
@@ -2030,7 +2070,7 @@
           </div>
         </div>
 
-        <div class="phase phase-3 card pl-6">
+        <div class="phase phase-3 card pl-6 drillable" onclick="openDetail('roadmap_p3')">
           <div class="flex items-start justify-between mb-3">
             <div>
               <div class="text-[11px] font-bold tracking-widest" style="color:#a855f7;">PHASE 3 · M13 - M18</div>
@@ -2350,13 +2390,13 @@
               <tr><th class="text-left py-2">编号</th><th class="text-left">位置</th><th class="text-left">当前菜品</th><th class="text-right">油温℃</th><th class="text-right">完成%</th><th class="text-right">利用率</th><th class="text-right">状态</th></tr>
             </thead>
             <tbody class="divide-y divide-[#2d3651]">
-              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T01</td><td>1 号店 · A 锅</td><td>麻婆豆腐</td><td class="text-right">218°</td><td class="text-right">62%</td><td class="text-right text-emerald-600">82%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
-              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T02</td><td>1 号店 · B 锅</td><td>宫保鸡丁</td><td class="text-right">235°</td><td class="text-right">38%</td><td class="text-right text-emerald-600">76%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
-              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono text-amber-600">GQ-T03</td><td>中央厨房 · A</td><td>—</td><td class="text-right text-amber-600">158° ⚠</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right"><span class="pill pill-warn">维修</span></td></tr>
-              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T04</td><td>中央厨房 · B</td><td>水煮牛肉</td><td class="text-right">240°</td><td class="text-right">81%</td><td class="text-right text-emerald-600">94%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
-              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T05</td><td>中央厨房 · C</td><td>鱼香肉丝</td><td class="text-right">222°</td><td class="text-right">15%</td><td class="text-right text-emerald-600">88%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
-              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T06</td><td>中央厨房 · D</td><td>回锅肉</td><td class="text-right">228°</td><td class="text-right">52%</td><td class="text-right">71%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
-              <tr class="hover:bg-[#1c2438]"><td class="py-2 font-mono">GQ-T07</td><td>中央厨房 · E</td><td>清洗中</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right">68%</td><td class="text-right"><span class="pill pill-info">清洗</span></td></tr>
+              <tr class="hover:bg-[#1c2438] drillable" style="cursor:pointer;" onclick="openDetail('robot_t01')"><td class="py-2 font-mono">GQ-T01</td><td>1 号店 · A 锅</td><td>麻婆豆腐</td><td class="text-right">218°</td><td class="text-right">62%</td><td class="text-right text-emerald-600">82%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438] drillable" style="cursor:pointer;" onclick="openDetail('robot_t01')"><td class="py-2 font-mono">GQ-T02</td><td>1 号店 · B 锅</td><td>宫保鸡丁</td><td class="text-right">235°</td><td class="text-right">38%</td><td class="text-right text-emerald-600">76%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438] drillable" style="cursor:pointer;" onclick="openDetail('robot_t03')"><td class="py-2 font-mono text-amber-600">GQ-T03</td><td>中央厨房 · A</td><td>—</td><td class="text-right text-amber-600">158° ⚠</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right"><span class="pill pill-warn">维修</span></td></tr>
+              <tr class="hover:bg-[#1c2438] drillable" style="cursor:pointer;" onclick="openDetail('robot_t01')"><td class="py-2 font-mono">GQ-T04</td><td>中央厨房 · B</td><td>水煮牛肉</td><td class="text-right">240°</td><td class="text-right">81%</td><td class="text-right text-emerald-600">94%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438] drillable" style="cursor:pointer;" onclick="openDetail('robot_t01')"><td class="py-2 font-mono">GQ-T05</td><td>中央厨房 · C</td><td>鱼香肉丝</td><td class="text-right">222°</td><td class="text-right">15%</td><td class="text-right text-emerald-600">88%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438] drillable" style="cursor:pointer;" onclick="openDetail('robot_t01')"><td class="py-2 font-mono">GQ-T06</td><td>中央厨房 · D</td><td>回锅肉</td><td class="text-right">228°</td><td class="text-right">52%</td><td class="text-right">71%</td><td class="text-right"><span class="pill pill-ok">运行</span></td></tr>
+              <tr class="hover:bg-[#1c2438] drillable" style="cursor:pointer;" onclick="openDetail('robot_t01')"><td class="py-2 font-mono">GQ-T07</td><td>中央厨房 · E</td><td>清洗中</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right">68%</td><td class="text-right"><span class="pill pill-info">清洗</span></td></tr>
               <tr class="hover:bg-[#1c2438] text-slate-500"><td class="py-2 font-mono">GQ-T08</td><td>2 号店</td><td>—</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right">—</td><td class="text-right"><span class="pill" style="background:#374151;color:#94a3b8;">待装</span></td></tr>
             </tbody>
           </table>
@@ -3007,6 +3047,799 @@
     if(window.miniMap)setTimeout(()=>window.miniMap.invalidateSize(),60);
     if(window.bigMap)setTimeout(()=>window.bigMap.invalidateSize(),60);
   });
+</script>
+
+<!-- ===== 下钻详情抽屉 ===== -->
+<div id="drillBackdrop" class="drill-backdrop"></div>
+<div id="drillPanel" class="drill-panel">
+  <div class="drill-head">
+    <div class="drill-head-icon" id="drillIcon">📊</div>
+    <div>
+      <div class="drill-head-title" id="drillTitle">详情</div>
+      <div class="drill-head-sub" id="drillSub"></div>
+    </div>
+    <button class="drill-close" id="drillClose">×</button>
+  </div>
+  <div class="drill-body" id="drillBody"></div>
+</div>
+
+<script>
+/* ===== 下钻内容库 ===== */
+const DETAILS = {
+
+  /* ── CEO 驾驶舱 KPI ── */
+  kpi_projects:{icon:'🏗',title:'在建/在营项目 · 3 家',sub:'多伦多市场 · 实时状态',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">项目一览</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">1</div><div class="drill-kpi-label">在营（开业 8 周）</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-amber-600">1</div><div class="drill-kpi-label">装修中（74%）</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-sky-600">1</div><div class="drill-kpi-label">筹备中（25%）</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">📍 多伦多 1 号店 · Markham</div>
+      <div class="drill-row"><span class="drill-row-label">状态</span><span class="drill-row-val"><span class="pill pill-ok">在营</span></span></div>
+      <div class="drill-row"><span class="drill-row-label">开业时间</span><span class="drill-row-val">2026-03-10（第 8 周）</span></div>
+      <div class="drill-row"><span class="drill-row-label">每日 GMV</span><span class="drill-row-val">CA$ 12,400</span></div>
+      <div class="drill-row"><span class="drill-row-label">周毛利率</span><span class="drill-row-val text-red-600">18% ⚠ 低于红线 22%</span></div>
+      <div class="drill-row"><span class="drill-row-label">本月外卖占比</span><span class="drill-row-val">62%（Uber Eats 主力）</span></div>
+      <div class="drill-row"><span class="drill-row-label">Google 评分</span><span class="drill-row-val text-emerald-600">4.7 ★（127 评）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🔨 多伦多 2 号店 · North York</div>
+      <div class="drill-row"><span class="drill-row-label">状态</span><span class="drill-row-val"><span class="pill pill-warn">装修中</span></span></div>
+      <div class="drill-row"><span class="drill-row-label">装修进度</span><span class="drill-row-val">74% · 第 14/16 周</span></div>
+      <div class="drill-row"><span class="drill-row-label">延期情况</span><span class="drill-row-val text-amber-600">预计 +7 天（市政许可）</span></div>
+      <div class="drill-row"><span class="drill-row-label">已花费</span><span class="drill-row-val">CA$ 287K / 预算 320K</span></div>
+      <div class="drill-row"><span class="drill-row-label">预计开业</span><span class="drill-row-val">2026-06-28</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🏭 多伦多中央厨房 · Mississauga</div>
+      <div class="drill-row"><span class="drill-row-label">状态</span><span class="drill-row-val"><span class="pill pill-info">筹备中</span></span></div>
+      <div class="drill-row"><span class="drill-row-label">进度</span><span class="drill-row-val">25% · 第 6/24 周</span></div>
+      <div class="drill-row"><span class="drill-row-label">已花费</span><span class="drill-row-val">CA$ 142K / 预算 1.85M</span></div>
+      <div class="drill-row"><span class="drill-row-label">关键节点</span><span class="drill-row-val">设备招标（6 月）· 投产预计 M12</span></div>
+    </div>`},
+
+  kpi_spend:{icon:'💰',title:'本月花费 · CA$ 487K',sub:'低于预算 4.5% · AI 实时归集',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">花费分解（5 月截至今日）</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num">487K</div><div class="drill-kpi-label">实际花费（CAD）</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">510K</div><div class="drill-kpi-label">月度预算</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">-4.5%</div><div class="drill-kpi-label">低于预算</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">按项目分拆</div>
+      <div class="drill-row"><span class="drill-row-label">多伦多 1 号店运营</span><span class="drill-row-val">CA$ 128K（26%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">2 号店装修</span><span class="drill-row-val">CA$ 189K（39%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">中央厨房筹备</span><span class="drill-row-val">CA$ 82K（17%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">AI 体系 / IT</span><span class="drill-row-val">CA$ 38K（8%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">总部支持 / 差旅</span><span class="drill-row-val">CA$ 28K（6%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">法务 / 合规</span><span class="drill-row-val">CA$ 22K（4%）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">按费用类型</div>
+      <div class="drill-row"><span class="drill-row-label">人工（本地 FT + 兼职）</span><span class="drill-row-val">CA$ 142K</span></div>
+      <div class="drill-row"><span class="drill-row-label">食材 / 料包</span><span class="drill-row-val">CA$ 96K</span></div>
+      <div class="drill-row"><span class="drill-row-label">装修材料及施工</span><span class="drill-row-val">CA$ 134K</span></div>
+      <div class="drill-row"><span class="drill-row-label">房租</span><span class="drill-row-val">CA$ 58K</span></div>
+      <div class="drill-row"><span class="drill-row-label">其他（外包/顾问/差旅）</span><span class="drill-row-val">CA$ 57K</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">💡 AI 财务监控洞察</div>
+      <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.25);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
+        节省 23K 主要来自：2 号店施工延期（节省 18K 工期款）+ 料包海运本月单箱成本优化 -5K。<br><br>
+        下月预计偏差：+6%（2 号店开业前冲刺装修 + 设备采购）
+      </div>
+    </div>`},
+
+  kpi_margin:{icon:'📈',title:'综合毛利率 · 31.2%',sub:'比上月 -1.8pp · AI 已启动分析',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">毛利率结构</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num text-red-600">18%</div><div class="drill-kpi-label">1 号店（⚠ 低于红线）</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-slate-400">—</div><div class="drill-kpi-label">2 号店（未开业）</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">31.2%</div><div class="drill-kpi-label">综合（含中厨）</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">毛利下滑根因（AI 分析）</div>
+      <div class="drill-row"><span class="drill-row-label">外卖平台抽佣 +3pp</span><span class="drill-row-val text-red-600">-3.0pp 影响</span></div>
+      <div class="drill-row"><span class="drill-row-label">食材成本上涨（牛肉）</span><span class="drill-row-val text-amber-600">-1.2pp 影响</span></div>
+      <div class="drill-row"><span class="drill-row-label">节假日临时用工</span><span class="drill-row-val text-amber-600">-0.6pp 影响</span></div>
+      <div class="drill-row"><span class="drill-row-label">效率改善（机器人利用率↑）</span><span class="drill-row-val text-emerald-600">+1.0pp 改善</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">AI 生成的 3 套修复方案</div>
+      <div style="font-size:12.5px;space-y:8px;">
+        <div style="background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);border-radius:8px;padding:10px;margin-bottom:8px;">
+          <b>方案 A · 优化外卖结构</b><br>
+          <span style="color:#475569;">将外卖占比从 62% 降至 48%，强推堂食/自取，预计毛利回升 +2.8pp，6 周内见效</span>
+        </div>
+        <div style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);border-radius:8px;padding:10px;margin-bottom:8px;">
+          <b>方案 B · 调整菜单定价</b><br>
+          <span style="color:#475569;">对 8 个高成本 SKU 提价 5-8%，预计毛利 +1.9pp，需评估客户流失风险</span>
+        </div>
+        <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:10px;">
+          <b>方案 C · 本地采购替代</b><br>
+          <span style="color:#475569;">牛肉/蔬菜转本地供应商，料包仅保留核心底料，预计食材成本 -1.5pp，需 4 周切换</span>
+        </div>
+      </div>
+    </div>`},
+
+  kpi_risk:{icon:'⚠️',title:'综合风险指数 · 42/100',sub:'中等 · 2 红 · 1 黄 · AI 实时巡查',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">风险分项得分</div>
+      <div class="drill-row"><span class="drill-row-label">💰 财务风险（权重 40%）</span><span class="drill-row-val text-red-600">58分 · 2 条红线触发</span></div>
+      <div class="drill-row"><span class="drill-row-label">🚧 进度风险（权重 30%）</span><span class="drill-row-val text-amber-600">42分 · 1 条黄线触发</span></div>
+      <div class="drill-row"><span class="drill-row-label">⚖️ 合规风险（权重 20%）</span><span class="drill-row-val text-emerald-600">8分 · 全绿</span></div>
+      <div class="drill-row"><span class="drill-row-label">🎯 市场风险（权重 10%）</span><span class="drill-row-val text-amber-600">38分 · 1 条黄线</span></div>
+      <div class="drill-row" style="font-weight:700;"><span class="drill-row-label">综合指数</span><span class="drill-row-val text-amber-600">42 / 100</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">当前触发的风险条目</div>
+      <div style="font-size:12.5px;">
+        <div style="background:rgba(220,38,38,.06);border-left:3px solid #ef4444;border-radius:0 8px 8px 0;padding:10px;margin-bottom:8px;">
+          ❌ <b>1 号店毛利 18%</b>（红线 22%）· 财务 Agent 已生成 3 套方案待决策
+        </div>
+        <div style="background:rgba(220,38,38,.06);border-left:3px solid #ef4444;border-radius:0 8px 8px 0;padding:10px;margin-bottom:8px;">
+          ❌ <b>料包单一供应商占比 72%</b>（红线 60%）· 供应链 Agent 已开始备选评估
+        </div>
+        <div style="background:rgba(245,158,11,.06);border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:10px;margin-bottom:8px;">
+          ⚠️ <b>2 号店延期 7 天</b>（黄线 5 天）· 装修 + 法务 Agent 协同中
+        </div>
+        <div style="background:rgba(245,158,11,.06);border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:10px;">
+          ⚠️ <b>Uber Eats 抽佣 +3pp</b>（黄线 2pp）· 外卖 Agent 监控中
+        </div>
+      </div>
+    </div>`},
+
+  /* ── 单店下钻 ── */
+  project_1:{icon:'🍜',title:'多伦多 1 号店 · 单店驾驶舱',sub:'Markham · 在营第 8 周',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">今日关键指标</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num">CA$12.4K</div><div class="drill-kpi-label">今日 GMV</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-red-600">18%</div><div class="drill-kpi-label">周毛利率 ⚠</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">312</div><div class="drill-kpi-label">今日出单</div></div>
+      </div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num">4.7★</div><div class="drill-kpi-label">Google 评分</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">62%</div><div class="drill-kpi-label">外卖占比</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">7/8</div><div class="drill-kpi-label">机器人在线</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">营收分拆</div>
+      <div class="drill-row"><span class="drill-row-label">Uber Eats</span><span class="drill-row-val">CA$ 4,820（38.9%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">DoorDash</span><span class="drill-row-val">CA$ 2,310（18.6%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">堂食</span><span class="drill-row-val">CA$ 3,180（25.6%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">自取</span><span class="drill-row-val">CA$ 2,090（16.9%）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">本周 TOP 3 热销 SKU</div>
+      <div class="drill-row"><span class="drill-row-label">① 麻婆豆腐</span><span class="drill-row-val">142 份 · 毛利 38%</span></div>
+      <div class="drill-row"><span class="drill-row-label">② 宫保鸡丁</span><span class="drill-row-val">128 份 · 毛利 41%</span></div>
+      <div class="drill-row"><span class="drill-row-label">③ 水煮牛肉</span><span class="drill-row-val">96 份 · 毛利 22% ⚠</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">AI 代理活动（今日）</div>
+      <div class="drill-timeline">
+        <div class="drill-timeline-item"><div class="drill-timeline-time">15:32</div>财务 Agent 完成日成本归集，偏差 -2.1%</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">14:55</div>风险 Agent ⚠ 触发毛利红线告警 → 生成 3 套方案</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">13:10</div>外卖 Agent 识别 Uber 抽佣变更，已上报</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">11:55</div>客服 Agent Google 评分 4.6→4.7，回复 3 条差评</div>
+      </div>
+    </div>`},
+
+  project_2:{icon:'🔨',title:'多伦多 2 号店 · 装修进度',sub:'North York · 第 14/16 周',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">施工阶段进度</div>
+      <div class="drill-row"><span class="drill-row-label">📐 设计确认</span><span class="drill-row-val text-emerald-600">✓ 完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">🏗 结构改造</span><span class="drill-row-val text-emerald-600">✓ 完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">⚡ 水电安装</span><span class="drill-row-val text-emerald-600">✓ 完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">🪵 墙面/地面</span><span class="drill-row-val text-amber-600">进行中（88%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">🚪 市政消防许可</span><span class="drill-row-val text-red-600">⚠ 审批延迟 +7 天</span></div>
+      <div class="drill-row"><span class="drill-row-label">🍳 厨房设备安装</span><span class="drill-row-val text-slate-400">待许可 → 未开始</span></div>
+      <div class="drill-row"><span class="drill-row-label">🎊 软开业</span><span class="drill-row-val">预计 2026-06-28</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">预算使用</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num">CA$287K</div><div class="drill-kpi-label">已花费</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">CA$320K</div><div class="drill-kpi-label">总预算</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">CA$33K</div><div class="drill-kpi-label">剩余余量</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">装修 Agent 最新行动</div>
+      <div class="drill-timeline">
+        <div class="drill-timeline-item"><div class="drill-timeline-time">今日 10:20</div>AI 已向市政局提交许可催促函（第 2 次）</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">昨日 16:30</div>法务 Agent 评估延期责任 → 施工方不承担违约</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/9</div>装修 Agent 自动重排开业节点：推迟 7 天，预算不超</div>
+      </div>
+    </div>`},
+
+  project_ck:{icon:'🏭',title:'多伦多中央厨房 · 筹备详情',sub:'Mississauga · 第 6/24 周',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">筹备阶段</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">25%</div><div class="drill-kpi-label">整体进度</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">CA$142K</div><div class="drill-kpi-label">已花费</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">CA$1.85M</div><div class="drill-kpi-label">总预算</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">里程碑</div>
+      <div class="drill-row"><span class="drill-row-label">✓ 选址确认（Mississauga）</span><span class="drill-row-val text-emerald-600">M1 完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">✓ 租约签订（10 年）</span><span class="drill-row-val text-emerald-600">M2 完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">→ 工程设计稿审批</span><span class="drill-row-val text-amber-600">M6 进行中</span></div>
+      <div class="drill-row"><span class="drill-row-label">→ 设备采购招标</span><span class="drill-row-val text-slate-400">M7 计划中</span></div>
+      <div class="drill-row"><span class="drill-row-label">→ 机器人产线安装</span><span class="drill-row-val text-slate-400">M9-M10</span></div>
+      <div class="drill-row"><span class="drill-row-label">→ 食品安全认证</span><span class="drill-row-val text-slate-400">M11</span></div>
+      <div class="drill-row"><span class="drill-row-label">→ 正式投产</span><span class="drill-row-val text-slate-400">M12 目标</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">规划产能（投产后）</div>
+      <div class="drill-row"><span class="drill-row-label">日产能（半成品包）</span><span class="drill-row-val">800 – 1,200 份</span></div>
+      <div class="drill-row"><span class="drill-row-label">服务门店数</span><span class="drill-row-val">多伦多 3 店 + 温哥华预留</span></div>
+      <div class="drill-row"><span class="drill-row-label">炒菜机器人数量</span><span class="drill-row-val">5 台（GQ-T03~T07）</span></div>
+      <div class="drill-row"><span class="drill-row-label">预计 ROI 回收期</span><span class="drill-row-val">28 – 34 个月</span></div>
+    </div>`},
+
+  /* ── 风险告警 ── */
+  alert_margin:{icon:'🚨',title:'1 号店毛利告警 · 红色',sub:'18% < 红线 22% · AI 已介入',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">告警详情</div>
+      <div class="drill-row"><span class="drill-row-label">触发时间</span><span class="drill-row-val">2026-05-06 14:55</span></div>
+      <div class="drill-row"><span class="drill-row-label">触发方式</span><span class="drill-row-val">财务监控 Agent 自动识别</span></div>
+      <div class="drill-row"><span class="drill-row-label">当前毛利率</span><span class="drill-row-val text-red-600">18%</span></div>
+      <div class="drill-row"><span class="drill-row-label">红线阈值</span><span class="drill-row-val">22%</span></div>
+      <div class="drill-row"><span class="drill-row-label">偏差</span><span class="drill-row-val text-red-600">-4pp</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">根因分析（AI）</div>
+      <div class="drill-row"><span class="drill-row-label">Uber Eats 抽佣调整</span><span class="drill-row-val text-red-600">-3.0pp（主因）</span></div>
+      <div class="drill-row"><span class="drill-row-label">牛肉原料价涨</span><span class="drill-row-val text-amber-600">-1.2pp</span></div>
+      <div class="drill-row"><span class="drill-row-label">节假日用工增加</span><span class="drill-row-val text-amber-600">-0.6pp</span></div>
+      <div class="drill-row"><span class="drill-row-label">机器人效率提升</span><span class="drill-row-val text-emerald-600">+0.8pp（部分对冲）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">AI 生成 3 套方案（等杨总决策）</div>
+      <div style="font-size:12.5px;">
+        <div style="background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);border-radius:8px;padding:10px;margin-bottom:8px;">
+          <b>A · 外卖结构调整</b> · 最快见效（6 周）· 毛利预计 +2.8pp<br>
+          <span style="color:#475569;">推堂食/自取，Uber 占比 62%→48%，外卖减少需同步补堂食营销</span>
+        </div>
+        <div style="background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);border-radius:8px;padding:10px;margin-bottom:8px;">
+          <b>B · 菜单定价优化</b> · 稳健方案 · 毛利预计 +1.9pp<br>
+          <span style="color:#475569;">8 个高成本 SKU 提价 5-8%，AI 测算流失率约 3-5%</span>
+        </div>
+        <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:10px;">
+          <b>C · 本地采购替代</b> · 长期方案 · 毛利预计 +1.5pp（4 周切换期）<br>
+          <span style="color:#475569;">牛肉转本地供应商，底料料包保留国内，需供应链 Agent 重新建立供应商关系</span>
+        </div>
+      </div>
+    </div>`},
+
+  alert_shipping:{icon:'🚢',title:'海运延期 · 黄色预警',sub:'集装箱 #GQT-204 · 温哥华港',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">货物信息</div>
+      <div class="drill-row"><span class="drill-row-label">集装箱号</span><span class="drill-row-val font-mono">GQT-204</span></div>
+      <div class="drill-row"><span class="drill-row-label">内容</span><span class="drill-row-val">料包（火锅底料、川味调料）× 1,200 箱</span></div>
+      <div class="drill-row"><span class="drill-row-label">原定到港</span><span class="drill-row-val">2026-05-09</span></div>
+      <div class="drill-row"><span class="drill-row-label">预计实际到港</span><span class="drill-row-val text-amber-600">2026-05-14（+5 天）</span></div>
+      <div class="drill-row"><span class="drill-row-label">延期原因</span><span class="drill-row-val">温哥华港拥堵（码头工人谈判）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">影响评估</div>
+      <div class="drill-row"><span class="drill-row-label">当前库存可撑天数</span><span class="drill-row-val text-emerald-600">9 天 · 安全</span></div>
+      <div class="drill-row"><span class="drill-row-label">缺货风险</span><span class="drill-row-val text-emerald-600">低（到港前有 4 天余量）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">海运 Agent 已采取的行动</div>
+      <div class="drill-timeline">
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/6 14:30</div>识别延期信号，自动拉取港口拥堵预报</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/6 14:35</div>联系本地备份供应商（3 家），询价调货</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/6 15:00</div>评估库存：可撑 9 天，无需紧急采购</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/6 15:10</div>上报风险 Agent，评级定为黄色</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/6 15:15</div>通知 1 号店门店 Agent 适当管控高料包消耗 SKU</div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">💡 AI 建议（无需杨总介入）</div>
+      <div style="background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
+        库存安全垫充足，AI 已自主处置。建议杨总关注：若温哥华港拥堵持续 >10 天，再启动备份采购（成本 +8%）。
+      </div>
+    </div>`},
+
+  alert_reno:{icon:'🔧',title:'2 号店装修超期 · 黄色',sub:'市政许可延迟 · 预计 +7 天',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">超期详情</div>
+      <div class="drill-row"><span class="drill-row-label">延期天数</span><span class="drill-row-val text-amber-600">+7 天</span></div>
+      <div class="drill-row"><span class="drill-row-label">根本原因</span><span class="drill-row-val">市政消防许可审批积压</span></div>
+      <div class="drill-row"><span class="drill-row-label">原计划开业</span><span class="drill-row-val">2026-06-21</span></div>
+      <div class="drill-row"><span class="drill-row-label">调整后开业</span><span class="drill-row-val text-amber-600">2026-06-28</span></div>
+      <div class="drill-row"><span class="drill-row-label">预算影响</span><span class="drill-row-val text-emerald-600">CA$ +0（工期款未超）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">装修 + 法务 Agent 协同行动</div>
+      <div class="drill-timeline">
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/5</div>识别审批延迟信号，触发黄色预警</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/5</div>法务 Agent 查阅 North York 消防局历史审批时效</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/6</div>装修 Agent 重排工期甘特图，软装提前启动</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/6</div>向市政局提交催审函（由法务顾问签发）</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">5/9</div>预计收到许可 → 厨房设备安装启动</div>
+      </div>
+    </div>`},
+
+  /* ── AI Agent 详情 ── */
+  agent_orchestrator:{icon:'🎯',title:'协调调度 Agent · Orchestrator',sub:'Master 层 · 总指挥',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">核心职责</div>
+      <div class="drill-row"><span class="drill-row-label">角色定位</span><span class="drill-row-val">所有跨部门任务总入口</span></div>
+      <div class="drill-row"><span class="drill-row-label">决策权限</span><span class="drill-row-val">任务分解 / 派单 / 优先级排序</span></div>
+      <div class="drill-row"><span class="drill-row-label">升级阈值</span><span class="drill-row-val">需杨总决策的事项实时推送</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">工作流</div>
+      <div class="drill-timeline">
+        <div class="drill-timeline-item">接收指令（杨总 / 重大事件 / 跨 Agent 请求）</div>
+        <div class="drill-timeline-item">拆解为子任务，映射到相关 Agent</div>
+        <div class="drill-timeline-item">并行调度，设置超时监控</div>
+        <div class="drill-timeline-item">汇总结果，生成执行摘要推送驾驶舱</div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">今日调度统计</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num">24</div><div class="drill-kpi-label">任务已调度</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">22</div><div class="drill-kpi-label">已完成</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-amber-600">2</div><div class="drill-kpi-label">进行中</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">技术规格</div>
+      <div class="drill-row"><span class="drill-row-label">模型</span><span class="drill-row-val">Claude Sonnet 4.6</span></div>
+      <div class="drill-row"><span class="drill-row-label">框架</span><span class="drill-row-val">Claude Agent SDK / LangGraph</span></div>
+      <div class="drill-row"><span class="drill-row-label">工具</span><span class="drill-row-val">14 个 Agent MCP 接口 · 企微 / Slack 通知</span></div>
+      <div class="drill-row"><span class="drill-row-label">平均响应时间</span><span class="drill-row-val">＜ 8 秒</span></div>
+    </div>`},
+
+  agent_risk:{icon:'⚠️',title:'风险预警 Agent · Risk Sentinel',sub:'Master 层 · 7×24 巡查',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">监控维度</div>
+      <div class="drill-row"><span class="drill-row-label">巡查频率</span><span class="drill-row-val">每 5 分钟全量扫描</span></div>
+      <div class="drill-row"><span class="drill-row-label">预设规则</span><span class="drill-row-val">32 条红线（财务/进度/合规/市场）</span></div>
+      <div class="drill-row"><span class="drill-row-label">AI 异常发现</span><span class="drill-row-val">LLM 模式识别（非规则覆盖项）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">告警分级</div>
+      <div style="font-size:12.5px;">
+        <div style="background:rgba(220,38,38,.08);border-left:3px solid #ef4444;border-radius:0 8px 8px 0;padding:8px 10px;margin-bottom:6px;"><b>红色</b> · 立即推送杨总 + 联动相关 Agent 紧急响应</div>
+        <div style="background:rgba(245,158,11,.08);border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:8px 10px;margin-bottom:6px;"><b>黄色</b> · Agent 自主处置 + 24h 内向杨总汇报</div>
+        <div style="background:rgba(22,163,74,.08);border-left:3px solid #22c55e;border-radius:0 8px 8px 0;padding:8px 10px;"><b>绿色</b> · 正常 · 仅记录日志</div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">今日活动</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num text-red-600">2</div><div class="drill-kpi-label">红色告警</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-amber-600">2</div><div class="drill-kpi-label">黄色告警</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">4,320</div><div class="drill-kpi-label">巡查次数</div></div>
+      </div>
+    </div>`},
+
+  agent_market:{icon:'📊',title:'市场情报 Agent',sub:'业务层 · 服务 CMO / 市场部',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">数据来源</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+        <span class="drill-tag drill-tag-blue">Yelp API</span>
+        <span class="drill-tag drill-tag-blue">Google Maps API</span>
+        <span class="drill-tag drill-tag-blue">Uber Eats 榜单</span>
+        <span class="drill-tag drill-tag-blue">Statistics Canada</span>
+        <span class="drill-tag drill-tag-blue">小红书爬虫</span>
+        <span class="drill-tag drill-tag-blue">TikTok 声量</span>
+        <span class="drill-tag drill-tag-blue">Reddit r/Toronto</span>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">自动输出</div>
+      <div class="drill-row"><span class="drill-row-label">双周市场报告</span><span class="drill-row-val">竞品动态 + 商圈评分</span></div>
+      <div class="drill-row"><span class="drill-row-label">竞品价格监控</span><span class="drill-row-val">实时（含 Mandy's / Mr.Goose）</span></div>
+      <div class="drill-row"><span class="drill-row-label">消费趋势</span><span class="drill-row-val">月度 · 华人饮食偏好变化</span></div>
+      <div class="drill-row"><span class="drill-row-label">新址评估报告</span><span class="drill-row-val">按需 · 3 个候选商圈打分</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">本周洞察摘要</div>
+      <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
+        竞品「Mr. Goose」本周在 DoorDash 做买一送一，客单价降低明显。本区域搜索「中餐外卖」本周+18%，与 Victoria Day 假期相关。建议趁势加大节日营销投入。
+      </div>
+    </div>`},
+
+  agent_finance:{icon:'💰',title:'财务监控 Agent',sub:'业务层 · 服务 CFO / 财务部',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">监控对象</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+        <span class="drill-tag drill-tag-orange">Toast POS</span>
+        <span class="drill-tag drill-tag-orange">QuickBooks ERP</span>
+        <span class="drill-tag drill-tag-orange">银行流水 API</span>
+        <span class="drill-tag drill-tag-orange">发票 OCR</span>
+        <span class="drill-tag drill-tag-orange">工资单</span>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">日常任务</div>
+      <div class="drill-row"><span class="drill-row-label">日成本归集</span><span class="drill-row-val">每天 15:30 自动完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">预算偏差预警</span><span class="drill-row-val">偏差 >5% 立即推送</span></div>
+      <div class="drill-row"><span class="drill-row-label">现金流预测</span><span class="drill-row-val">滚动 90 天预测</span></div>
+      <div class="drill-row"><span class="drill-row-label">汇率监控</span><span class="drill-row-val">CAD/CNY 每小时刷新</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">今日执行记录</div>
+      <div class="drill-timeline">
+        <div class="drill-timeline-item"><div class="drill-timeline-time">15:32</div>完成日成本归集，1 号店实际 vs 预算偏差 -2.1%</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">14:55</div>识别毛利下穿红线，触发风险 Agent 联动</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">09:00</div>生成今日现金流预警简报推送杨总</div>
+      </div>
+    </div>`},
+
+  agent_supply:{icon:'📦',title:'供应链 Agent',sub:'业务层 · 服务采购经理',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">当前供应链状态</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num text-red-600">72%</div><div class="drill-kpi-label">单一供应商占比 ⚠</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">9天</div><div class="drill-kpi-label">当前库存天数</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">3</div><div class="drill-kpi-label">备选供应商已评估</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">供应商分布</div>
+      <div class="drill-row"><span class="drill-row-label">🇨🇳 国内料包（主）</span><span class="drill-row-val text-red-600">72%（红线 60%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">🇨🇦 本地生鲜</span><span class="drill-row-val">18%</span></div>
+      <div class="drill-row"><span class="drill-row-label">🇺🇸 美国食材</span><span class="drill-row-val">10%</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">自动补货逻辑</div>
+      <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
+        触发条件：库存天数 ≤ 7 天 → 自动生成补货单 → 发送采购经理确认<br><br>
+        优先级：1. 在途海运订单 → 2. 本地备用供应商 → 3. 紧急跨境快递
+      </div>
+    </div>`},
+
+  /* ── 技术架构层 ── */
+  stack_l4:{icon:'🖥',title:'L4 展示层 · Presentation',sub:'谁看 / 在哪看 / 看什么',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">四大展示入口</div>
+      <div class="drill-row"><span class="drill-row-label">CEO 驾驶舱</span><span class="drill-row-val">本页面 · 杨总专属 · 全局视角</span></div>
+      <div class="drill-row"><span class="drill-row-label">部门工作台</span><span class="drill-row-val">Web · 财务 / 选址 / 供应链 / HR…</span></div>
+      <div class="drill-row"><span class="drill-row-label">店长 App</span><span class="drill-row-val">移动端 · 排班/库存/差评/成本</span></div>
+      <div class="drill-row"><span class="drill-row-label">对话入口</span><span class="drill-row-val">企微 / Teams / Slack 自然语言提问</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">技术选型</div>
+      <div class="drill-row"><span class="drill-row-label">前端框架</span><span class="drill-row-val">Next.js + Tailwind CSS</span></div>
+      <div class="drill-row"><span class="drill-row-label">实时推送</span><span class="drill-row-val">WebSocket · Server-Sent Events</span></div>
+      <div class="drill-row"><span class="drill-row-label">移动端</span><span class="drill-row-val">React Native</span></div>
+      <div class="drill-row"><span class="drill-row-label">BI 工具</span><span class="drill-row-val">Metabase / Apache Superset</span></div>
+      <div class="drill-row"><span class="drill-row-label">部署</span><span class="drill-row-val">Cloudflare Pages + Workers</span></div>
+    </div>`},
+
+  stack_l3:{icon:'🧠',title:'L3 决策层 · Decision Brain',sub:'大模型 / 规则引擎 / RAG',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">大模型选型</div>
+      <div class="drill-row"><span class="drill-row-label">主力模型</span><span class="drill-row-val">Claude Sonnet 4.6</span></div>
+      <div class="drill-row"><span class="drill-row-label">轻量任务</span><span class="drill-row-val">Claude Haiku 4.5</span></div>
+      <div class="drill-row"><span class="drill-row-label">备份</span><span class="drill-row-val">GPT-4o</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">知识库 / RAG</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+        <span class="drill-tag drill-tag-purple">海外食品法规</span>
+        <span class="drill-tag drill-tag-purple">菜谱 SOP</span>
+        <span class="drill-tag drill-tag-purple">历史决策审计</span>
+        <span class="drill-tag drill-tag-purple">供应商数据库</span>
+        <span class="drill-tag drill-tag-purple">竞品情报库</span>
+      </div>
+      <div class="drill-row"><span class="drill-row-label">向量数据库</span><span class="drill-row-val">pgvector / Pinecone</span></div>
+      <div class="drill-row"><span class="drill-row-label">嵌入模型</span><span class="drill-row-val">Voyage AI (Anthropic)</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">Agent 框架</div>
+      <div class="drill-row"><span class="drill-row-label">编排框架</span><span class="drill-row-val">Claude Agent SDK + LangGraph</span></div>
+      <div class="drill-row"><span class="drill-row-label">工具协议</span><span class="drill-row-val">MCP（Model Context Protocol）</span></div>
+      <div class="drill-row"><span class="drill-row-label">审计</span><span class="drill-row-val">每个 Agent 决策可回放</span></div>
+    </div>`},
+
+  stack_l2:{icon:'🤖',title:'L2 智能体层 · Agents',sub:'14 个专属 Agent + Master 编排',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">Agent 清单</div>
+      <div class="drill-row"><span class="drill-row-label">Master 层</span><span class="drill-row-val">协调调度 · 风险预警</span></div>
+      <div class="drill-row"><span class="drill-row-label">业务层</span><span class="drill-row-val">市场情报 · 财务监控 · 选址 · 装修管理 · 供应链 · 海运 · 中厨调度 · 门店运营 · 外卖 · 客户洞察 · 招聘HR · 法务合规</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">Agent 规范（每个必须明确）</div>
+      <div class="drill-row"><span class="drill-row-label">输入数据源</span><span class="drill-row-val">明确 API / 数据表 / Webhook</span></div>
+      <div class="drill-row"><span class="drill-row-label">输出动作</span><span class="drill-row-val">明确（通知 / 写入 / 调用 API）</span></div>
+      <div class="drill-row"><span class="drill-row-label">决策权限</span><span class="drill-row-val">明确（自主 / 人工确认 / 杨总）</span></div>
+      <div class="drill-row"><span class="drill-row-label">升级路径</span><span class="drill-row-val">明确（何时升级给上层）</span></div>
+      <div class="drill-row"><span class="drill-row-label">审计日志</span><span class="drill-row-val">每次执行记录可查</span></div>
+    </div>`},
+
+  stack_l1:{icon:'🗄',title:'L1 数据层 · Data',sub:'单一数据源 · 所有数据汇入仓库',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">数据接入清单</div>
+      <div class="drill-row"><span class="drill-row-label">POS / 收银</span><span class="drill-row-val">Toast / Square</span></div>
+      <div class="drill-row"><span class="drill-row-label">外卖平台</span><span class="drill-row-val">Uber Eats / DoorDash / Skip API</span></div>
+      <div class="drill-row"><span class="drill-row-label">ERP / 财务</span><span class="drill-row-val">QuickBooks / NetSuite</span></div>
+      <div class="drill-row"><span class="drill-row-label">HR / 排班</span><span class="drill-row-val">7shifts / Deputy</span></div>
+      <div class="drill-row"><span class="drill-row-label">供应链 / 库存</span><span class="drill-row-val">MarketMan / xtraCHEF</span></div>
+      <div class="drill-row"><span class="drill-row-label">海运 / 物流</span><span class="drill-row-val">船公司 API · Flexport</span></div>
+      <div class="drill-row"><span class="drill-row-label">IoT 设备</span><span class="drill-row-val">中厨设备温度 / 能耗传感器</span></div>
+      <div class="drill-row"><span class="drill-row-label">视频 / 客流</span><span class="drill-row-val">边缘 AI 盒 → 元数据上云</span></div>
+      <div class="drill-row"><span class="drill-row-label">评论 / 社媒</span><span class="drill-row-val">Yelp / Google / 小红书</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">数据仓库规格</div>
+      <div class="drill-row"><span class="drill-row-label">OLAP 仓库</span><span class="drill-row-val">BigQuery / Snowflake</span></div>
+      <div class="drill-row"><span class="drill-row-label">流处理</span><span class="drill-row-val">Kafka / Kinesis</span></div>
+      <div class="drill-row"><span class="drill-row-label">ETL</span><span class="drill-row-val">Airbyte（开源）</span></div>
+      <div class="drill-row"><span class="drill-row-label">向量存储</span><span class="drill-row-val">pgvector（RAG 用）</span></div>
+    </div>`},
+
+  /* ── 风险监控 ── */
+  risk_finance:{icon:'💰',title:'财务风险详情',sub:'2 条红线触发 · 高优先级',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">32 条规则中财务类（共 8 条）</div>
+      <div class="drill-row"><span class="drill-row-label">单店毛利 &lt; 22%</span><span class="drill-row-val text-red-600">❌ 1 号店 18%</span></div>
+      <div class="drill-row"><span class="drill-row-label">月度花费偏差 &gt;±10%</span><span class="drill-row-val text-emerald-600">✓ 当前 -4.5%</span></div>
+      <div class="drill-row"><span class="drill-row-label">现金流安全垫 &lt; 3 月</span><span class="drill-row-val text-emerald-600">✓ 4.2 月</span></div>
+      <div class="drill-row"><span class="drill-row-label">单一供应商占比 &gt; 60%</span><span class="drill-row-val text-red-600">❌ 料包 72%</span></div>
+      <div class="drill-row"><span class="drill-row-label">应收账款逾期 &gt; 60 天</span><span class="drill-row-val text-emerald-600">✓ 无逾期</span></div>
+      <div class="drill-row"><span class="drill-row-label">外卖抽佣突变 &gt; 2pp</span><span class="drill-row-val text-amber-600">⚠ Uber +3pp</span></div>
+      <div class="drill-row"><span class="drill-row-label">汇率波动 &gt; 5%（月）</span><span class="drill-row-val text-emerald-600">✓ 当月 +1.2%</span></div>
+      <div class="drill-row"><span class="drill-row-label">单 SKU 成本占比 &gt; 25%</span><span class="drill-row-val text-emerald-600">✓ 最高 19%</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">AI 建议行动</div>
+      <div style="background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
+        优先处理毛利告警（等杨总决策选方案）+ 启动供应商多元化计划（供应链 Agent 已评估 3 家本地备选）
+      </div>
+    </div>`},
+
+  risk_schedule:{icon:'🚧',title:'进度风险详情',sub:'1 条黄线触发 · 中优先级',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">进度类规则（共 7 条）</div>
+      <div class="drill-row"><span class="drill-row-label">关键里程碑延期 &gt; 5 天</span><span class="drill-row-val text-amber-600">⚠ 2 号店 +7 天</span></div>
+      <div class="drill-row"><span class="drill-row-label">装修花费超预算 &gt; 8%</span><span class="drill-row-val text-emerald-600">✓ 当前 -10%</span></div>
+      <div class="drill-row"><span class="drill-row-label">许可证续期窗口 &lt; 30 天</span><span class="drill-row-val text-emerald-600">✓ 全部有效</span></div>
+      <div class="drill-row"><span class="drill-row-label">关键岗位空缺 &gt; 14 天</span><span class="drill-row-val text-emerald-600">✓ 仅 2 职位空缺 3 天</span></div>
+      <div class="drill-row"><span class="drill-row-label">海运到港延期 &gt; 3 天</span><span class="drill-row-val text-amber-600">⚠ GQT-204 +5 天（已处置）</span></div>
+      <div class="drill-row"><span class="drill-row-label">设备交货延期 &gt; 7 天</span><span class="drill-row-val text-emerald-600">✓ 全部按时</span></div>
+      <div class="drill-row"><span class="drill-row-label">开业前招聘完成率 &lt; 80%</span><span class="drill-row-val text-emerald-600">✓ 1 号店 100%</span></div>
+    </div>`},
+
+  risk_compliance:{icon:'⚖️',title:'合规风险详情',sub:'全绿 · AI 持续监控',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">合规类规则（共 9 条）</div>
+      <div class="drill-row"><span class="drill-row-label">Health Inspection 评分 &lt; A</span><span class="drill-row-val text-emerald-600">✓ 最近评分 A</span></div>
+      <div class="drill-row"><span class="drill-row-label">CFIA / 食品标签合规</span><span class="drill-row-val text-emerald-600">✓ 全部申报</span></div>
+      <div class="drill-row"><span class="drill-row-label">工签 / LMIA 到期 &lt; 60 天</span><span class="drill-row-val text-emerald-600">✓ 最早续签 2027-03</span></div>
+      <div class="drill-row"><span class="drill-row-label">商标侵权监控</span><span class="drill-row-val text-emerald-600">✓ 无告警</span></div>
+      <div class="drill-row"><span class="drill-row-label">数据合规（PIPEDA）</span><span class="drill-row-val text-emerald-600">✓ 隐私政策已更新</span></div>
+      <div class="drill-row"><span class="drill-row-label">劳动法（最低工资）</span><span class="drill-row-val text-emerald-600">✓ CA$17.20/h 以上</span></div>
+      <div class="drill-row"><span class="drill-row-label">消防许可有效</span><span class="drill-row-val text-amber-600">⚠ 2 号店待批（正常流程）</span></div>
+      <div class="drill-row"><span class="drill-row-label">营业执照续期</span><span class="drill-row-val text-emerald-600">✓ 有效至 2027-01</span></div>
+      <div class="drill-row"><span class="drill-row-label">环保 / 废物处理合规</span><span class="drill-row-val text-emerald-600">✓</span></div>
+    </div>`},
+
+  risk_market:{icon:'🎯',title:'市场风险详情',sub:'1 条黄线 · Uber 抽佣变动',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">市场类规则（共 8 条）</div>
+      <div class="drill-row"><span class="drill-row-label">差评率 &gt; 8%</span><span class="drill-row-val text-emerald-600">✓ 当前 5.2%</span></div>
+      <div class="drill-row"><span class="drill-row-label">Google 评分 &lt; 4.3</span><span class="drill-row-val text-emerald-600">✓ 4.7 ★</span></div>
+      <div class="drill-row"><span class="drill-row-label">外卖平台抽佣突变 &gt; 2pp</span><span class="drill-row-val text-amber-600">⚠ Uber +3pp</span></div>
+      <div class="drill-row"><span class="drill-row-label">竞品 1km 内开新店</span><span class="drill-row-val text-emerald-600">✓ 无（近 90 天）</span></div>
+      <div class="drill-row"><span class="drill-row-label">社媒负面声量突增</span><span class="drill-row-val text-emerald-600">✓ 正常</span></div>
+      <div class="drill-row"><span class="drill-row-label">外卖评分 &lt; 4.2</span><span class="drill-row-val text-emerald-600">✓ Uber 4.8</span></div>
+      <div class="drill-row"><span class="drill-row-label">月度进店客流下滑 &gt; 15%</span><span class="drill-row-val text-emerald-600">✓ 实际 +8%</span></div>
+      <div class="drill-row"><span class="drill-row-label">外卖平台下架 SKU &gt; 5 个</span><span class="drill-row-val text-emerald-600">✓ 无</span></div>
+    </div>`},
+
+  /* ── 路线图 ── */
+  roadmap_p1:{icon:'🌱',title:'Phase 1 · M1-M6 · 体系搭建',sub:'投入 CA$ 2.4M · 1 号样板店上线',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">关键交付物</div>
+      <div class="drill-row"><span class="drill-row-label">市场情报 Agent v0.1</span><span class="drill-row-val text-emerald-600">✓ 已完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">双周多伦多市场报告</span><span class="drill-row-val text-emerald-600">✓ 运行中</span></div>
+      <div class="drill-row"><span class="drill-row-label">财务模型 / 投资测算</span><span class="drill-row-val text-emerald-600">✓ 已完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">选址 + 装修 Agent 上线</span><span class="drill-row-val text-emerald-600">✓ 已完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">1 号店选址 + 签约</span><span class="drill-row-val text-emerald-600">✓ Markham</span></div>
+      <div class="drill-row"><span class="drill-row-label">供应链 / 海运 / HR Agent</span><span class="drill-row-val text-emerald-600">✓ 已完成</span></div>
+      <div class="drill-row"><span class="drill-row-label">1 号店正式开业</span><span class="drill-row-val text-emerald-600">✓ 2026-03-10</span></div>
+      <div class="drill-row"><span class="drill-row-label">杨总驾驶舱 v1.0</span><span class="drill-row-val text-emerald-600">✓ 本页面</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">预算执行</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num">CA$2.4M</div><div class="drill-kpi-label">计划投入</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">CA$2.31M</div><div class="drill-kpi-label">实际花费</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">-3.8%</div><div class="drill-kpi-label">低于预算</div></div>
+      </div>
+    </div>`},
+
+  roadmap_p2:{icon:'🚀',title:'Phase 2 · M7-M12 · 多店扩张',sub:'投入 CA$ 4.8M · 中央厨房投产',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">进行中 / 计划中</div>
+      <div class="drill-row"><span class="drill-row-label">2 号店装修</span><span class="drill-row-val text-amber-600">进行中（延期 7 天）</span></div>
+      <div class="drill-row"><span class="drill-row-label">2 号店开业</span><span class="drill-row-val">预计 2026-06-28</span></div>
+      <div class="drill-row"><span class="drill-row-label">中央厨房筹备</span><span class="drill-row-val text-amber-600">进行中（25%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">中厨调度 Agent 上线</span><span class="drill-row-val text-slate-400">M9 计划</span></div>
+      <div class="drill-row"><span class="drill-row-label">3 号店选址</span><span class="drill-row-val text-slate-400">M10 计划</span></div>
+      <div class="drill-row"><span class="drill-row-label">3 号店开业</span><span class="drill-row-val text-slate-400">M12 目标</span></div>
+      <div class="drill-row"><span class="drill-row-label">财务自动月结</span><span class="drill-row-val text-slate-400">M12 目标</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">Phase 2 核心风险</div>
+      <div style="font-size:12.5px;">
+        <div style="background:rgba(245,158,11,.08);border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:8px 10px;margin-bottom:6px;">中央厨房投产时间表紧，M9-M10 设备安装窗口有风险</div>
+        <div style="background:rgba(245,158,11,.08);border-left:3px solid #f59e0b;border-radius:0 8px 8px 0;padding:8px 10px;">1 号店毛利待修复，否则影响 Phase 2 现金流</div>
+      </div>
+    </div>`},
+
+  roadmap_p3:{icon:'🌍',title:'Phase 3 · M13-M18 · 跨市场扩张',sub:'温哥华 / 美西 / 越南 · 体系克隆',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">扩张计划</div>
+      <div class="drill-row"><span class="drill-row-label">温哥华 1 号店</span><span class="drill-row-val">M13 启动（已预评估）</span></div>
+      <div class="drill-row"><span class="drill-row-label">美西（西雅图）</span><span class="drill-row-val">M15 评估 → M16 决策</span></div>
+      <div class="drill-row"><span class="drill-row-label">越南（胡志明）JV</span><span class="drill-row-val text-amber-600">AI 建议延后 1 月至 M16</span></div>
+      <div class="drill-row"><span class="drill-row-label">体系参数化封装</span><span class="drill-row-val">「城市包」一键部署</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">「城市包」克隆内容</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+        <span class="drill-tag drill-tag-purple">14 个 Agent 配置模板</span>
+        <span class="drill-tag drill-tag-purple">财务基准模型</span>
+        <span class="drill-tag drill-tag-purple">本地化合规清单</span>
+        <span class="drill-tag drill-tag-purple">供应链建立 SOP</span>
+        <span class="drill-tag drill-tag-purple">开业 180 天 Playbook</span>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">预期 ROI（Phase 3 启动后 24 个月）</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num">8+</div><div class="drill-kpi-label">门店数量</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">3</div><div class="drill-kpi-label">城市 / 地区</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">CA$24M</div><div class="drill-kpi-label">年 GMV 目标</div></div>
+      </div>
+    </div>`},
+
+  /* ── 机器人 ── */
+  robot_t01:{icon:'🍳',title:'GQ-T01 · 1号店 A锅',sub:'运行中 · 麻婆豆腐',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">实时状态</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">218°C</div><div class="drill-kpi-label">当前油温</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">62%</div><div class="drill-kpi-label">当前批次完成</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">82%</div><div class="drill-kpi-label">今日利用率</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">今日产出</div>
+      <div class="drill-row"><span class="drill-row-label">已完成批次</span><span class="drill-row-val">84 份</span></div>
+      <div class="drill-row"><span class="drill-row-label">平均单份耗时</span><span class="drill-row-val">4.2 分钟</span></div>
+      <div class="drill-row"><span class="drill-row-label">用油量</span><span class="drill-row-val">2.3L（比标准 +0.1L ⚠）</span></div>
+      <div class="drill-row"><span class="drill-row-label">品控通过率</span><span class="drill-row-val text-emerald-600">98.8%</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">设备档案</div>
+      <div class="drill-row"><span class="drill-row-label">型号</span><span class="drill-row-val">锅圈 WR-3000 Pro</span></div>
+      <div class="drill-row"><span class="drill-row-label">投产日期</span><span class="drill-row-val">2026-03-08</span></div>
+      <div class="drill-row"><span class="drill-row-label">累计运行</span><span class="drill-row-val">1,247 小时</span></div>
+      <div class="drill-row"><span class="drill-row-label">下次保养</span><span class="drill-row-val">2026-06-08（剩 28 天）</span></div>
+    </div>`},
+
+  robot_t03:{icon:'⚠️',title:'GQ-T03 · 中央厨房 A · 维修中',sub:'油温异常 · 维修 Agent 已派单',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">故障详情</div>
+      <div class="drill-row"><span class="drill-row-label">发现时间</span><span class="drill-row-val">2026-05-06 11:42</span></div>
+      <div class="drill-row"><span class="drill-row-label">异常现象</span><span class="drill-row-val text-red-600">油温 158°C（正常 210-250°C）</span></div>
+      <div class="drill-row"><span class="drill-row-label">初步判断</span><span class="drill-row-val">加热元件故障</span></div>
+      <div class="drill-row"><span class="drill-row-label">影响产能</span><span class="drill-row-val text-amber-600">中央厨房 -20%（其余 4 台补位）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">维修进度</div>
+      <div class="drill-timeline">
+        <div class="drill-timeline-item"><div class="drill-timeline-time">11:42</div>IoT 传感器检测异常，风险 Agent 告警</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">11:45</div>中厨调度 Agent 重分配任务至 T04/T05/T06</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">12:10</div>维修工程师到场，判断加热元件</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">预计 17:00</div>零件到货 → 修复完成 → 恢复运行</div>
+      </div>
+    </div>`},
+
+  /* ── 供应链 ── */
+  supply_sea:{icon:'🚢',title:'海运供应链详情',sub:'国内→温哥华→多伦多',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">在途货物</div>
+      <div class="drill-row"><span class="drill-row-label">集装箱 GQT-204</span><span class="drill-row-val text-amber-600">延期 +5 天</span></div>
+      <div class="drill-row"><span class="drill-row-label">集装箱 GQT-198</span><span class="drill-row-val text-emerald-600">已抵多伦多仓库</span></div>
+      <div class="drill-row"><span class="drill-row-label">下一批次（GQT-210）</span><span class="drill-row-val">6 月 15 日出港</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">海运时效</div>
+      <div class="drill-row"><span class="drill-row-label">中国 → 温哥华港</span><span class="drill-row-val">约 18-22 天</span></div>
+      <div class="drill-row"><span class="drill-row-label">清关</span><span class="drill-row-val">3-5 天</span></div>
+      <div class="drill-row"><span class="drill-row-label">温哥华 → 多伦多</span><span class="drill-row-val">陆运 4-5 天</span></div>
+      <div class="drill-row"><span class="drill-row-label">全程总耗时</span><span class="drill-row-val">约 25-32 天</span></div>
+    </div>`},
+
+  /* ── 全球城市 ── */
+  city_toronto:{icon:'🍁',title:'多伦多 · 当前运营中心',sub:'3 个项目 · 北美样板市场',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">城市概况</div>
+      <div class="drill-row"><span class="drill-row-label">华人人口</span><span class="drill-row-val">约 60 万（大多区）</span></div>
+      <div class="drill-row"><span class="drill-row-label">餐饮消费</span><span class="drill-row-val">人均 CA$ 82/周</span></div>
+      <div class="drill-row"><span class="drill-row-label">中餐市场规模</span><span class="drill-row-val">约 CA$ 12 亿/年</span></div>
+      <div class="drill-row"><span class="drill-row-label">锅圈竞品密度</span><span class="drill-row-val">低（直接竞品 2 家）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">当前项目</div>
+      <div class="drill-row"><span class="drill-row-label">1 号店（Markham）</span><span class="drill-row-val text-emerald-600">在营 · GMV CA$12.4K/天</span></div>
+      <div class="drill-row"><span class="drill-row-label">2 号店（North York）</span><span class="drill-row-val text-amber-600">装修中 · 预计 6/28 开业</span></div>
+      <div class="drill-row"><span class="drill-row-label">中央厨房（Mississauga）</span><span class="drill-row-val text-sky-600">筹备中 · M12 投产</span></div>
+    </div>`},
+
+  city_vancouver:{icon:'🌲',title:'温哥华 · M13 启动',sub:'西海岸华人核心市场',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">市场评估</div>
+      <div class="drill-row"><span class="drill-row-label">华人人口</span><span class="drill-row-val">约 45 万（大温区）</span></div>
+      <div class="drill-row"><span class="drill-row-label">目标商圈</span><span class="drill-row-val">Richmond / Burnaby</span></div>
+      <div class="drill-row"><span class="drill-row-label">市场情报 Agent 评分</span><span class="drill-row-val">88 / 100 · 强推荐</span></div>
+      <div class="drill-row"><span class="drill-row-label">预计 ROI 回收期</span><span class="drill-row-val">20-24 个月</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">启动计划</div>
+      <div class="drill-row"><span class="drill-row-label">选址 Agent 启动</span><span class="drill-row-val">M13（2027-04）</span></div>
+      <div class="drill-row"><span class="drill-row-label">1 号店开业目标</span><span class="drill-row-val">M16（2027-07）</span></div>
+      <div class="drill-row"><span class="drill-row-label">供应链优势</span><span class="drill-row-val">海运直抵温哥华港，成本 -15%</span></div>
+    </div>`},
+
+  city_vietnam:{icon:'🇻🇳',title:'越南（胡志明市）· JV 评估',sub:'M16 启动 · AI 建议延后 1 月',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">市场吸引力</div>
+      <div class="drill-row"><span class="drill-row-label">人口</span><span class="drill-row-val">胡志明 900 万</span></div>
+      <div class="drill-row"><span class="drill-row-label">外食消费增速</span><span class="drill-row-val">+18%/年（东南亚第一）</span></div>
+      <div class="drill-row"><span class="drill-row-label">中餐偏好度</span><span class="drill-row-val">高（历史饮食联系）</span></div>
+      <div class="drill-row"><span class="drill-row-label">人工成本</span><span class="drill-row-val">多伦多 1/6</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">AI 延期建议理由</div>
+      <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
+        基于多伦多 1 号店现金流状况 + 越南合伙人就绪度评估 + 料包产能约束，AI 推荐延后 1 个月至 M16，释放 CA$ 1.2M 现金垫，降低跨区域并发风险。
+      </div>
+    </div>`}
+};
+
+/* ── 开 / 关 逻辑 ── */
+function openDetail(key){
+  const d=DETAILS[key];if(!d)return;
+  document.getElementById('drillIcon').textContent=d.icon;
+  document.getElementById('drillTitle').textContent=d.title;
+  document.getElementById('drillSub').textContent=d.sub;
+  document.getElementById('drillBody').innerHTML=d.html;
+  document.getElementById('drillPanel').classList.add('open');
+  document.getElementById('drillBackdrop').classList.add('show');
+}
+function closeDetail(){
+  document.getElementById('drillPanel').classList.remove('open');
+  document.getElementById('drillBackdrop').classList.remove('show');
+}
+document.getElementById('drillClose').addEventListener('click',closeDetail);
+document.getElementById('drillBackdrop').addEventListener('click',closeDetail);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail();});
 </script>
 </body>
 </html>
