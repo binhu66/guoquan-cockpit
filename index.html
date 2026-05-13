@@ -2564,6 +2564,217 @@
           <div class="card-2 p-3"><b class="text-[#FF6B35]">18:35</b> 门店 Agent 推送店长：「队列恢复正常」 · 全程无人工干预</div>
         </div>
       </div>
+
+      <!-- ===== 客户口味引擎 ===== -->
+      <div class="card p-5 mt-4">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="text-sm font-semibold">👤 客户口味引擎 · Flavor Profile Engine</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">顾客点单 → AI 识别口味档案 → 实时推送机器人调参 · 从「两种人」到「每个人」</div>
+          </div>
+          <div class="flex gap-2">
+            <span class="pill pill-ai">AI 驱动</span>
+            <span class="pill pill-ok">接入 POS</span>
+          </div>
+        </div>
+
+        <!-- 数据流：顾客点单 → 机器人出餐 -->
+        <div class="grid grid-cols-5 gap-2 mb-5 text-[11.5px]">
+          <div class="card-2 p-3 text-center" style="border-top:3px solid #60a5fa;">
+            <div class="text-lg mb-1">📱</div>
+            <b class="text-slate-700">① 点单</b>
+            <div class="text-slate-500 mt-1">App / 二维码 / 收银台<br>选辣度 / 口味 / 忌口</div>
+          </div>
+          <div class="card-2 p-3 text-center" style="border-top:3px solid #a78bfa;">
+            <div class="text-lg mb-1">🧠</div>
+            <b class="text-slate-700">② 识别档案</b>
+            <div class="text-slate-500 mt-1">新客 → 按客群默认<br>熟客 → 读取历史偏好</div>
+          </div>
+          <div class="card-2 p-3 text-center" style="border-top:3px solid #FF6B35;">
+            <div class="text-lg mb-1">⚙️</div>
+            <b class="text-slate-700">③ 生成参数</b>
+            <div class="text-slate-500 mt-1">辣度 / 油量 / 咸淡<br>酱汁比 / 出锅时间</div>
+          </div>
+          <div class="card-2 p-3 text-center" style="border-top:3px solid #E53935;">
+            <div class="text-lg mb-1">🤖</div>
+            <b class="text-slate-700">④ 机器人执行</b>
+            <div class="text-slate-500 mt-1">GQ-T01/T02 实时<br>调整火力 · 用料比</div>
+          </div>
+          <div class="card-2 p-3 text-center" style="border-top:3px solid #16a34a;">
+            <div class="text-lg mb-1">⭐</div>
+            <b class="text-slate-700">⑤ 反馈学习</b>
+            <div class="text-slate-500 mt-1">评分 → AI 自动<br>迭代该客口味档案</div>
+          </div>
+        </div>
+
+        <!-- 两大客群口味矩阵 -->
+        <div class="text-[12px] font-semibold text-slate-700 mb-3">📊 两大客群默认口味矩阵（Phase 1 基线）</div>
+        <div class="grid grid-cols-2 gap-4 mb-5">
+
+          <!-- 华人客群 -->
+          <div class="card-2 p-4" style="border-top:4px solid #E53935;">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-2xl">🇨🇳</span>
+              <div>
+                <div class="font-semibold text-slate-800">华人 / 亚裔客群</div>
+                <div class="text-[11px] text-slate-500">占比约 68% · Markham 主力客群</div>
+              </div>
+              <span class="pill pill-bad ml-auto" style="font-size:10px;">高辣偏好</span>
+            </div>
+            <div class="space-y-2 text-[12px]">
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-slate-500">🌶 辣度</span><span class="font-semibold">3.8 / 5</span></div>
+                <div style="height:6px;background:#fee2e2;border-radius:3px;"><div style="height:100%;width:76%;background:linear-gradient(90deg,#dc2626,#ef4444);border-radius:3px;"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-slate-500">🛢 油量</span><span class="font-semibold">标准偏重</span></div>
+                <div style="height:6px;background:#fef3c7;border-radius:3px;"><div style="height:100%;width:65%;background:linear-gradient(90deg,#d97706,#fbbf24);border-radius:3px;"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-slate-500">🧂 咸淡</span><span class="font-semibold">标准偏重</span></div>
+                <div style="height:6px;background:#dbeafe;border-radius:3px;"><div style="height:100%;width:62%;background:linear-gradient(90deg,#2563eb,#60a5fa);border-radius:3px;"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-slate-500">🍶 酱汁浓度</span><span class="font-semibold">浓郁</span></div>
+                <div style="height:6px;background:#f3e8ff;border-radius:3px;"><div style="height:100%;width:75%;background:linear-gradient(90deg,#7c3aed,#a78bfa);border-radius:3px;"></div></div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 text-[11px] text-slate-500">
+                <b class="text-slate-700">热门 SKU：</b>水煮牛肉 · 麻婆豆腐 · 夫妻肺片 · 鱼香肉丝<br>
+                <b class="text-slate-700">忌口：</b>约 12% 无猪肉偏好
+              </div>
+            </div>
+          </div>
+
+          <!-- 本地老外客群 -->
+          <div class="card-2 p-4" style="border-top:4px solid #0284c7;">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-2xl">🍁</span>
+              <div>
+                <div class="font-semibold text-slate-800">本地老外 / 非华裔</div>
+                <div class="text-[11px] text-slate-500">占比约 32% · 增长最快客群</div>
+              </div>
+              <span class="pill pill-info ml-auto" style="font-size:10px;">温和口味</span>
+            </div>
+            <div class="space-y-2 text-[12px]">
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-slate-500">🌶 辣度</span><span class="font-semibold">1.6 / 5</span></div>
+                <div style="height:6px;background:#fee2e2;border-radius:3px;"><div style="height:100%;width:32%;background:linear-gradient(90deg,#fca5a5,#fcd34d);border-radius:3px;"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-slate-500">🛢 油量</span><span class="font-semibold">偏少</span></div>
+                <div style="height:6px;background:#fef3c7;border-radius:3px;"><div style="height:100%;width:38%;background:linear-gradient(90deg,#fbbf24,#fde68a);border-radius:3px;"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-slate-500">🧂 咸淡</span><span class="font-semibold">偏淡</span></div>
+                <div style="height:6px;background:#dbeafe;border-radius:3px;"><div style="height:100%;width:35%;background:linear-gradient(90deg,#60a5fa,#93c5fd);border-radius:3px;"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-slate-500">🍶 酱汁浓度</span><span class="font-semibold">清淡</span></div>
+                <div style="height:6px;background:#f3e8ff;border-radius:3px;"><div style="height:100%;width:35%;background:linear-gradient(90deg,#a78bfa,#c4b5fd);border-radius:3px;"></div></div>
+              </div>
+              <div class="pt-2 border-t border-slate-200 text-[11px] text-slate-500">
+                <b class="text-slate-700">热门 SKU：</b>宫保鸡丁（微辣版）· 炒河粉 · 蒜香炒菜 · 照烧鸡<br>
+                <b class="text-slate-700">忌口：</b>约 28% 无麸质 / 素食需求
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 机器人参数差异对比 -->
+        <div class="text-[12px] font-semibold text-slate-700 mb-3">⚙️ 同一道菜 · 机器人对两种客群的参数差异（宫保鸡丁为例）</div>
+        <div class="overflow-x-auto mb-5">
+          <table class="w-full text-[12px]">
+            <thead>
+              <tr class="text-[10.5px] text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                <th class="text-left py-2 pr-4">参数</th>
+                <th class="text-center px-4">🇨🇳 华人档案</th>
+                <th class="text-center px-4">🍁 老外档案</th>
+                <th class="text-center px-4 text-slate-300">差值</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr><td class="py-2 pr-4">干辣椒量</td><td class="text-center px-4 font-semibold text-red-600">8 颗</td><td class="text-center px-4 font-semibold text-sky-600">2 颗</td><td class="text-center px-4 text-slate-400">-75%</td></tr>
+              <tr><td class="py-2 pr-4">用油量</td><td class="text-center px-4 font-semibold text-red-600">35 ml</td><td class="text-center px-4 font-semibold text-sky-600">22 ml</td><td class="text-center px-4 text-slate-400">-37%</td></tr>
+              <tr><td class="py-2 pr-4">生抽用量</td><td class="text-center px-4 font-semibold text-red-600">18 ml</td><td class="text-center px-4 font-semibold text-sky-600">12 ml</td><td class="text-center px-4 text-slate-400">-33%</td></tr>
+              <tr><td class="py-2 pr-4">花椒粒</td><td class="text-center px-4 font-semibold text-red-600">15 粒</td><td class="text-center px-4 font-semibold text-sky-600">3 粒</td><td class="text-center px-4 text-slate-400">-80%</td></tr>
+              <tr><td class="py-2 pr-4">出锅温度</td><td class="text-center px-4">235°C</td><td class="text-center px-4">228°C</td><td class="text-center px-4 text-slate-400">-7°</td></tr>
+              <tr><td class="py-2 pr-4">翻炒时间</td><td class="text-center px-4">4 分 20 秒</td><td class="text-center px-4">4 分 05 秒</td><td class="text-center px-4 text-slate-400">-15s</td></tr>
+              <tr><td class="py-2 pr-4 text-emerald-700 font-semibold">标准化率</td><td class="text-center px-4 font-semibold text-emerald-600">97.2%</td><td class="text-center px-4 font-semibold text-emerald-600">96.8%</td><td class="text-center px-4 text-emerald-600">≈ 持平</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 个人档案示例 -->
+        <div class="text-[12px] font-semibold text-slate-700 mb-3">👤 个人档案示例（常客 · 会员系统）</div>
+        <div class="grid grid-cols-3 gap-3 mb-5">
+          <div class="card-2 p-3 drillable" onclick="openDetail('flavor_member_1')">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-sm font-bold text-red-600">王</div>
+              <div><div class="font-semibold text-[12.5px]">王先生</div><div class="text-[10px] text-slate-400">来访 23 次 · 黄金会员</div></div>
+              <span class="pill pill-bad ml-auto" style="font-size:9px;">超辣</span>
+            </div>
+            <div class="space-y-1 text-[11px]">
+              <div class="flex justify-between"><span class="text-slate-500">辣度</span><span class="font-semibold">5 / 5 🌶🌶🌶🌶🌶</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">油量</span><span>标准</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">常点</span><span>水煮牛肉 · 夫妻肺片</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">忌口</span><span class="text-emerald-600">无</span></div>
+            </div>
+            <div class="text-[10px] text-[#FF6B35] mt-2">→ 机器人识别后：+50% 辣椒 · +30% 花椒</div>
+          </div>
+          <div class="card-2 p-3 drillable" onclick="openDetail('flavor_member_2')">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sm font-bold text-sky-600">S</div>
+              <div><div class="font-semibold text-[12.5px]">Sarah M.</div><div class="text-[10px] text-slate-400">来访 11 次 · 普通会员</div></div>
+              <span class="pill pill-info ml-auto" style="font-size:9px;">无辣</span>
+            </div>
+            <div class="space-y-1 text-[11px]">
+              <div class="flex justify-between"><span class="text-slate-500">辣度</span><span class="font-semibold">1 / 5 🌶</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">油量</span><span>少油</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">常点</span><span>宫保鸡丁 · 炒河粉</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">忌口</span><span class="text-amber-600">无麸质</span></div>
+            </div>
+            <div class="text-[10px] text-[#FF6B35] mt-2">→ 机器人：无辣椒 · 少油 · 无酱油替换</div>
+          </div>
+          <div class="card-2 p-3 drillable" onclick="openDetail('flavor_member_3')">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-sm font-bold text-purple-600">李</div>
+              <div><div class="font-semibold text-[12.5px]">李小姐</div><div class="text-[10px] text-slate-400">来访 7 次 · 普通会员</div></div>
+              <span class="pill pill-ok ml-auto" style="font-size:9px;">中辣素食</span>
+            </div>
+            <div class="space-y-1 text-[11px]">
+              <div class="flex justify-between"><span class="text-slate-500">辣度</span><span class="font-semibold">3 / 5 🌶🌶🌶</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">油量</span><span>少油</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">常点</span><span>鱼香茄子 · 麻婆豆腐（素）</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">忌口</span><span class="text-amber-600">纯素</span></div>
+            </div>
+            <div class="text-[10px] text-[#FF6B35] mt-2">→ 机器人：去肉 · 豆腐替换 · 蚝油换素蚝油</div>
+          </div>
+        </div>
+
+        <!-- 扩展路径 -->
+        <div class="card p-4" style="background:linear-gradient(90deg,rgba(229,57,53,.04),rgba(168,85,247,.04));border:1px solid rgba(229,57,53,.15);">
+          <div class="text-[12px] font-semibold mb-2">🗺 个人化演进路径</div>
+          <div class="grid grid-cols-4 gap-3 text-[11.5px]">
+            <div class="text-center">
+              <div class="font-bold text-emerald-600 mb-1">现阶段 ✓</div>
+              <div class="card-2 p-2"><b>2 段</b><div class="text-slate-500">华人 / 老外<br>默认口味档案</div></div>
+            </div>
+            <div class="text-center">
+              <div class="font-bold text-[#FF6B35] mb-1">M6 目标 →</div>
+              <div class="card-2 p-2"><b>5 段</b><div class="text-slate-500">华人 / 本地华裔<br>老外 / 素食 / 儿童</div></div>
+            </div>
+            <div class="text-center">
+              <div class="font-bold text-purple-600 mb-1">M12 目标 →</div>
+              <div class="card-2 p-2"><b>会员个人档案</b><div class="text-slate-500">扫码识别 → AI 自动<br>调用该客历史偏好</div></div>
+            </div>
+            <div class="text-center">
+              <div class="font-bold text-slate-400 mb-1">远期 →</div>
+              <div class="card-2 p-2"><b>实时学习</b><div class="text-slate-500">每次评分 → 模型<br>自动修正偏好权重</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </section>
 
     <!-- ========== 11. 计划 vs 实际 · 第一期测试阶段 ========== -->
@@ -4242,6 +4453,100 @@ const DETAILS = {
       <div class="drill-section-title">AI 延期建议理由</div>
       <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
         基于多伦多 1 号店现金流状况 + 越南合伙人就绪度评估 + 料包产能约束，AI 推荐延后 1 个月至 M16，释放 CA$ 1.2M 现金垫，降低跨区域并发风险。
+      </div>
+    </div>`},
+
+  /* ── 口味会员档案 ── */
+  flavor_member_1:{icon:'🌶️',title:'王先生 · 超辣口味档案',sub:'来访 23 次 · 黄金会员 · 华人客群',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">口味参数（机器人执行版）</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num text-red-600">5/5</div><div class="drill-kpi-label">辣度偏好</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num">标准</div><div class="drill-kpi-label">油量</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">无</div><div class="drill-kpi-label">忌口</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">机器人实际执行参数（vs 标准华人档案）</div>
+      <div class="drill-row"><span class="drill-row-label">干辣椒</span><span class="drill-row-val text-red-600">12 颗（标准 8 颗 +50%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">花椒</span><span class="drill-row-val text-red-600">20 粒（标准 15 粒 +33%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">豆瓣酱</span><span class="drill-row-val text-red-600">25 ml（标准 18 ml +39%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">用油量</span><span class="drill-row-val">35 ml（标准不变）</span></div>
+      <div class="drill-row"><span class="drill-row-label">咸淡</span><span class="drill-row-val">标准</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">常点菜品 TOP 3</div>
+      <div class="drill-row"><span class="drill-row-label">① 水煮牛肉</span><span class="drill-row-val">15 次 · 评分 5.0★</span></div>
+      <div class="drill-row"><span class="drill-row-label">② 夫妻肺片</span><span class="drill-row-val">9 次 · 评分 4.9★</span></div>
+      <div class="drill-row"><span class="drill-row-label">③ 麻婆豆腐</span><span class="drill-row-val">6 次 · 评分 4.8★</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">AI 学习历程</div>
+      <div class="drill-timeline">
+        <div class="drill-timeline-item"><div class="drill-timeline-time">第 1 次来访</div>新客 → 默认华人档案（辣度 3.8）</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">第 3 次来访</div>每次追加辣 → AI 上调至 4.5</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">第 8 次来访</div>连续 5 次 5 星 → 锁定超辣参数</div>
+        <div class="drill-timeline-item"><div class="drill-timeline-time">当前</div>免询问直接调用，满意度 4.95★</div>
+      </div>
+    </div>`},
+
+  flavor_member_2:{icon:'🥗',title:'Sarah M. · 无辣无麸质档案',sub:'来访 11 次 · 普通会员 · 老外客群',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">口味参数</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num text-sky-600">1/5</div><div class="drill-kpi-label">辣度偏好</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-sky-600">少油</div><div class="drill-kpi-label">油量</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-amber-600">无麸质</div><div class="drill-kpi-label">忌口</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">机器人执行参数（vs 标准老外档案）</div>
+      <div class="drill-row"><span class="drill-row-label">干辣椒</span><span class="drill-row-val text-sky-600">0 颗（标准老外 2 颗）</span></div>
+      <div class="drill-row"><span class="drill-row-label">用油量</span><span class="drill-row-val text-sky-600">16 ml（标准 22 ml -27%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">生抽</span><span class="drill-row-val text-amber-600">替换为无麸质酱油 Tamari</span></div>
+      <div class="drill-row"><span class="drill-row-label">蚝油</span><span class="drill-row-val text-amber-600">替换为无麸质版本</span></div>
+      <div class="drill-row"><span class="drill-row-label">淀粉勾芡</span><span class="drill-row-val text-amber-600">替换为玉米淀粉（无麸质）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">常点菜品 TOP 3</div>
+      <div class="drill-row"><span class="drill-row-label">① 宫保鸡丁（微辣版）</span><span class="drill-row-val">6 次 · 评分 4.7★</span></div>
+      <div class="drill-row"><span class="drill-row-label">② 炒河粉（GF 版）</span><span class="drill-row-val">4 次 · 评分 4.5★</span></div>
+      <div class="drill-row"><span class="drill-row-label">③ 蒜香西兰花</span><span class="drill-row-val">3 次 · 评分 4.8★</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">💡 AI 洞察</div>
+      <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
+        Sarah 的无麸质需求在老外客群中占比 ~28%，已触发 AI 建议：在菜单上标注 GF 标识，预计增加该客群复购率 +15%。
+      </div>
+    </div>`},
+
+  flavor_member_3:{icon:'🥬',title:'李小姐 · 中辣纯素档案',sub:'来访 7 次 · 普通会员 · 华人客群',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">口味参数</div>
+      <div class="drill-kpi-row">
+        <div class="drill-kpi"><div class="drill-kpi-num text-amber-600">3/5</div><div class="drill-kpi-label">辣度偏好</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-sky-600">少油</div><div class="drill-kpi-label">油量</div></div>
+        <div class="drill-kpi"><div class="drill-kpi-num text-emerald-600">纯素</div><div class="drill-kpi-label">忌口</div></div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">机器人执行参数（纯素模式）</div>
+      <div class="drill-row"><span class="drill-row-label">肉类</span><span class="drill-row-val text-emerald-600">全部剔除 / 豆腐替换</span></div>
+      <div class="drill-row"><span class="drill-row-label">蚝油</span><span class="drill-row-val text-emerald-600">替换为素蚝油</span></div>
+      <div class="drill-row"><span class="drill-row-label">鸡精</span><span class="drill-row-val text-emerald-600">替换为蘑菇粉</span></div>
+      <div class="drill-row"><span class="drill-row-label">辣度</span><span class="drill-row-val">干辣椒 5 颗（中辣）</span></div>
+      <div class="drill-row"><span class="drill-row-label">用油量</span><span class="drill-row-val">20 ml（偏少）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">常点菜品 TOP 3</div>
+      <div class="drill-row"><span class="drill-row-label">① 鱼香茄子（素版）</span><span class="drill-row-val">5 次 · 评分 4.9★</span></div>
+      <div class="drill-row"><span class="drill-row-label">② 麻婆豆腐（纯素）</span><span class="drill-row-val">4 次 · 评分 4.7★</span></div>
+      <div class="drill-row"><span class="drill-row-label">③ 素炒时蔬</span><span class="drill-row-val">3 次 · 评分 4.6★</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">💡 AI 洞察</div>
+      <div style="background:rgba(22,163,74,.06);border:1px solid rgba(22,163,74,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
+        素食需求在多伦多华人客群中约 8%，但增速快（+22%/年）。建议在菜单增加 3 个专属素食 SKU，机器人参数已可支持，无需增设备。
       </div>
     </div>`}
 };
