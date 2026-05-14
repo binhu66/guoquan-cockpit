@@ -8,6 +8,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- MapLibre GL JS — 全球大地图（Mapbox 同款渲染引擎 · 无需 API Key） -->
+<link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
+<script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>
 <style>
   :root{
     --gq-red:#E53935;
@@ -117,6 +120,16 @@
   .gq-marker .label{position:absolute;left:36px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;color:var(--text-main);white-space:nowrap;box-shadow:0 2px 8px rgba(15,23,42,.06);}
   .gq-marker .label .sub{display:block;font-size:9px;font-weight:500;color:var(--text-dim);}
   @keyframes pulseRing{0%{transform:scale(.5);opacity:.6;}80%,100%{transform:scale(1.3);opacity:0;}}
+  /* MapLibre 大地图弹窗 & 控件 */
+  .maplibregl-ctrl-attrib,.maplibregl-ctrl-logo{display:none!important;}
+  .maplibregl-ctrl-group{background:rgba(255,255,255,.9)!important;border-radius:8px!important;box-shadow:0 2px 8px rgba(15,23,42,.12)!important;}
+  .maplibregl-ctrl-group button{background:transparent!important;}
+  .gq-store-popup .maplibregl-popup-content{padding:10px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,.18);font-family:inherit;}
+  .gq-store-popup .maplibregl-popup-tip{display:none;}
+  .map-store-bar{display:flex;gap:10px;margin-bottom:10px;}
+  .map-store-card{flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s;}
+  .map-store-card:hover{border-color:#FF6B35;box-shadow:0 4px 12px rgba(229,57,53,.12);}
+  .map-store-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;}
 
   /* 小型 AI 辅助分析按钮（用于金字塔每层 + 部门卡片） */
   .ai-btn-mini{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:5px;background:linear-gradient(90deg,rgba(255,255,255,.95),rgba(255,255,255,.85));color:#B71C1C;font-size:10px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.5);line-height:1.5;letter-spacing:.2px;transition:all .15s;}
@@ -2262,12 +2275,52 @@
         </div>
 
         <div id="bigMap" style="height:520px;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--line);"></div>
+
+        <!-- 多伦多在营店面快速入口 -->
+        <div class="map-store-bar mt-3">
+          <div class="map-store-card" onclick="openDetail('city_store_1')">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="map-store-dot" style="background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.6);"></span>
+              <span class="font-semibold text-[12px]">1 号店 · Markham</span>
+              <span class="pill pill-ok ml-auto" style="font-size:9.5px;">在营</span>
+            </div>
+            <div class="text-[11px] text-slate-500">3255 Hwy 7 E, Markham, ON L3R 3P9</div>
+            <div class="flex items-center gap-3 mt-1.5 text-[10.5px]">
+              <span class="text-slate-400">📍 Markham 华人商圈</span>
+              <a href="https://maps.google.com/?layer=c&cbll=43.8561,-79.3365" target="_blank" onclick="event.stopPropagation()" class="text-[#E53935] font-semibold hover:underline">Google 街景 →</a>
+            </div>
+          </div>
+          <div class="map-store-card" onclick="openDetail('city_store_2')">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="map-store-dot" style="background:#f59e0b;box-shadow:0 0 6px rgba(245,158,11,.5);"></span>
+              <span class="font-semibold text-[12px]">2 号店 · North York</span>
+              <span class="pill pill-warn ml-auto" style="font-size:9.5px;">装修</span>
+            </div>
+            <div class="text-[11px] text-slate-500">4750 Yonge St, Toronto, ON M2N 5M6</div>
+            <div class="flex items-center gap-3 mt-1.5 text-[10.5px]">
+              <span class="text-slate-400">📍 Yonge-Sheppard 核心区</span>
+              <a href="https://maps.google.com/?layer=c&cbll=43.7726,-79.4141" target="_blank" onclick="event.stopPropagation()" class="text-[#E53935] font-semibold hover:underline">Google 街景 →</a>
+            </div>
+          </div>
+          <div class="map-store-card" onclick="openDetail('city_store_ck')">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="map-store-dot" style="background:#60a5fa;box-shadow:0 0 6px rgba(96,165,250,.5);"></span>
+              <span class="font-semibold text-[12px]">中央厨房 · Mississauga</span>
+              <span class="pill pill-info ml-auto" style="font-size:9.5px;">筹备</span>
+            </div>
+            <div class="text-[11px] text-slate-500">2801 Argentia Rd, Mississauga, ON L5N 8E5</div>
+            <div class="flex items-center gap-3 mt-1.5 text-[10.5px]">
+              <span class="text-slate-400">📍 Mississauga 工业园区</span>
+              <a href="https://maps.google.com/?layer=c&cbll=43.5923,-79.6586" target="_blank" onclick="event.stopPropagation()" class="text-[#E53935] font-semibold hover:underline">Google 街景 →</a>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 各市场详情 -->
       <div class="grid grid-cols-3 gap-3">
         <!-- 中国 -->
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('city_china')">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold flex items-center gap-2">🇨🇳 中国总部</div>
             <span class="pill" style="background:rgba(229,57,53,.2);color:#f87171;">基地</span>
@@ -2281,7 +2334,7 @@
         </div>
 
         <!-- 多伦多 -->
-        <div class="card p-4 border-2" style="border-color:rgba(255,107,53,0.5);">
+        <div class="card p-4 border-2 drillable" style="border-color:rgba(255,107,53,0.5);" onclick="openDetail('city_toronto')">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold flex items-center gap-2">🇨🇦 多伦多 ★</div>
             <span class="pill pill-info">在营 + 在建</span>
@@ -2296,7 +2349,7 @@
         </div>
 
         <!-- 温哥华 -->
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('city_vancouver')">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold flex items-center gap-2">🇨🇦 温哥华</div>
             <span class="pill pill-warn">M13 启动</span>
@@ -2311,7 +2364,7 @@
         </div>
 
         <!-- 美西 -->
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('city_la')">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold flex items-center gap-2">🇺🇸 洛杉矶 / 美西</div>
             <span class="pill pill-warn">M17+ 评估</span>
@@ -2325,7 +2378,7 @@
         </div>
 
         <!-- 越南 -->
-        <div class="card p-4 border-2" style="border-color:rgba(34,197,94,0.4);">
+        <div class="card p-4 border-2 drillable" style="border-color:rgba(34,197,94,0.4);" onclick="openDetail('city_vietnam')">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold flex items-center gap-2">🇻🇳 胡志明市</div>
             <span class="pill pill-warn">M15 JV</span>
@@ -2340,7 +2393,7 @@
         </div>
 
         <!-- 新加坡 -->
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('city_singapore')">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold flex items-center gap-2">🇸🇬 新加坡</div>
             <span class="pill" style="background:rgba(168,85,247,0.18);color:#c084fc;">远期</span>
@@ -2354,7 +2407,7 @@
         </div>
 
         <!-- 曼谷 -->
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('city_bangkok')">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold flex items-center gap-2">🇹🇭 曼谷</div>
             <span class="pill" style="background:rgba(168,85,247,0.18);color:#c084fc;">远期</span>
@@ -2367,7 +2420,7 @@
         </div>
 
         <!-- 悉尼 -->
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('city_sydney')">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold flex items-center gap-2">🇦🇺 悉尼 / 墨尔本</div>
             <span class="pill" style="background:rgba(168,85,247,0.18);color:#c084fc;">远期</span>
@@ -2380,7 +2433,7 @@
         </div>
 
         <!-- 伦敦 -->
-        <div class="card p-4">
+        <div class="card p-4 drillable" onclick="openDetail('city_london')">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold flex items-center gap-2">🇬🇧 伦敦</div>
             <span class="pill" style="background:rgba(168,85,247,0.18);color:#c084fc;">远期</span>
@@ -2771,6 +2824,262 @@
               <div class="font-bold text-slate-400 mb-1">远期 →</div>
               <div class="card-2 p-2"><b>实时学习</b><div class="text-slate-500">每次评分 → 模型<br>自动修正偏好权重</div></div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 竞品拆解：Panda Express & Thai Express ===== -->
+      <div class="mt-6">
+        <div class="flex items-center gap-3 mb-4">
+          <h2 class="text-base font-bold">🔍 竞品本土化拆解 — 向对手学习，超越对手</h2>
+          <span class="pill" style="background:rgba(229,57,53,.1);color:#E53935;font-size:9.5px;">战略参考</span>
+        </div>
+
+        <!-- 两大竞品对比卡 -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+
+          <!-- Panda Express -->
+          <div class="card p-4" style="border:1.5px solid rgba(220,38,38,.3);background:linear-gradient(135deg,rgba(220,38,38,.04) 0%,#fff 100%);">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center text-lg font-black" style="background:#c8102e;color:#fff;">🐼</div>
+              <div>
+                <div class="font-bold text-[13px]">Panda Express</div>
+                <div class="text-[10.5px] text-slate-400">美式中餐鼻祖 · 北美 2,400+ 门店</div>
+              </div>
+              <div class="ml-auto text-right">
+                <div class="text-[11px] font-semibold text-slate-600">客单价</div>
+                <div class="text-[13px] font-bold" style="color:#c8102e;">CA$12–16</div>
+              </div>
+            </div>
+
+            <!-- 核心策略 -->
+            <div class="text-[11px] font-semibold text-slate-600 mb-1.5">🎯 本土化核心策略</div>
+            <div class="space-y-1.5 mb-3">
+              <div class="flex items-start gap-2 text-[11px]">
+                <span class="mt-0.5 w-4 h-4 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-[9px] flex-shrink-0">1</span>
+                <span><b>甜化 + 去刺激</b> — 甜橙鸡（Orange Chicken）主打甜酸，辣度接近零；菜单无辣度标注</span>
+              </div>
+              <div class="flex items-start gap-2 text-[11px]">
+                <span class="mt-0.5 w-4 h-4 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-[9px] flex-shrink-0">2</span>
+                <span><b>Bowl 模式</b> — 主食（白饭/炒面）+ 1–3 配菜自由组合，快速结账，快餐节奏</span>
+              </div>
+              <div class="flex items-start gap-2 text-[11px]">
+                <span class="mt-0.5 w-4 h-4 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-[9px] flex-shrink-0">3</span>
+                <span><b>卖"中国感"而非中国菜</b> — 门店红黑中式元素，但口味 100% 西化；降低体验门槛</span>
+              </div>
+              <div class="flex items-start gap-2 text-[11px]">
+                <span class="mt-0.5 w-4 h-4 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-[9px] flex-shrink-0">4</span>
+                <span><b>标准化极强</b> — 中央厨房预制，门店仅加热 + 摆盘；炒锅已退出生产线</span>
+              </div>
+            </div>
+
+            <!-- 关键菜品 -->
+            <div class="text-[11px] font-semibold text-slate-600 mb-1.5">🍱 引流款 SKU</div>
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium" style="background:#fef2f2;color:#c8102e;border:1px solid rgba(220,38,38,.2);">甜橙鸡 Orange Chicken ⭐</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium" style="background:#fef2f2;color:#c8102e;border:1px solid rgba(220,38,38,.2);">北京牛肉 Beijing Beef</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium" style="background:#fef2f2;color:#c8102e;border:1px solid rgba(220,38,38,.2);">蜜汁鸡胸 Honey Sesame</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium" style="background:#fef2f2;color:#c8102e;border:1px solid rgba(220,38,38,.2);">炒杂蔬（素） Chow Mein</span>
+            </div>
+
+            <!-- 弱点 -->
+            <div class="p-2.5 rounded-lg text-[10.5px]" style="background:#fafafa;border:1px dashed #e5e7eb;">
+              <span class="font-semibold text-slate-500">⚠ 致命弱点：</span>
+              <span class="text-slate-600">无现炒 · 味道"无聊"· 华人回头率极低 · 个性化能力 = 零</span>
+            </div>
+          </div>
+
+          <!-- Thai Express -->
+          <div class="card p-4" style="border:1.5px solid rgba(234,179,8,.4);background:linear-gradient(135deg,rgba(234,179,8,.05) 0%,#fff 100%);">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-9 h-9 rounded-xl flex items-center justify-center text-lg font-black" style="background:#eab308;color:#fff;">🌶</div>
+              <div>
+                <div class="font-bold text-[13px]">Thai Express</div>
+                <div class="text-[10.5px] text-slate-400">亚洲快餐连锁 · 加拿大 200+ 门店</div>
+              </div>
+              <div class="ml-auto text-right">
+                <div class="text-[11px] font-semibold text-slate-600">客单价</div>
+                <div class="text-[13px] font-bold" style="color:#ca8a04;">CA$14–18</div>
+              </div>
+            </div>
+
+            <!-- 核心策略 -->
+            <div class="text-[11px] font-semibold text-slate-600 mb-1.5">🎯 本土化核心策略</div>
+            <div class="space-y-1.5 mb-3">
+              <div class="flex items-start gap-2 text-[11px]">
+                <span class="mt-0.5 w-4 h-4 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center text-[9px] flex-shrink-0">1</span>
+                <span><b>明确辣度分级</b> — 菜单标注 ⭐1–4 星辣度，顾客点单时自选；消除"怕辣"顾虑</span>
+              </div>
+              <div class="flex items-start gap-2 text-[11px]">
+                <span class="mt-0.5 w-4 h-4 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center text-[9px] flex-shrink-0">2</span>
+                <span><b>过敏原标注</b> — GF（无麸质）/ V（素食）/ VG（纯素）图标显著标注，满足北美饮食诉求</span>
+              </div>
+              <div class="flex items-start gap-2 text-[11px]">
+                <span class="mt-0.5 w-4 h-4 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center text-[9px] flex-shrink-0">3</span>
+                <span><b>"异域感" 保留</b> — 保持椰奶/鱼露等真实风味；不过度西化，用辣度选项补偿</span>
+              </div>
+              <div class="flex items-start gap-2 text-[11px]">
+                <span class="mt-0.5 w-4 h-4 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center text-[9px] flex-shrink-0">4</span>
+                <span><b>Social-friendly 摆盘</b> — 色彩丰富、料足量大；Instagram 曝光驱动自然流量</span>
+              </div>
+            </div>
+
+            <!-- 关键菜品 -->
+            <div class="text-[11px] font-semibold text-slate-600 mb-1.5">🍜 引流款 SKU</div>
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium" style="background:#fefce8;color:#854d0e;border:1px solid rgba(234,179,8,.3);">泰式炒金面 Pad Thai ⭐</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium" style="background:#fefce8;color:#854d0e;border:1px solid rgba(234,179,8,.3);">绿咖喱 Green Curry ★★</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium" style="background:#fefce8;color:#854d0e;border:1px solid rgba(234,179,8,.3);">椰汁汤粉 Tom Kha ★★★</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium" style="background:#fefce8;color:#854d0e;border:1px solid rgba(234,179,8,.3);">芒果糯米饭 (甜品)</span>
+            </div>
+
+            <!-- 弱点 -->
+            <div class="p-2.5 rounded-lg text-[10.5px]" style="background:#fafafa;border:1px dashed #e5e7eb;">
+              <span class="font-semibold text-slate-500">⚠ 致命弱点：</span>
+              <span class="text-slate-600">菜单固化 · 无法记忆个人口味 · 下次仍需重新选辣度 · 无锅气</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 锅圈适配方案 -->
+        <div class="card p-5" style="background:linear-gradient(135deg,rgba(229,57,53,.06) 0%,rgba(255,107,53,.04) 50%,rgba(168,85,247,.04) 100%);border:1.5px solid rgba(229,57,53,.25);">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="text-base">🔥</div>
+            <div class="font-bold text-[13.5px]">锅圈小炒 — 竞品学习 + 差异化超越方案</div>
+            <span class="ml-auto pill" style="background:rgba(229,57,53,.12);color:#E53935;font-size:9.5px;">执行计划</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <!-- 向PE借鉴 -->
+            <div>
+              <div class="text-[11px] font-bold text-red-600 mb-2 flex items-center gap-1">
+                <span>🐼 向 Panda Express 借鉴</span>
+              </div>
+              <div class="space-y-2">
+                <div class="p-2.5 rounded-lg text-[10.5px]" style="background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);">
+                  <div class="font-semibold mb-1">推出 3 款"入门甜口" Gateway SKU</div>
+                  <div class="text-slate-600 space-y-0.5">
+                    <div>• 甜辣鸡丁小炒（糖醋改良版）</div>
+                    <div>• 照烧牛肉炒饭套餐</div>
+                    <div>• 番茄炒蛋（零辣，最安全）</div>
+                  </div>
+                </div>
+                <div class="p-2.5 rounded-lg text-[10.5px]" style="background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);">
+                  <div class="font-semibold mb-1">套餐 Bowl 模式</div>
+                  <div class="text-slate-600">小炒 + 饭/面自选 → 快速结账，降低决策门槛</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 向Thai Express借鉴 -->
+            <div>
+              <div class="text-[11px] font-bold text-yellow-700 mb-2 flex items-center gap-1">
+                <span>🌶 向 Thai Express 借鉴</span>
+              </div>
+              <div class="space-y-2">
+                <div class="p-2.5 rounded-lg text-[10.5px]" style="background:rgba(234,179,8,.07);border:1px solid rgba(234,179,8,.25);">
+                  <div class="font-semibold mb-1">菜单明标辣度 ⭐ 系统</div>
+                  <div class="text-slate-600 space-y-0.5">
+                    <div>⭐ 微辣 — 老外友好</div>
+                    <div>⭐⭐ 中辣 — 本地华裔</div>
+                    <div>⭐⭐⭐ 重辣 — 华人标准</div>
+                    <div>⭐⭐⭐⭐ 特辣 — 挑战款</div>
+                    <div>⭐⭐⭐⭐⭐ 变态辣 — 联名营销</div>
+                  </div>
+                </div>
+                <div class="p-2.5 rounded-lg text-[10.5px]" style="background:rgba(234,179,8,.07);border:1px solid rgba(234,179,8,.25);">
+                  <div class="font-semibold mb-1">过敏原 / 饮食标签</div>
+                  <div class="text-slate-600">
+                    <span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold mr-1" style="background:#dcfce7;color:#16a34a;">GF</span>
+                    <span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold mr-1" style="background:#f0fdf4;color:#15803d;">V</span>
+                    <span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold" style="background:#fef9c3;color:#854d0e;">坚果⚠</span>
+                    <div class="text-slate-500 mt-1">显著标注 → 满足北美饮食多样性</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 锅圈独有优势 -->
+            <div>
+              <div class="text-[11px] font-bold mb-2 flex items-center gap-1" style="color:#E53935;">
+                <span>🚀 锅圈独有 — 无法复制</span>
+              </div>
+              <div class="space-y-2">
+                <div class="p-2.5 rounded-lg text-[10.5px]" style="background:linear-gradient(135deg,rgba(229,57,53,.08),rgba(255,107,53,.06));border:1px solid rgba(229,57,53,.2);">
+                  <div class="font-semibold mb-1">AI 口味记忆 — 次次不用重选</div>
+                  <div class="text-slate-600">扫码/面部识别 → 机器人自动调用历史档案 → 零沟通成本</div>
+                </div>
+                <div class="p-2.5 rounded-lg text-[10.5px]" style="background:linear-gradient(135deg,rgba(229,57,53,.08),rgba(255,107,53,.06));border:1px solid rgba(229,57,53,.2);">
+                  <div class="font-semibold mb-1">真·现炒锅气</div>
+                  <div class="text-slate-600">500°C 铁锅 · 真正的 Wok Hei · PE/Thai 均为预制加热，无法媲美</div>
+                </div>
+                <div class="p-2.5 rounded-lg text-[10.5px]" style="background:linear-gradient(135deg,rgba(229,57,53,.08),rgba(255,107,53,.06));border:1px solid rgba(229,57,53,.2);">
+                  <div class="font-semibold mb-1">定价区间</div>
+                  <div class="text-slate-600">CA$14–19 · 高于PE但低于餐厅 · 以品质感拉开差距</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 综合对比表 -->
+          <div class="mt-1">
+            <div class="text-[11px] font-semibold text-slate-600 mb-2">📊 三方能力矩阵对比</div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-[11px]" style="border-collapse:separate;border-spacing:0;">
+                <thead>
+                  <tr style="background:#f8fafc;">
+                    <th class="text-left py-2 px-3 font-semibold text-slate-500 rounded-tl-lg" style="border:1px solid #e2e8f0;border-right:none;">能力维度</th>
+                    <th class="py-2 px-3 font-semibold text-center" style="border:1px solid #e2e8f0;border-right:none;color:#c8102e;">🐼 Panda Express</th>
+                    <th class="py-2 px-3 font-semibold text-center" style="border:1px solid #e2e8f0;border-right:none;color:#ca8a04;">🌶 Thai Express</th>
+                    <th class="py-2 px-3 font-semibold text-center rounded-tr-lg" style="border:1px solid #e2e8f0;color:#E53935;">🔥 锅圈小炒</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="py-1.5 px-3 text-slate-600" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">本土化口味适配</td>
+                    <td class="py-1.5 px-3 text-center" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">✅ 极强（全西化）</td>
+                    <td class="py-1.5 px-3 text-center" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">✅ 较强（辣度选项）</td>
+                    <td class="py-1.5 px-3 text-center font-semibold text-emerald-600" style="border:1px solid #e2e8f0;border-top:none;">🔄 建设中</td>
+                  </tr>
+                  <tr style="background:#fafafa;">
+                    <td class="py-1.5 px-3 text-slate-600" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">个人化 AI 记忆</td>
+                    <td class="py-1.5 px-3 text-center text-slate-400" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">❌ 无</td>
+                    <td class="py-1.5 px-3 text-center text-slate-400" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">❌ 无</td>
+                    <td class="py-1.5 px-3 text-center font-semibold text-emerald-600" style="border:1px solid #e2e8f0;border-top:none;">✅ 核心优势</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1.5 px-3 text-slate-600" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">现炒锅气 Wok Hei</td>
+                    <td class="py-1.5 px-3 text-center text-slate-400" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">❌ 预制加热</td>
+                    <td class="py-1.5 px-3 text-center text-slate-400" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">❌ 预制加热</td>
+                    <td class="py-1.5 px-3 text-center font-semibold text-emerald-600" style="border:1px solid #e2e8f0;border-top:none;">✅ 500°C 真炒</td>
+                  </tr>
+                  <tr style="background:#fafafa;">
+                    <td class="py-1.5 px-3 text-slate-600" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">辣度分级标注</td>
+                    <td class="py-1.5 px-3 text-center text-slate-400" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">❌ 无</td>
+                    <td class="py-1.5 px-3 text-center text-emerald-600" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">✅ 1–4 星</td>
+                    <td class="py-1.5 px-3 text-center font-semibold text-emerald-600" style="border:1px solid #e2e8f0;border-top:none;">✅ 1–5 星（规划）</td>
+                  </tr>
+                  <tr>
+                    <td class="py-1.5 px-3 text-slate-600" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">过敏原 / 饮食标签</td>
+                    <td class="py-1.5 px-3 text-center text-amber-600" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">⚠ 部分</td>
+                    <td class="py-1.5 px-3 text-center text-emerald-600" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">✅ GF/V/VG</td>
+                    <td class="py-1.5 px-3 text-center font-semibold text-emerald-600" style="border:1px solid #e2e8f0;border-top:none;">✅ 规划导入</td>
+                  </tr>
+                  <tr style="background:#fafafa;">
+                    <td class="py-1.5 px-3 text-slate-600 rounded-bl-lg" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">华人客群回头率</td>
+                    <td class="py-1.5 px-3 text-center text-red-500" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">❌ 极低</td>
+                    <td class="py-1.5 px-3 text-center text-amber-600" style="border:1px solid #e2e8f0;border-top:none;border-right:none;">⚠ 中等</td>
+                    <td class="py-1.5 px-3 text-center font-semibold text-emerald-600 rounded-br-lg" style="border:1px solid #e2e8f0;border-top:none;">✅ 目标主客群</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- AI 驱动结语 -->
+          <div class="mt-3 p-3 rounded-xl text-[11px] flex items-start gap-2" style="background:rgba(229,57,53,.07);border:1px solid rgba(229,57,53,.18);">
+            <span class="text-base mt-0.5">💡</span>
+            <span class="text-slate-700"><b>AI Agent 战略洞察：</b>PE 用"去中化"征服老外，Thai Express 用"辣度透明"降低门槛——但两者都是一次性服务，没有记忆。锅圈的终极护城河是 <b>AI 记住每个人</b>：老外第一次点⭐微辣，第二次机器人自动调好，不用开口。这是标准化连锁永远无法复制的壁垒。</span>
           </div>
         </div>
       </div>
@@ -3465,8 +3774,110 @@
   // 初始化两张地图
   window.miniMap = initLeafletMap('miniMap',1,[28,40]);
   if(window.miniMap){drawArcs(window.miniMap);}
-  window.bigMap = initLeafletMap('bigMap',2,[25,30]);
-  if(window.bigMap){drawArcs(window.bigMap);}
+  // ========== MapLibre GL 大地图（暗色 · 店面 pin · Google 街景入口） ==========
+  (function initBigMapLibre(){
+    const el=document.getElementById('bigMap');
+    if(!el||typeof maplibregl==='undefined')return;
+
+    const cityDefs=[
+      {key:'city_china',   name:'中国总部 · 上海',  lat:31.23, lng:121.47, level:'base',   lbl:true},
+      {key:'city_toronto', name:'多伦多 ★',        lat:43.65, lng:-79.38, level:'active', lbl:true},
+      {key:'city_vancouver',name:'温哥华',          lat:49.28, lng:-123.12,level:'soon',  lbl:true},
+      {key:'city_la',      name:'洛杉矶',          lat:34.05, lng:-118.24,level:'soon',  lbl:false},
+      {key:'city_vietnam', name:'胡志明市',         lat:10.78, lng:106.70, level:'soon',  lbl:true},
+      {key:'city_singapore',name:'新加坡',         lat:1.35,  lng:103.82, level:'future',lbl:false},
+      {key:'city_bangkok', name:'曼谷',            lat:13.76, lng:100.50, level:'future',lbl:false},
+      {key:'city_sydney',  name:'悉尼',            lat:-33.87,lng:151.21, level:'future',lbl:false},
+      {key:'city_london',  name:'伦敦',            lat:51.51, lng:-0.13,  level:'future',lbl:false},
+    ];
+
+    const storeDefs=[
+      {name:'1号店 Markham',     addr:'3255 Hwy 7 E, Markham, ON',       lat:43.8561,lng:-79.3365,color:'#22c55e',key:'city_store_1'},
+      {name:'2号店 North York',  addr:'4750 Yonge St, Toronto, ON',       lat:43.7726,lng:-79.4141,color:'#f59e0b',key:'city_store_2'},
+      {name:'中央厨房 Mississauga',addr:'2801 Argentia Rd, Mississauga, ON',lat:43.5923,lng:-79.6586,color:'#60a5fa',key:'city_store_ck'},
+    ];
+
+    const routeLines=[
+      [[121.47,31.23],[-79.38,43.65],'main'],
+      [[121.47,31.23],[106.70,10.78],'main'],
+      [[-79.38,43.65],[-123.12,49.28],'plan'],
+      [[-79.38,43.65],[-118.24,34.05],'plan'],
+      [[121.47,31.23],[-0.13,51.51],'future'],
+      [[121.47,31.23],[151.21,-33.87],'future'],
+      [[121.47,31.23],[103.82,1.35],'future'],
+      [[106.70,10.78],[103.82,1.35],'future'],
+    ];
+
+    const map=new maplibregl.Map({
+      container:'bigMap',
+      style:'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center:[35,25],zoom:1.7,
+      scrollZoom:false,attributionControl:false
+    });
+
+    // 向后兼容 invalidateSize 调用
+    window.bigMap={invalidateSize:()=>map.resize()};
+
+    map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+
+    map.on('load',function(){
+      // 航线 GeoJSON
+      const features=routeLines.map(([a,b,t])=>({
+        type:'Feature',properties:{t},
+        geometry:{type:'LineString',coordinates:[a,b]}
+      }));
+      map.addSource('routes',{type:'geojson',data:{type:'FeatureCollection',features}});
+      const routeStyle={
+        main:{color:'#FF6B35',w:1.8,op:.75,dash:[5,3]},
+        plan:{color:'#F59E0B',w:1.4,op:.55,dash:[3,4]},
+        future:{color:'#A855F7',w:1.0,op:.38,dash:[2,6]}
+      };
+      Object.entries(routeStyle).forEach(([type,s])=>{
+        map.addLayer({id:`r-${type}`,type:'line',source:'routes',
+          filter:['==',['get','t'],type],
+          paint:{'line-color':s.color,'line-width':s.w,'line-opacity':s.op,'line-dasharray':s.dash}
+        });
+      });
+
+      // 城市大 marker（可点击 → openDetail）
+      cityDefs.forEach(city=>{
+        const div=document.createElement('div');
+        div.className=`gq-marker lvl-${city.level}`;
+        div.innerHTML=`<div class="ring"></div><div class="dot"></div>${city.lbl?`<div class="label">${city.name}</div>`:''}`;
+        div.style.cursor='pointer';
+        div.title=city.name;
+        div.addEventListener('click',e=>{e.stopPropagation();openDetail(city.key);});
+        new maplibregl.Marker({element:div,anchor:'center'}).setLngLat([city.lng,city.lat]).addTo(map);
+      });
+
+      // 多伦多门店小 pin（hover → 弹窗 + 街景链接）
+      storeDefs.forEach(s=>{
+        const pin=document.createElement('div');
+        pin.style.cssText=`width:13px;height:13px;border-radius:50%;background:${s.color};border:2.5px solid rgba(255,255,255,.95);box-shadow:0 2px 10px rgba(0,0,0,.5);cursor:pointer;position:relative;z-index:10;transition:transform .15s;`;
+        pin.onmouseenter=()=>{pin.style.transform='scale(1.5)';};
+        pin.onmouseleave=()=>{pin.style.transform='scale(1)';};
+
+        const popup=new maplibregl.Popup({
+          offset:16,closeButton:false,maxWidth:'230px',className:'gq-store-popup'
+        }).setHTML(`
+          <div style="font-size:12.5px;font-weight:700;color:#1e293b;margin-bottom:3px;">${s.name}</div>
+          <div style="font-size:10.5px;color:#64748b;margin-bottom:5px;">📍 ${s.addr}</div>
+          <a href="https://maps.google.com/?layer=c&cbll=${s.lat},${s.lng}" target="_blank"
+            style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;padding:3px 8px;background:rgba(229,57,53,.08);border-radius:6px;">
+            🗺 打开 Google 街景
+          </a>
+        `);
+
+        const marker=new maplibregl.Marker({element:pin,anchor:'center'})
+          .setLngLat([s.lng,s.lat]).setPopup(popup).addTo(map);
+        pin.addEventListener('click',e=>{e.stopPropagation();marker.togglePopup();openDetail(s.key);});
+      });
+
+      // 多伦多城市区域 zoom in（演示用：0.6s 后飞入）
+      setTimeout(()=>map.flyTo({center:[-79.38,43.65],zoom:9,duration:1800,essential:true}),600);
+      setTimeout(()=>map.flyTo({center:[35,25],zoom:1.7,duration:2200,essential:true}),4000);
+    });
+  })();
 
   // ============ AI 总裁辅助决策助手 ============
   const aiPanel = document.createElement('div');
@@ -4424,6 +4835,40 @@ const DETAILS = {
       <div class="drill-row"><span class="drill-row-label">1 号店（Markham）</span><span class="drill-row-val text-emerald-600">在营 · GMV CA$12.4K/天</span></div>
       <div class="drill-row"><span class="drill-row-label">2 号店（North York）</span><span class="drill-row-val text-amber-600">装修中 · 预计 6/28 开业</span></div>
       <div class="drill-row"><span class="drill-row-label">中央厨房（Mississauga）</span><span class="drill-row-val text-sky-600">筹备中 · M12 投产</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">📍 门店地址 · 点击跳转 Google 街景</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:12px;font-weight:700;">1 号店 · Markham</span>
+            <span style="font-size:9.5px;background:rgba(22,163,74,.12);color:#15803d;padding:2px 8px;border-radius:999px;font-weight:600;">在营 ●</span>
+          </div>
+          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">3255 Hwy 7 E, Markham, ON L3R 3P9</div>
+          <a href="https://maps.google.com/?layer=c&cbll=43.8561,-79.3365" target="_blank" style="font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:12px;font-weight:700;">2 号店 · North York</span>
+            <span style="font-size:9.5px;background:rgba(217,119,6,.12);color:#b45309;padding:2px 8px;border-radius:999px;font-weight:600;">装修中</span>
+          </div>
+          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">4750 Yonge St, Toronto, ON M2N 5M6</div>
+          <a href="https://maps.google.com/?layer=c&cbll=43.7726,-79.4141" target="_blank" style="font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+        </div>
+        <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:12px;font-weight:700;">中央厨房 · Mississauga</span>
+            <span style="font-size:9.5px;background:rgba(59,130,246,.12);color:#1d4ed8;padding:2px 8px;border-radius:999px;font-weight:600;">筹备</span>
+          </div>
+          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">2801 Argentia Rd, Mississauga, ON L5N 8E5</div>
+          <a href="https://maps.google.com/?layer=c&cbll=43.5923,-79.6586" target="_blank" style="font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+        </div>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🗺 1 号店区域地图（Markham 华人商圈）</div>
+      <iframe src="https://maps.google.com/maps?q=43.8561,-79.3365&z=16&output=embed"
+        style="width:100%;height:210px;border:none;border-radius:10px;margin-top:4px;" loading="lazy" title="1号店位置"></iframe>
     </div>`},
 
   city_vancouver:{icon:'🌲',title:'温哥华 · M13 启动',sub:'西海岸华人核心市场',html:`
@@ -4453,6 +4898,233 @@ const DETAILS = {
       <div class="drill-section-title">AI 延期建议理由</div>
       <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
         基于多伦多 1 号店现金流状况 + 越南合伙人就绪度评估 + 料包产能约束，AI 推荐延后 1 个月至 M16，释放 CA$ 1.2M 现金垫，降低跨区域并发风险。
+      </div>
+    </div>`},
+
+  /* ── 更多城市 ── */
+  city_china:{icon:'🇨🇳',title:'中国总部 · 上海 · 出海大本营',sub:'国内 10,000+ 家 · 料包研发 · 出海资源中枢',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">核心角色</div>
+      <div class="drill-row"><span class="drill-row-label">国内门店</span><span class="drill-row-val">10,000+ 家（基础现金流）</span></div>
+      <div class="drill-row"><span class="drill-row-label">料包工厂</span><span class="drill-row-val">江苏/四川 · 年产能 2 亿包</span></div>
+      <div class="drill-row"><span class="drill-row-label">出海定价权</span><span class="drill-row-val">料包成本 ¥18/份 → 加拿大零售 CA$4.2/份</span></div>
+      <div class="drill-row"><span class="drill-row-label">品牌势能</span><span class="drill-row-val">华人认知度 >85%（2024 调研）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">出海支持输出</div>
+      <div class="drill-row"><span class="drill-row-label">资金</span><span class="drill-row-val">CA$ 7.2M Phase 1-2 拨付</span></div>
+      <div class="drill-row"><span class="drill-row-label">人才</span><span class="drill-row-val">外派 5 名 FT 核心（行政/技术/厨师长）</span></div>
+      <div class="drill-row"><span class="drill-row-label">系统</span><span class="drill-row-val">AI 平台、POS、ERP 全套授权海外子公司</span></div>
+      <div class="drill-row"><span class="drill-row-label">数据汇聚</span><span class="drill-row-val">全球 → 杨总驾驶舱 · 实时回流</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🗺 上海总部地区</div>
+      <iframe src="https://maps.google.com/maps?q=31.23,121.47&z=12&output=embed"
+        style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="上海总部"></iframe>
+      <a href="https://maps.google.com/?layer=c&cbll=31.23,121.47" target="_blank"
+        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+    </div>`},
+
+  city_la:{icon:'🇺🇸',title:'洛杉矶 / 美西 · 评估中',sub:'M17+ · 圣盖博 / 亚凯迪亚华人核心区',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">市场吸引力</div>
+      <div class="drill-row"><span class="drill-row-label">洛杉矶华人人口</span><span class="drill-row-val">约 40 万（全美最大华人聚居地）</span></div>
+      <div class="drill-row"><span class="drill-row-label">目标商圈</span><span class="drill-row-val">San Gabriel Valley · Alhambra · Arcadia</span></div>
+      <div class="drill-row"><span class="drill-row-label">市场情报 Agent 评分</span><span class="drill-row-val">76 / 100 · 需法规评估后确认</span></div>
+      <div class="drill-row"><span class="drill-row-label">客单价参考</span><span class="drill-row-val">USD 18-24（高于多伦多 ~20%）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">主要挑战</div>
+      <div class="drill-row"><span class="drill-row-label">劳工法</span><span class="drill-row-val">加州最低工资 $20/h · 人力成本高</span></div>
+      <div class="drill-row"><span class="drill-row-label">食品法规</span><span class="drill-row-val">FDA 注册 + 加州 Prop 65 · 耗时 4-6 月</span></div>
+      <div class="drill-row"><span class="drill-row-label">料包清关</span><span class="drill-row-val">美国进口关税 · 中美贸易摩擦风险</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">触发进入条件</div>
+      <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:12px;font-size:12px;color:#475569;">
+        ① 多伦多 2 店稳定盈利 ≥ 3 个月<br>② 美国主体公司注册完成<br>③ 找到本地合伙人（LA 华人餐饮圈）<br>④ AI 体系本地化（USD / 英文菜单 / 美国法规）
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🗺 圣盖博 / 亚凯迪亚华人商圈</div>
+      <iframe src="https://maps.google.com/maps?q=34.0966,-118.0355&z=13&output=embed"
+        style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="洛杉矶华人区"></iframe>
+      <a href="https://maps.google.com/?layer=c&cbll=34.0966,-118.0355" target="_blank"
+        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+    </div>`},
+
+  city_singapore:{icon:'🇸🇬',title:'新加坡 · 东南亚旗舰站',sub:'远期 · 越南跑通后启动',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">市场特征</div>
+      <div class="drill-row"><span class="drill-row-label">华人人口</span><span class="drill-row-val">约 280 万（占总人口 74%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">客单价</span><span class="drill-row-val">SGD 25-35 · 高客单市场</span></div>
+      <div class="drill-row"><span class="drill-row-label">法规环境</span><span class="drill-row-val">清晰 · 英语友好 · SFA 许可 2-3 月</span></div>
+      <div class="drill-row"><span class="drill-row-label">目标商圈</span><span class="drill-row-val">Chinatown / Orchard / Jurong East</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">战略定位</div>
+      <div class="drill-row"><span class="drill-row-label">角色</span><span class="drill-row-val">东南亚旗舰 + 展示窗口</span></div>
+      <div class="drill-row"><span class="drill-row-label">挑战</span><span class="drill-row-val">租金高（Orchard: SGD 30+/sqft/月）</span></div>
+      <div class="drill-row"><span class="drill-row-label">触发条件</span><span class="drill-row-val">越南 JV 跑通 6 个月后评估</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🗺 乌节路 / 牛车水商圈</div>
+      <iframe src="https://maps.google.com/maps?q=1.2847,103.8452&z=14&output=embed"
+        style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="新加坡牛车水"></iframe>
+      <a href="https://maps.google.com/?layer=c&cbll=1.2847,103.8452" target="_blank"
+        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+    </div>`},
+
+  city_bangkok:{icon:'🇹🇭',title:'曼谷 · 东南亚第二站',sub:'远期 · 越南成功 6 个月后入场',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">市场吸引力</div>
+      <div class="drill-row"><span class="drill-row-label">潮州 / 华人人口</span><span class="drill-row-val">约 700 万（东南亚最大华裔群体）</span></div>
+      <div class="drill-row"><span class="drill-row-label">川菜接受度</span><span class="drill-row-val">高（泰国人喜辣，与川味高度重叠）</span></div>
+      <div class="drill-row"><span class="drill-row-label">目标商圈</span><span class="drill-row-val">Central WOrld / Siam / 唐人街 Yaowarat</span></div>
+      <div class="drill-row"><span class="drill-row-label">人力成本</span><span class="drill-row-val">月薪约 8,000 泰铢（约 CA$ 300）· 极低</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">AI 本地化需求</div>
+      <div class="drill-row"><span class="drill-row-label">语言</span><span class="drill-row-val">泰语菜单 + 英语 + 中文</span></div>
+      <div class="drill-row"><span class="drill-row-label">支付</span><span class="drill-row-val">PromptPay / 泰铢 THB</span></div>
+      <div class="drill-row"><span class="drill-row-label">宗教饮食</span><span class="drill-row-val">佛教斋日素食模式 · 清真认证评估</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🗺 曼谷 Central World 商圈</div>
+      <iframe src="https://maps.google.com/maps?q=13.7468,100.5393&z=14&output=embed"
+        style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="曼谷商圈"></iframe>
+      <a href="https://maps.google.com/?layer=c&cbll=13.7468,100.5393" target="_blank"
+        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+    </div>`},
+
+  city_sydney:{icon:'🇦🇺',title:'悉尼 / 墨尔本 · 澳洲市场',sub:'远期 · 多伦多模型成熟后克隆',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">市场概况</div>
+      <div class="drill-row"><span class="drill-row-label">华人人口（悉尼）</span><span class="drill-row-val">约 60 万 · 留学生 + 移民</span></div>
+      <div class="drill-row"><span class="drill-row-label">华人人口（墨尔本）</span><span class="drill-row-val">约 40 万</span></div>
+      <div class="drill-row"><span class="drill-row-label">客单价参考</span><span class="drill-row-val">AUD 22-30 · 与多伦多接近</span></div>
+      <div class="drill-row"><span class="drill-row-label">目标商圈</span><span class="drill-row-val">Chatswood / Cabramatta（悉尼）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">主要挑战</div>
+      <div class="drill-row"><span class="drill-row-label">食品检疫</span><span class="drill-row-val">澳洲 DAFF 严格 · 料包入境需 6-9 月</span></div>
+      <div class="drill-row"><span class="drill-row-label">海运距离</span><span class="drill-row-val">上海→悉尼：约 28 天 · 成本高于多伦多</span></div>
+      <div class="drill-row"><span class="drill-row-label">竞品</span><span class="drill-row-val">Nine Group 中餐连锁已布局</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🗺 悉尼 Chatswood 华人商圈</div>
+      <iframe src="https://maps.google.com/maps?q=-33.7972,151.1808&z=14&output=embed"
+        style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="悉尼Chatswood"></iframe>
+      <a href="https://maps.google.com/?layer=c&cbll=-33.7972,151.1808" target="_blank"
+        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+    </div>`},
+
+  city_london:{icon:'🇬🇧',title:'伦敦 · 欧洲旗舰探索',sub:'远期 · 欧洲华人最大聚集地',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">市场概况</div>
+      <div class="drill-row"><span class="drill-row-label">华人人口</span><span class="drill-row-val">约 22 万（英国最大华人群体）</span></div>
+      <div class="drill-row"><span class="drill-row-label">目标商圈</span><span class="drill-row-val">Chinatown（Gerrard St）/ Canary Wharf</span></div>
+      <div class="drill-row"><span class="drill-row-label">客单价</span><span class="drill-row-val">GBP 16-24 · 高消费市场</span></div>
+      <div class="drill-row"><span class="drill-row-label">AI 情报 Agent 评分</span><span class="drill-row-val">64 / 100 · 法规复杂性扣分</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">主要挑战</div>
+      <div class="drill-row"><span class="drill-row-label">Brexit 后供应链</span><span class="drill-row-val">EU → UK 额外清关 · 料包关税评估中</span></div>
+      <div class="drill-row"><span class="drill-row-label">品牌注册</span><span class="drill-row-val">UK IPO 商标注册 · 约 4 个月</span></div>
+      <div class="drill-row"><span class="drill-row-label">食品法规</span><span class="drill-row-val">UK FSA · Allergen 14 项强制标注</span></div>
+      <div class="drill-row"><span class="drill-row-label">建议</span><span class="drill-row-val">Phase 2 后期探索旗舰店可行性</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🗺 伦敦唐人街 Gerrard Street</div>
+      <iframe src="https://maps.google.com/maps?q=51.5126,-0.1313&z=15&output=embed"
+        style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="伦敦唐人街"></iframe>
+      <a href="https://maps.google.com/?layer=c&cbll=51.5126,-0.1313" target="_blank"
+        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+    </div>`},
+
+  /* ── 多伦多门店详情 ── */
+  city_store_1:{icon:'🍜',title:'1 号店 · Markham · 在营',sub:'3255 Hwy 7 E, Markham, ON L3R 3P9',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">门店实时数据</div>
+      <div class="drill-row"><span class="drill-row-label">今日 GMV</span><span class="drill-row-val text-emerald-600 font-bold">CA$ 12,417</span></div>
+      <div class="drill-row"><span class="drill-row-label">本周毛利率</span><span class="drill-row-val text-red-500">18% ⚠ 低于红线 22%</span></div>
+      <div class="drill-row"><span class="drill-row-label">机器人在线</span><span class="drill-row-val">GQ-T01/T02 · 2/2 台</span></div>
+      <div class="drill-row"><span class="drill-row-label">Google 评分</span><span class="drill-row-val text-emerald-600">4.7 ★（218 评价）</span></div>
+      <div class="drill-row"><span class="drill-row-label">座位数</span><span class="drill-row-val">42 座（含吧台 6 座）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">📍 地理位置</div>
+      <iframe src="https://maps.google.com/maps?q=43.8561,-79.3365&z=17&output=embed"
+        style="width:100%;height:220px;border:none;border-radius:10px;" loading="lazy" title="1号店位置"></iframe>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <a href="https://maps.google.com/?layer=c&cbll=43.8561,-79.3365" target="_blank"
+          style="flex:1;text-align:center;padding:7px;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:8px;font-size:11px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景</a>
+        <a href="https://maps.google.com/maps?q=43.8561,-79.3365" target="_blank"
+          style="flex:1;text-align:center;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;font-weight:600;text-decoration:none;">📍 导航前往</a>
+      </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">今日 AI 行动日志</div>
+      <div style="font-size:11px;space-y:4px;color:#475569;">
+        <div style="padding:4px 0;border-bottom:1px solid #f1f5f9;">14:55 · 财务 Agent 识别毛利红线 → 已上报</div>
+        <div style="padding:4px 0;border-bottom:1px solid #f1f5f9;">14:30 · 外卖 Agent：Uber 抽佣 +3pp，菜单调价方案已推送</div>
+        <div style="padding:4px 0;border-bottom:1px solid #f1f5f9;">12:20 · 机器人 T01 完成第 48 锅，油温稳定 248°C</div>
+        <div style="padding:4px 0;">11:30 · 客户 Agent：今日首批 3 条 5★ 好评已收录</div>
+      </div>
+    </div>`},
+
+  city_store_2:{icon:'🔨',title:'2 号店 · North York · 装修中',sub:'4750 Yonge St, Toronto, ON M2N 5M6',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">装修进度</div>
+      <div class="drill-row"><span class="drill-row-label">总工期</span><span class="drill-row-val">16 周（第 14/16 周）</span></div>
+      <div class="drill-row"><span class="drill-row-label">完工率</span><span class="drill-row-val text-amber-600">88%（延期 7 天）</span></div>
+      <div class="drill-row"><span class="drill-row-label">开业目标</span><span class="drill-row-val">2026-06-28（原 6-21）</span></div>
+      <div class="drill-row"><span class="drill-row-label">预算执行</span><span class="drill-row-val">CA$ 318K / 360K（88%）</span></div>
+      <div class="drill-row"><span class="drill-row-label">延期原因</span><span class="drill-row-val text-amber-600">市政排水许可延迟 7 天</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">商圈定位</div>
+      <div class="drill-row"><span class="drill-row-label">地址</span><span class="drill-row-val">4750 Yonge St，Yonge-Sheppard 核心</span></div>
+      <div class="drill-row"><span class="drill-row-label">商圈特征</span><span class="drill-row-val">地铁上盖 · 白领 + 华人混合客群</span></div>
+      <div class="drill-row"><span class="drill-row-label">预期日均客流</span><span class="drill-row-val">80-110 人（高于 1 号店）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">📍 地理位置</div>
+      <iframe src="https://maps.google.com/maps?q=43.7726,-79.4141&z=16&output=embed"
+        style="width:100%;height:220px;border:none;border-radius:10px;" loading="lazy" title="2号店位置"></iframe>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <a href="https://maps.google.com/?layer=c&cbll=43.7726,-79.4141" target="_blank"
+          style="flex:1;text-align:center;padding:7px;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:8px;font-size:11px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景</a>
+        <a href="https://maps.google.com/maps?q=43.7726,-79.4141" target="_blank"
+          style="flex:1;text-align:center;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;font-weight:600;text-decoration:none;">📍 导航前往</a>
+      </div>
+    </div>`},
+
+  city_store_ck:{icon:'🏭',title:'中央厨房 · Mississauga · 筹备中',sub:'2801 Argentia Rd, Mississauga, ON L5N 8E5',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">项目状态</div>
+      <div class="drill-row"><span class="drill-row-label">筹备进度</span><span class="drill-row-val text-sky-600">25%（第 6/24 周）</span></div>
+      <div class="drill-row"><span class="drill-row-label">预计投产</span><span class="drill-row-val">M12（2026-12）</span></div>
+      <div class="drill-row"><span class="drill-row-label">占地面积</span><span class="drill-row-val">4,200 平方英尺</span></div>
+      <div class="drill-row"><span class="drill-row-label">产能目标</span><span class="drill-row-val">日处理 1,200 份料包（支持 4-5 家门店）</span></div>
+      <div class="drill-row"><span class="drill-row-label">机器人配置</span><span class="drill-row-val">6 台 GQ-T03-T08（M12 到货）</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">选址理由</div>
+      <div class="drill-row"><span class="drill-row-label">区位</span><span class="drill-row-val">Mississauga 工业园 · 两大高速交汇</span></div>
+      <div class="drill-row"><span class="drill-row-label">到 1 号店</span><span class="drill-row-val">车程 34 分钟</span></div>
+      <div class="drill-row"><span class="drill-row-label">到 2 号店</span><span class="drill-row-val">车程 28 分钟</span></div>
+      <div class="drill-row"><span class="drill-row-label">仓储空间</span><span class="drill-row-val">冷库 400 sqft + 干货仓 600 sqft</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">📍 地理位置</div>
+      <iframe src="https://maps.google.com/maps?q=43.5923,-79.6586&z=15&output=embed"
+        style="width:100%;height:220px;border:none;border-radius:10px;" loading="lazy" title="中央厨房位置"></iframe>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <a href="https://maps.google.com/?layer=c&cbll=43.5923,-79.6586" target="_blank"
+          style="flex:1;text-align:center;padding:7px;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:8px;font-size:11px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景</a>
+        <a href="https://maps.google.com/maps?q=43.5923,-79.6586" target="_blank"
+          style="flex:1;text-align:center;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;font-weight:600;text-decoration:none;">📍 导航前往</a>
       </div>
     </div>`},
 
