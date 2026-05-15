@@ -276,6 +276,22 @@
   .drill-timeline-item::before{content:"";position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:#FF6B35;border:2px solid #fff;box-shadow:0 0 0 1px #FF6B35;}
   .drill-timeline-time{font-size:10px;color:var(--text-dim);margin-bottom:2px;}
   @media(max-width:640px){.drill-panel{width:100vw;}}
+  /* ── 地图大图 Modal ── */
+  .gq-map-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+  .gq-map-modal.open{display:flex;}
+  .gq-map-box{background:#fff;border-radius:16px;overflow:hidden;width:min(920px,96vw);height:min(640px,88vh);display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(15,23,42,.3);}
+  .gq-map-head{padding:12px 16px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;}
+  .gq-map-name{flex-shrink:0;}
+  .gq-map-svc{display:flex;gap:5px;flex-wrap:wrap;}
+  .gq-map-svc-btn{padding:5px 13px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid #e2e8f0;cursor:pointer;background:#f8fafc;color:#475569;transition:all .15s;white-space:nowrap;}
+  .gq-map-svc-btn:hover{border-color:#FF6B35;color:#E53935;}
+  .gq-map-svc-btn.active{background:#E53935;color:#fff;border-color:#E53935;}
+  .gq-map-close{margin-left:auto;width:28px;height:28px;border-radius:50%;background:#f1f5f9;border:none;cursor:pointer;font-size:14px;color:#64748b;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+  .gq-map-close:hover{background:#fee2e2;color:#E53935;}
+  .gq-map-frame{flex:1;width:100%;border:none;}
+  .gq-map-ext{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#f8fafc;padding:24px;text-align:center;}
+  .gq-bigmap-btn{padding:3px 10px;border-radius:6px;font-size:10.5px;font-weight:700;border:1px solid rgba(229,57,53,.28);color:#E53935;background:rgba(229,57,53,.06);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;line-height:1.6;}
+  .gq-bigmap-btn:hover{background:rgba(229,57,53,.12);border-color:#E53935;}
 </style>
 </head>
 <body class="min-h-screen">
@@ -5471,6 +5487,25 @@ function openDetail(key){
   document.getElementById('drillTitle').textContent=d.title;
   document.getElementById('drillSub').textContent=d.sub;
   document.getElementById('drillBody').innerHTML=d.html;
+
+  // 自动为所有 Google Maps iframe 注入「查看大图」按钮
+  document.querySelectorAll('#drillBody iframe[src*="maps.google.com"]').forEach(iframe=>{
+    const m=iframe.src.match(/\?q=([-\d.]+),([-\d.]+)/);
+    if(!m)return;
+    const lat=parseFloat(m[1]),lng=parseFloat(m[2]);
+    const sec=iframe.closest('.drill-section');
+    if(!sec)return;
+    const ttl=sec.querySelector('.drill-section-title');
+    if(ttl){
+      ttl.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;';
+      const btn=document.createElement('button');
+      btn.className='gq-bigmap-btn';
+      btn.textContent='⛶ 查看大图';
+      btn.onclick=()=>openMapModal(lat,lng,d.title,d.sub);
+      ttl.appendChild(btn);
+    }
+  });
+
   document.getElementById('drillPanel').classList.add('open');
   document.getElementById('drillBackdrop').classList.add('show');
 }
@@ -5480,7 +5515,102 @@ function closeDetail(){
 }
 document.getElementById('drillClose').addEventListener('click',closeDetail);
 document.getElementById('drillBackdrop').addEventListener('click',closeDetail);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();closeMapModal();}});
+
+/* ── 地图大图 Modal ── */
+// 注入 Modal DOM
+(function(){
+  const m=document.createElement('div');
+  m.id='gqMapModal';m.className='gq-map-modal';
+  m.innerHTML=`
+    <div class="gq-map-box">
+      <div class="gq-map-head">
+        <div class="gq-map-name">
+          <div id="gqMMTitle" style="font-size:14px;font-weight:700;color:#0f172a;"></div>
+          <div id="gqMMSub" style="font-size:11px;color:#64748b;margin-top:1px;"></div>
+        </div>
+        <div class="gq-map-svc">
+          <button class="gq-map-svc-btn active" id="gqSvcML"     onclick="switchMapSvc('ml',this)">🗺 驾驶舱暗色地图</button>
+          <button class="gq-map-svc-btn"         id="gqSvcGoogle" onclick="switchMapSvc('google',this)">🌐 Google Maps</button>
+          <button class="gq-map-svc-btn"         id="gqSvcAmap"   onclick="switchMapSvc('amap',this)">🟢 高德地图</button>
+        </div>
+        <button class="gq-map-close" onclick="closeMapModal()">✕</button>
+      </div>
+      <iframe id="gqMapFrame" class="gq-map-frame" src="" title="地图" loading="lazy" allowfullscreen></iframe>
+      <div id="gqMapExt" class="gq-map-ext" style="display:none;">
+        <div style="font-size:48px;" id="gqMapExtIcon">🗺</div>
+        <div style="font-size:14px;color:#475569;line-height:1.7;" id="gqMapExtMsg"></div>
+        <a id="gqMapExtLink" href="#" target="_blank"
+          style="padding:10px 28px;background:#E53935;color:#fff;border-radius:8px;font-weight:700;text-decoration:none;font-size:13px;">在新标签页打开 →</a>
+      </div>
+    </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click',e=>{if(e.target===m)closeMapModal();});
+})();
+
+let _mLat=0,_mLng=0,_mName='',_mSvc='ml';
+
+function openMapModal(lat,lng,name,sub){
+  _mLat=lat;_mLng=lng;_mName=name;
+  document.getElementById('gqMMTitle').textContent=name;
+  document.getElementById('gqMMSub').textContent=sub||'';
+  document.getElementById('gqMapModal').classList.add('open');
+  // 默认驾驶舱暗色地图
+  document.querySelectorAll('.gq-map-svc-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('gqSvcML').classList.add('active');
+  switchMapSvc('ml');
+}
+
+function switchMapSvc(svc,el){
+  if(el){document.querySelectorAll('.gq-map-svc-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+  _mSvc=svc;
+  const frame=document.getElementById('gqMapFrame');
+  const ext=document.getElementById('gqMapExt');
+
+  if(svc==='ml'){
+    // MapLibre 暗色地图 — 用嵌入式 mini MapLibre 实例
+    frame.style.display='block';ext.style.display='none';
+    // 生成一个独立 HTML data URL 内嵌 MapLibre 地图
+    const html=`<!DOCTYPE html><html><head>
+      <meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+      <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet'/>
+      <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'><\/script>
+      <style>*{margin:0;padding:0;}body,#m{width:100%;height:100vh;}</style>
+    </head><body><div id='m'></div><script>
+      const map=new maplibregl.Map({container:'m',
+        style:'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+        center:[${_mLng},${_mLat}],zoom:16,attributionControl:false});
+      map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+      map.on('load',()=>{
+        const el=document.createElement('div');
+        el.style.cssText='width:22px;height:22px;background:#FF6B35;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 10px rgba(255,107,53,.6);';
+        new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([${_mLng},${_mLat}]).addTo(map);
+      });
+    <\/script></body></html>`;
+    frame.src='data:text/html;charset=utf-8,'+encodeURIComponent(html);
+
+  }else if(svc==='google'){
+    frame.style.display='block';ext.style.display='none';
+    frame.src=`https://maps.google.com/maps?q=${_mLat},${_mLng}&z=17&output=embed`;
+
+  }else if(svc==='amap'){
+    frame.style.display='none';ext.style.display='flex';
+    const url=`https://uri.amap.com/marker?position=${_mLng},${_mLat}&name=${encodeURIComponent(_mName)}&callnative=0`;
+    document.getElementById('gqMapExtIcon').textContent='🟢';
+    document.getElementById('gqMapExtMsg').innerHTML=`高德地图不支持网页嵌入<br><span style="font-size:12px;color:#94a3b8;">（浏览器安全策略限制）</span><br>点击下方按钮在新标签页打开`;
+    const lnk=document.getElementById('gqMapExtLink');
+    lnk.href=url;lnk.textContent='在高德地图打开 →';
+    lnk.style.background='#15803d';
+    window.open(url,'_blank');
+  }
+}
+
+function closeMapModal(){
+  const m=document.getElementById('gqMapModal');
+  if(m)m.classList.remove('open');
+  const f=document.getElementById('gqMapFrame');
+  if(f)f.src='';
+}
 </script>
 </body>
 </html>
