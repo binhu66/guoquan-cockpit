@@ -2281,13 +2281,13 @@
           <div class="map-store-card" onclick="openDetail('city_store_1')">
             <div class="flex items-center gap-2 mb-1">
               <span class="map-store-dot" style="background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.6);"></span>
-              <span class="font-semibold text-[12px]">1 号店 · Markham</span>
+              <span class="font-semibold text-[12px]">1 号店 · Downtown Toronto</span>
               <span class="pill pill-ok ml-auto" style="font-size:9.5px;">在营</span>
             </div>
-            <div class="text-[11px] text-slate-500">3255 Hwy 7 E, Markham, ON L3R 3P9</div>
+            <div class="text-[11px] text-slate-500">11 Wellesley St W, Toronto, ON M4Y 1E6</div>
             <div class="flex items-center gap-3 mt-1.5 text-[10.5px]">
-              <span class="text-slate-400">📍 Markham 华人商圈</span>
-              <a href="https://maps.google.com/?layer=c&cbll=43.8561,-79.3365" target="_blank" onclick="event.stopPropagation()" class="text-[#E53935] font-semibold hover:underline">Google 街景 →</a>
+              <span class="text-slate-400">📍 Bay & Wellesley · Downtown Core</span>
+              <a href="https://maps.google.com/?layer=c&cbll=43.6650,-79.3835" target="_blank" onclick="event.stopPropagation()" class="text-[#E53935] font-semibold hover:underline">Google 街景 →</a>
             </div>
           </div>
           <div class="map-store-card" onclick="openDetail('city_store_2')">
@@ -3686,11 +3686,11 @@
   // ============ Leaflet 真实世界地图 ============
   // 城市数据
   const cities = [
-    {key:'shanghai',name:'中国总部 · 上海',sub:'出海大本营 · 料包工厂',lat:31.23,lng:121.47,level:'base'},
-    {key:'toronto',name:'多伦多 ★',sub:'M1-M12 · 1+2+CK',lat:43.65,lng:-79.38,level:'active'},
+    {key:'shanghai',name:'中国总部 · 上海',sub:'出海大本营 · 料包工厂',lat:31.1975,lng:121.3448,level:'base'},
+    {key:'toronto',name:'多伦多 ★',sub:'M1-M12 · 1+2+CK',lat:43.665,lng:-79.383,level:'active'},
     {key:'vancouver',name:'温哥华',sub:'M13-M16 · 计划 1-2 家',lat:49.28,lng:-123.12,level:'soon'},
     {key:'la',name:'洛杉矶 · 美西',sub:'M17+ · 评估中',lat:34.05,lng:-118.24,level:'soon'},
-    {key:'hcm',name:'胡志明 · 越南',sub:'M15-M18 · JV 入场',lat:10.78,lng:106.70,level:'soon'},
+    {key:'hcm',name:'胡志明 · 越南',sub:'M15-M18 · JV 入场 · Landmark 81',lat:10.7951,lng:106.7218,level:'soon'},
     {key:'ny',name:'纽约（远期）',sub:'',lat:40.71,lng:-74.00,level:'future'},
     {key:'sg',name:'新加坡（远期）',sub:'',lat:1.35,lng:103.82,level:'future'},
     {key:'bk',name:'曼谷（远期）',sub:'',lat:13.76,lng:100.50,level:'future'},
@@ -3780,11 +3780,11 @@
     if(!el||typeof maplibregl==='undefined')return;
 
     const cityDefs=[
-      {key:'city_china',   name:'中国总部 · 上海',  lat:31.23, lng:121.47, level:'base',   lbl:true},
-      {key:'city_toronto', name:'多伦多 ★',        lat:43.65, lng:-79.38, level:'active', lbl:true},
+      {key:'city_china',   name:'中国总部 · 上海',  lat:31.1975, lng:121.3448, level:'base',   lbl:true},
+      {key:'city_toronto', name:'多伦多 ★',        lat:43.665,  lng:-79.383,  level:'active', lbl:true},
       {key:'city_vancouver',name:'温哥华',          lat:49.28, lng:-123.12,level:'soon',  lbl:true},
       {key:'city_la',      name:'洛杉矶',          lat:34.05, lng:-118.24,level:'soon',  lbl:false},
-      {key:'city_vietnam', name:'胡志明市',         lat:10.78, lng:106.70, level:'soon',  lbl:true},
+      {key:'city_vietnam', name:'胡志明 · Landmark 81', lat:10.7951, lng:106.7218, level:'soon',  lbl:true},
       {key:'city_singapore',name:'新加坡',         lat:1.35,  lng:103.82, level:'future',lbl:false},
       {key:'city_bangkok', name:'曼谷',            lat:13.76, lng:100.50, level:'future',lbl:false},
       {key:'city_sydney',  name:'悉尼',            lat:-33.87,lng:151.21, level:'future',lbl:false},
@@ -3792,20 +3792,21 @@
     ];
 
     const storeDefs=[
-      {name:'1号店 Markham',     addr:'3255 Hwy 7 E, Markham, ON',       lat:43.8561,lng:-79.3365,color:'#22c55e',key:'city_store_1'},
+      {name:'1号店 Downtown Toronto', addr:'11 Wellesley St W, Toronto, ON', lat:43.6650,lng:-79.3835,color:'#22c55e',key:'city_store_1'},
+      {name:'越南 1 号店（规划）',       addr:'Landmark 81, 720A Điện Biên Phủ, Bình Thạnh', lat:10.7951,lng:106.7218,color:'#34d399',key:'city_vietnam'},
       {name:'2号店 North York',  addr:'4750 Yonge St, Toronto, ON',       lat:43.7726,lng:-79.4141,color:'#f59e0b',key:'city_store_2'},
       {name:'中央厨房 Mississauga',addr:'2801 Argentia Rd, Mississauga, ON',lat:43.5923,lng:-79.6586,color:'#60a5fa',key:'city_store_ck'},
     ];
 
     const routeLines=[
-      [[121.47,31.23],[-79.38,43.65],'main'],
-      [[121.47,31.23],[106.70,10.78],'main'],
-      [[-79.38,43.65],[-123.12,49.28],'plan'],
-      [[-79.38,43.65],[-118.24,34.05],'plan'],
-      [[121.47,31.23],[-0.13,51.51],'future'],
-      [[121.47,31.23],[151.21,-33.87],'future'],
-      [[121.47,31.23],[103.82,1.35],'future'],
-      [[106.70,10.78],[103.82,1.35],'future'],
+      [[121.3448,31.1975],[-79.383,43.665],'main'],
+      [[121.3448,31.1975],[106.7218,10.7951],'main'],
+      [[-79.383,43.665],[-123.12,49.28],'plan'],
+      [[-79.383,43.665],[-118.24,34.05],'plan'],
+      [[121.3448,31.1975],[-0.13,51.51],'future'],
+      [[121.3448,31.1975],[151.21,-33.87],'future'],
+      [[121.3448,31.1975],[103.82,1.35],'future'],
+      [[106.7218,10.7951],[103.82,1.35],'future'],
     ];
 
     const map=new maplibregl.Map({
@@ -3874,7 +3875,7 @@
       });
 
       // 多伦多城市区域 zoom in（演示用：0.6s 后飞入）
-      setTimeout(()=>map.flyTo({center:[-79.38,43.65],zoom:9,duration:1800,essential:true}),600);
+      setTimeout(()=>map.flyTo({center:[-79.3835,43.665],zoom:14,duration:2000,essential:true}),600);
       setTimeout(()=>map.flyTo({center:[35,25],zoom:1.7,duration:2200,essential:true}),4000);
     });
   })();
@@ -4832,7 +4833,7 @@ const DETAILS = {
     </div>
     <div class="drill-section">
       <div class="drill-section-title">当前项目</div>
-      <div class="drill-row"><span class="drill-row-label">1 号店（Markham）</span><span class="drill-row-val text-emerald-600">在营 · GMV CA$12.4K/天</span></div>
+      <div class="drill-row"><span class="drill-row-label">1 号店（Downtown Toronto）</span><span class="drill-row-val text-emerald-600">在营 · GMV CA$12.4K/天</span></div>
       <div class="drill-row"><span class="drill-row-label">2 号店（North York）</span><span class="drill-row-val text-amber-600">装修中 · 预计 6/28 开业</span></div>
       <div class="drill-row"><span class="drill-row-label">中央厨房（Mississauga）</span><span class="drill-row-val text-sky-600">筹备中 · M12 投产</span></div>
     </div>
@@ -4841,11 +4842,11 @@ const DETAILS = {
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-            <span style="font-size:12px;font-weight:700;">1 号店 · Markham</span>
+            <span style="font-size:12px;font-weight:700;">1 号店 · Downtown Toronto</span>
             <span style="font-size:9.5px;background:rgba(22,163,74,.12);color:#15803d;padding:2px 8px;border-radius:999px;font-weight:600;">在营 ●</span>
           </div>
-          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">3255 Hwy 7 E, Markham, ON L3R 3P9</div>
-          <a href="https://maps.google.com/?layer=c&cbll=43.8561,-79.3365" target="_blank" style="font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">11 Wellesley St W, Toronto, ON M4Y 1E6</div>
+          <a href="https://maps.google.com/?layer=c&cbll=43.6650,-79.3835" target="_blank" style="font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
         </div>
         <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
@@ -4866,8 +4867,8 @@ const DETAILS = {
       </div>
     </div>
     <div class="drill-section">
-      <div class="drill-section-title">🗺 1 号店区域地图（Markham 华人商圈）</div>
-      <iframe src="https://maps.google.com/maps?q=43.8561,-79.3365&z=16&output=embed"
+      <div class="drill-section-title">🗺 1 号店 · 11 Wellesley St W（Downtown Toronto）</div>
+      <iframe src="https://maps.google.com/maps?q=43.6650,-79.3835&z=17&output=embed"
         style="width:100%;height:210px;border:none;border-radius:10px;margin-top:4px;" loading="lazy" title="1号店位置"></iframe>
     </div>`},
 
@@ -4886,7 +4887,14 @@ const DETAILS = {
       <div class="drill-row"><span class="drill-row-label">供应链优势</span><span class="drill-row-val">海运直抵温哥华港，成本 -15%</span></div>
     </div>`},
 
-  city_vietnam:{icon:'🇻🇳',title:'越南（胡志明市）· JV 评估',sub:'M16 启动 · AI 建议延后 1 月',html:`
+  city_vietnam:{icon:'🇻🇳',title:'越南（胡志明市）· JV 评估',sub:'Landmark 81 · M16 启动 · AI 建议延后 1 月',html:`
+    <div class="drill-section">
+      <div class="drill-section-title">选址 · Landmark 81</div>
+      <div class="drill-row"><span class="drill-row-label">地址</span><span class="drill-row-val">720A Điện Biên Phủ, Bình Thạnh, TP.HCM</span></div>
+      <div class="drill-row"><span class="drill-row-label">建筑</span><span class="drill-row-val">越南最高楼（461m · 81层）· 地标级客流</span></div>
+      <div class="drill-row"><span class="drill-row-label">配套</span><span class="drill-row-val">Vinpearl 酒店 + Vinhomes 豪宅 · 高端客群</span></div>
+      <div class="drill-row"><span class="drill-row-label">日均人流</span><span class="drill-row-val">约 15,000–20,000（商场 + 观光）</span></div>
+    </div>
     <div class="drill-section">
       <div class="drill-section-title">市场吸引力</div>
       <div class="drill-row"><span class="drill-row-label">人口</span><span class="drill-row-val">胡志明 900 万</span></div>
@@ -4899,10 +4907,21 @@ const DETAILS = {
       <div style="background:rgba(255,107,53,.06);border:1px solid rgba(255,107,53,.2);border-radius:10px;padding:12px;font-size:12.5px;color:#475569;">
         基于多伦多 1 号店现金流状况 + 越南合伙人就绪度评估 + 料包产能约束，AI 推荐延后 1 个月至 M16，释放 CA$ 1.2M 现金垫，降低跨区域并发风险。
       </div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🗺 Landmark 81 · 西贡河畔</div>
+      <iframe src="https://maps.google.com/maps?q=10.7951,106.7218&z=16&output=embed"
+        style="width:100%;height:210px;border:none;border-radius:10px;" loading="lazy" title="Landmark 81"></iframe>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <a href="https://maps.google.com/?layer=c&cbll=10.7951,106.7218" target="_blank"
+          style="flex:1;text-align:center;padding:7px;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:8px;font-size:11px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景</a>
+        <a href="https://maps.google.com/maps?q=10.7951,106.7218" target="_blank"
+          style="flex:1;text-align:center;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;font-weight:600;text-decoration:none;">📍 导航前往</a>
+      </div>
     </div>`},
 
   /* ── 更多城市 ── */
-  city_china:{icon:'🇨🇳',title:'中国总部 · 上海 · 出海大本营',sub:'国内 10,000+ 家 · 料包研发 · 出海资源中枢',html:`
+  city_china:{icon:'🇨🇳',title:'中国总部 · 上海虹桥',sub:'兴虹路187弄3号 · 虹桥协信中心 · 出海大本营',html:`
     <div class="drill-section">
       <div class="drill-section-title">核心角色</div>
       <div class="drill-row"><span class="drill-row-label">国内门店</span><span class="drill-row-val">10,000+ 家（基础现金流）</span></div>
@@ -4919,9 +4938,9 @@ const DETAILS = {
     </div>
     <div class="drill-section">
       <div class="drill-section-title">🗺 上海总部地区</div>
-      <iframe src="https://maps.google.com/maps?q=31.23,121.47&z=12&output=embed"
-        style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="上海总部"></iframe>
-      <a href="https://maps.google.com/?layer=c&cbll=31.23,121.47" target="_blank"
+      <iframe src="https://maps.google.com/maps?q=31.1975,121.3448&z=16&output=embed"
+        style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="上海虹桥总部"></iframe>
+      <a href="https://maps.google.com/?layer=c&cbll=31.1975,121.3448" target="_blank"
         style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
     </div>`},
 
@@ -5043,7 +5062,7 @@ const DETAILS = {
     </div>`},
 
   /* ── 多伦多门店详情 ── */
-  city_store_1:{icon:'🍜',title:'1 号店 · Markham · 在营',sub:'3255 Hwy 7 E, Markham, ON L3R 3P9',html:`
+  city_store_1:{icon:'🍜',title:'1 号店 · Downtown Toronto · 在营',sub:'11 Wellesley St W, Toronto, ON M4Y 1E6',html:`
     <div class="drill-section">
       <div class="drill-section-title">门店实时数据</div>
       <div class="drill-row"><span class="drill-row-label">今日 GMV</span><span class="drill-row-val text-emerald-600 font-bold">CA$ 12,417</span></div>
@@ -5054,12 +5073,12 @@ const DETAILS = {
     </div>
     <div class="drill-section">
       <div class="drill-section-title">📍 地理位置</div>
-      <iframe src="https://maps.google.com/maps?q=43.8561,-79.3365&z=17&output=embed"
+      <iframe src="https://maps.google.com/maps?q=43.6650,-79.3835&z=17&output=embed"
         style="width:100%;height:220px;border:none;border-radius:10px;" loading="lazy" title="1号店位置"></iframe>
       <div style="display:flex;gap:8px;margin-top:8px;">
-        <a href="https://maps.google.com/?layer=c&cbll=43.8561,-79.3365" target="_blank"
+        <a href="https://maps.google.com/?layer=c&cbll=43.6650,-79.3835" target="_blank"
           style="flex:1;text-align:center;padding:7px;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:8px;font-size:11px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景</a>
-        <a href="https://maps.google.com/maps?q=43.8561,-79.3365" target="_blank"
+        <a href="https://maps.google.com/maps?q=43.6650,-79.3835" target="_blank"
           style="flex:1;text-align:center;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;font-weight:600;text-decoration:none;">📍 导航前往</a>
       </div>
     </div>
