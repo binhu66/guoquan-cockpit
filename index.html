@@ -3806,16 +3806,31 @@
       {name:'中央厨房 Mississauga',addr:'2801 Argentia Rd, Mississauga, ON',lat:43.5923,lng:-79.6586,color:'#60a5fa',key:'city_store_ck'},
     ];
 
-    const routeLines=[
-      [[121.3448,31.1975],[-79.383,43.665],'main'],
-      [[121.3448,31.1975],[106.7218,10.7951],'main'],
-      [[-79.383,43.665],[-123.12,49.28],'plan'],
-      [[-79.383,43.665],[-118.24,34.05],'plan'],
-      [[121.3448,31.1975],[-0.13,51.51],'future'],
-      [[121.3448,31.1975],[151.21,-33.87],'future'],
-      [[121.3448,31.1975],[103.82,1.35],'future'],
-      [[106.7218,10.7951],[103.82,1.35],'future'],
+    // ── 大圆弧航线（多段折点近似真实飞行路径）──
+    // 上海→多伦多：经北大西洋/格陵兰/加拿大，避开赤道直线穿非洲
+    // 上海→伦敦：经西伯利亚/北欧
+    // 上海→悉尼：经东南亚沿海
+    const arcRoutes=[
+      {t:'main', coords:[[121.34,31.20],[110,38],[88,50],[55,58],[20,60],[-10,58],[-40,52],[-60,48],[-79.38,43.67]]},
+      {t:'main', coords:[[121.34,31.20],[115,24],[112,18],[108,14],[106.72,10.80]]},
+      {t:'plan', coords:[[-79.38,43.67],[-95,47],[-108,50],[-118,50],[-123.12,49.28]]},
+      {t:'plan', coords:[[-79.38,43.67],[-88,38],[-100,34],[-112,33],[-118.24,34.05]]},
+      {t:'future',coords:[[121.34,31.20],[95,48],[65,56],[30,57],[5,53],[-0.13,51.51]]},
+      {t:'future',coords:[[121.34,31.20],[128,22],[135,12],[140,2],[145,-10],[150,-22],[151.21,-33.87]]},
+      {t:'future',coords:[[121.34,31.20],[115,22],[110,15],[106,8],[103.82,1.35]]},
+      {t:'future',coords:[[106.72,10.80],[106,7],[104.5,4],[103.82,1.35]]},
+      {t:'future',coords:[[-79.38,43.67],[-65,47],[-30,55],[5,53],[30,55],[60,50],[95,45],[103.82,1.35]]},
     ];
+
+    // ── 门店 GeoJSON（支持 cluster 聚合）──
+    const storeGeoJSON={
+      type:'FeatureCollection',
+      features:storeDefs.map(s=>({
+        type:'Feature',
+        properties:{name:s.name,addr:s.addr,color:s.color,key:s.key,lat:s.lat,lng:s.lng},
+        geometry:{type:'Point',coordinates:[s.lng,s.lat]}
+      }))
+    };
 
     const map=new maplibregl.Map({
       container:'bigMap',
@@ -3824,22 +3839,20 @@
       scrollZoom:false,attributionControl:false
     });
 
-    // 向后兼容 invalidateSize 调用
     window.bigMap={invalidateSize:()=>map.resize()};
-
     map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
 
     map.on('load',function(){
-      // 航线 GeoJSON
-      const features=routeLines.map(([a,b,t])=>({
-        type:'Feature',properties:{t},
-        geometry:{type:'LineString',coordinates:[a,b]}
+      // ── 大圆弧航线层 ──
+      const routeFeatures=arcRoutes.map(r=>({
+        type:'Feature',properties:{t:r.t},
+        geometry:{type:'LineString',coordinates:r.coords}
       }));
-      map.addSource('routes',{type:'geojson',data:{type:'FeatureCollection',features}});
+      map.addSource('routes',{type:'geojson',data:{type:'FeatureCollection',features:routeFeatures}});
       const routeStyle={
-        main:{color:'#FF6B35',w:1.8,op:.75,dash:[5,3]},
-        plan:{color:'#F59E0B',w:1.4,op:.55,dash:[3,4]},
-        future:{color:'#A855F7',w:1.0,op:.38,dash:[2,6]}
+        main:{color:'#FF6B35',w:1.8,op:.78,dash:[5,3]},
+        plan:{color:'#F59E0B',w:1.4,op:.58,dash:[3,4]},
+        future:{color:'#A855F7',w:1.0,op:.40,dash:[2,6]}
       };
       Object.entries(routeStyle).forEach(([type,s])=>{
         map.addLayer({id:`r-${type}`,type:'line',source:'routes',
@@ -3848,7 +3861,76 @@
         });
       });
 
-      // 城市大 marker（可点击 → openDetail）
+      // ── 门店 cluster GeoJSON 层 ──
+      map.addSource('stores',{
+        type:'geojson',data:storeGeoJSON,
+        cluster:true,clusterMaxZoom:7,clusterRadius:55
+      });
+
+      // 聚合圆（含店数气泡）
+      map.addLayer({id:'clusters',type:'circle',source:'stores',
+        filter:['has','point_count'],
+        paint:{
+          'circle-color':'#FF6B35',
+          'circle-radius':['step',['get','point_count'],15,3,19,6,24],
+          'circle-opacity':.88,
+          'circle-stroke-width':2.5,
+          'circle-stroke-color':'rgba(255,255,255,.92)'
+        }
+      });
+      map.addLayer({id:'cluster-count',type:'symbol',source:'stores',
+        filter:['has','point_count'],
+        layout:{
+          'text-field':'{point_count_abbreviated}',
+          'text-size':11,
+          'text-font':['Open Sans Bold','Arial Unicode MS Bold']
+        },
+        paint:{'text-color':'#fff'}
+      });
+
+      // 单店圆点
+      map.addLayer({id:'store-point',type:'circle',source:'stores',
+        filter:['!',['has','point_count']],
+        paint:{
+          'circle-color':['get','color'],
+          'circle-radius':7,
+          'circle-stroke-width':2.5,
+          'circle-stroke-color':'rgba(255,255,255,.95)',
+          'circle-opacity':.92
+        }
+      });
+
+      // 点击聚合 → 展开
+      map.on('click','clusters',e=>{
+        const f=map.queryRenderedFeatures(e.point,{layers:['clusters']})[0];
+        map.getSource('stores').getClusterExpansionZoom(f.properties.cluster_id,(err,zoom)=>{
+          if(err)return;
+          map.easeTo({center:f.geometry.coordinates,zoom:zoom+1,duration:600});
+        });
+      });
+
+      // 点击单店 → popup + 详情面板
+      const storePopup=new maplibregl.Popup({closeButton:false,maxWidth:'230px',className:'gq-store-popup'});
+      map.on('click','store-point',e=>{
+        const p=e.features[0].properties;
+        const c=e.features[0].geometry.coordinates.slice();
+        storePopup.setLngLat(c).setHTML(`
+          <div style="font-size:12.5px;font-weight:700;color:#1e293b;margin-bottom:3px;">${p.name}</div>
+          <div style="font-size:10.5px;color:#64748b;margin-bottom:5px;">📍 ${p.addr}</div>
+          <a href="https://maps.google.com/?layer=c&cbll=${p.lat},${p.lng}" target="_blank"
+            style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;padding:3px 8px;background:rgba(229,57,53,.08);border-radius:6px;">
+            🗺 Google 街景
+          </a>`).addTo(map);
+        openDetail(p.key);
+      });
+
+      // 鼠标样式
+      ['clusters','store-point'].forEach(id=>{
+        map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');
+        map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');
+      });
+
+      // ── 城市大 marker（HTML · 可点击） ──
       cityDefs.forEach(city=>{
         const div=document.createElement('div');
         div.className=`gq-marker lvl-${city.level}`;
@@ -3859,31 +3941,8 @@
         new maplibregl.Marker({element:div,anchor:'center'}).setLngLat([city.lng,city.lat]).addTo(map);
       });
 
-      // 多伦多门店小 pin（hover → 弹窗 + 街景链接）
-      storeDefs.forEach(s=>{
-        const pin=document.createElement('div');
-        pin.style.cssText=`width:13px;height:13px;border-radius:50%;background:${s.color};border:2.5px solid rgba(255,255,255,.95);box-shadow:0 2px 10px rgba(0,0,0,.5);cursor:pointer;position:relative;z-index:10;transition:transform .15s;`;
-        pin.onmouseenter=()=>{pin.style.transform='scale(1.5)';};
-        pin.onmouseleave=()=>{pin.style.transform='scale(1)';};
-
-        const popup=new maplibregl.Popup({
-          offset:16,closeButton:false,maxWidth:'230px',className:'gq-store-popup'
-        }).setHTML(`
-          <div style="font-size:12.5px;font-weight:700;color:#1e293b;margin-bottom:3px;">${s.name}</div>
-          <div style="font-size:10.5px;color:#64748b;margin-bottom:5px;">📍 ${s.addr}</div>
-          <a href="https://maps.google.com/?layer=c&cbll=${s.lat},${s.lng}" target="_blank"
-            style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;padding:3px 8px;background:rgba(229,57,53,.08);border-radius:6px;">
-            🗺 打开 Google 街景
-          </a>
-        `);
-
-        const marker=new maplibregl.Marker({element:pin,anchor:'center'})
-          .setLngLat([s.lng,s.lat]).setPopup(popup).addTo(map);
-        pin.addEventListener('click',e=>{e.stopPropagation();marker.togglePopup();openDetail(s.key);});
-      });
-
-      // 多伦多城市区域 zoom in（演示用：0.6s 后飞入）
-      setTimeout(()=>map.flyTo({center:[-79.3835,43.665],zoom:14,duration:2000,essential:true}),600);
+      // 演示飞入：聚焦多伦多 → 返回全球
+      setTimeout(()=>map.flyTo({center:[-79.3835,43.665],zoom:10,duration:2000,essential:true}),600);
       setTimeout(()=>map.flyTo({center:[35,25],zoom:1.7,duration:2200,essential:true}),4000);
     });
   })();
