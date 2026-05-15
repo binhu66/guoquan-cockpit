@@ -4209,6 +4209,38 @@
             map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');
           });
         }
+        // 城市点位（主题切换后重建）
+        if(!map.getSource('cities')){
+          const cityGeoJSON={type:'FeatureCollection',features:cityDefs.map(c=>({
+            type:'Feature',
+            properties:{key:c.key,name:c.name,level:c.level,lbl:c.lbl?1:0},
+            geometry:{type:'Point',coordinates:[c.lng,c.lat]}
+          }))};
+          map.addSource('cities',{type:'geojson',data:cityGeoJSON});
+          map.addLayer({id:'city-halo',type:'circle',source:'cities',paint:{
+            'circle-radius':['match',['get','level'],'base',17,'active',17,'soon',13,10],
+            'circle-color':['match',['get','level'],'base','#E53935','active','#FF6B35','soon','#f59e0b','#a855f7'],
+            'circle-opacity':0.18,'circle-stroke-width':0
+          }});
+          map.addLayer({id:'city-dot',type:'circle',source:'cities',paint:{
+            'circle-radius':['match',['get','level'],'base',9,'active',9,'soon',7,6],
+            'circle-color':['match',['get','level'],'base','#E53935','active','#FF6B35','soon','#f59e0b','#a855f7'],
+            'circle-stroke-width':2.5,'circle-stroke-color':'#ffffff','circle-opacity':0.96
+          }});
+          map.addLayer({id:'city-label',type:'symbol',source:'cities',filter:['==',['get','lbl'],1],
+            layout:{
+              'text-field':['get','name'],'text-size':11,'text-offset':[0,1.4],'text-anchor':'top',
+              'text-font':['Open Sans Semibold','Arial Unicode MS Bold']
+            },
+            paint:{'text-color':'#ffffff','text-halo-color':'rgba(15,23,42,.9)','text-halo-width':1.8}
+          });
+          map.on('click','city-dot',e=>{
+            if(!e.features.length)return;
+            openDetail(e.features[0].properties.key);
+          });
+          map.on('mouseenter','city-dot',()=>map.getCanvas().style.cursor='pointer');
+          map.on('mouseleave','city-dot',()=>map.getCanvas().style.cursor='');
+        }
       }
 
       themeBtn.onclick=()=>{
@@ -4363,16 +4395,40 @@
         map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');
       });
 
-      // ── 城市大 marker（HTML · 可点击） ──
-      cityDefs.forEach(city=>{
-        const div=document.createElement('div');
-        div.className=`gq-marker lvl-${city.level}`;
-        div.innerHTML=`<div class="ring"></div><div class="dot"></div>${city.lbl?`<div class="label">${city.name}</div>`:''}`;
-        div.style.cursor='pointer';
-        div.title=city.name;
-        div.addEventListener('click',e=>{e.stopPropagation();openDetail(city.key);});
-        new maplibregl.Marker({element:div,anchor:'center'}).setLngLat([city.lng,city.lat]).addTo(map);
+      // ── 城市点位（GeoJSON WebGL 图层，坐标永远精准）──
+      const cityGeoJSON={type:'FeatureCollection',features:cityDefs.map(c=>({
+        type:'Feature',
+        properties:{key:c.key,name:c.name,level:c.level,lbl:c.lbl?1:0},
+        geometry:{type:'Point',coordinates:[c.lng,c.lat]}
+      }))};
+      map.addSource('cities',{type:'geojson',data:cityGeoJSON});
+      // 外圈（光晕效果）
+      map.addLayer({id:'city-halo',type:'circle',source:'cities',paint:{
+        'circle-radius':['match',['get','level'],'base',17,'active',17,'soon',13,10],
+        'circle-color':['match',['get','level'],'base','#E53935','active','#FF6B35','soon','#f59e0b','#a855f7'],
+        'circle-opacity':0.18,'circle-stroke-width':0
+      }});
+      // 实心圆点
+      map.addLayer({id:'city-dot',type:'circle',source:'cities',paint:{
+        'circle-radius':['match',['get','level'],'base',9,'active',9,'soon',7,6],
+        'circle-color':['match',['get','level'],'base','#E53935','active','#FF6B35','soon','#f59e0b','#a855f7'],
+        'circle-stroke-width':2.5,'circle-stroke-color':'#ffffff','circle-opacity':0.96
+      }});
+      // 文字标签
+      map.addLayer({id:'city-label',type:'symbol',source:'cities',filter:['==',['get','lbl'],1],
+        layout:{
+          'text-field':['get','name'],'text-size':11,'text-offset':[0,1.4],'text-anchor':'top',
+          'text-font':['Open Sans Semibold','Arial Unicode MS Bold']
+        },
+        paint:{'text-color':'#ffffff','text-halo-color':'rgba(15,23,42,.9)','text-halo-width':1.8}
       });
+      // 点击城市 → 详情面板
+      map.on('click','city-dot',e=>{
+        if(!e.features.length)return;
+        openDetail(e.features[0].properties.key);
+      });
+      map.on('mouseenter','city-dot',()=>map.getCanvas().style.cursor='pointer');
+      map.on('mouseleave','city-dot',()=>map.getCanvas().style.cursor='');
 
       // 演示：先全球看货船 → 飞入多伦多看货车 → 返回全球
       setTimeout(()=>map.flyTo({center:[-79.52,43.63],zoom:10,duration:1800,essential:true}),800);
