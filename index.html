@@ -3838,10 +3838,13 @@
       window.scrollTo({top:0,behavior:'smooth'});
       // 移动端关闭侧边栏
       document.getElementById('sidebar').classList.remove('open');
-      // 触发地图 / 图表 resize
+      // 触发地图 / 图表 resize；globe section 首次进入时懒初始化 bigMap
+      if(it.dataset.target==='globe'){
+        initBigMapLibre();           // 第一次调用：容器已可见再初始化
+        setTimeout(()=>{ if(window.bigMap)window.bigMap.invalidateSize(); },300);
+      }
       setTimeout(()=>{
         if(window.miniMap)window.miniMap.invalidateSize();
-        if(window.bigMap)window.bigMap.invalidateSize();
         if(window.Chart && Chart.instances)Object.values(Chart.instances).forEach(c=>c.resize());
       },120);
     });
@@ -4030,8 +4033,10 @@
       setTimeout(function(){window.miniMap&&window.miniMap.invalidateSize();},120);
     });
   })();
-  // ========== MapLibre GL 大地图（暗色 · 店面 pin · Google 街景入口） ==========
-  (function initBigMapLibre(){
+  // ========== MapLibre GL 大地图（懒加载：首次进入 globe section 时初始化） ==========
+  let _bigMapReady=false;
+  function initBigMapLibre(){
+    if(_bigMapReady)return; _bigMapReady=true;
     const el=document.getElementById('bigMap');
     if(!el||typeof maplibregl==='undefined')return;
 
@@ -4370,11 +4375,11 @@
       });
 
       // 演示：先全球看货船 → 飞入多伦多看货车 → 返回全球
-      setTimeout(()=>map.flyTo({center:[-79.52,43.63],zoom:10,duration:1800,essential:true}),1000);
-      setTimeout(()=>animTruck(),1000);
-      setTimeout(()=>map.flyTo({center:[35,25],zoom:1.7,duration:2000,essential:true}),6000);
+      setTimeout(()=>map.flyTo({center:[-79.52,43.63],zoom:10,duration:1800,essential:true}),800);
+      setTimeout(()=>animTruck(),800);
+      setTimeout(()=>map.flyTo({center:[35,25],zoom:1.7,duration:2000,essential:true}),5600);
     });
-  })();
+  }
 
   // ============ AI 总裁辅助决策助手 ============
   const aiPanel = document.createElement('div');
