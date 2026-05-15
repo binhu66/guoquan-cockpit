@@ -130,6 +130,14 @@
   .map-store-card{flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s;}
   .map-store-card:hover{border-color:#FF6B35;box-shadow:0 4px 12px rgba(229,57,53,.12);}
   .map-store-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;}
+  /* 地图服务选项按钮 */
+  .map-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px;}
+  .map-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:8px 6px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;border:1px solid;transition:opacity .15s;}
+  .map-btn:hover{opacity:.82;}
+  .map-btn-g{background:rgba(229,57,53,.09);border-color:rgba(229,57,53,.25);color:#E53935;}
+  .map-btn-a{background:#f0fdf4;border-color:rgba(34,197,94,.28);color:#15803d;}
+  .map-btn-b{background:#eff6ff;border-color:rgba(59,130,246,.28);color:#1d4ed8;}
+  .map-btn-m{background:#f8fafc;border-color:#e2e8f0;color:#475569;}
 
   /* 小型 AI 辅助分析按钮（用于金字塔每层 + 部门卡片） */
   .ai-btn-mini{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:5px;background:linear-gradient(90deg,rgba(255,255,255,.95),rgba(255,255,255,.85));color:#B71C1C;font-size:10px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.5);line-height:1.5;letter-spacing:.2px;transition:all .15s;}
@@ -4846,23 +4854,35 @@ const DETAILS = {
             <span style="font-size:9.5px;background:rgba(22,163,74,.12);color:#15803d;padding:2px 8px;border-radius:999px;font-weight:600;">在营 ●</span>
           </div>
           <div style="font-size:11px;color:#64748b;margin-bottom:6px;">11 Wellesley St W, Toronto, ON M4Y 1E6</div>
-          <a href="https://maps.google.com/?layer=c&cbll=43.6650,-79.3835" target="_blank" style="font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+          <div style="display:flex;gap:6px;margin-top:5px;">
+            <a href="https://maps.google.com/?layer=c&cbll=43.6650,-79.3835" target="_blank" class="map-btn map-btn-g" style="font-size:10px;padding:4px 8px;">🌏 Google</a>
+            <a href="https://uri.amap.com/marker?position=-79.3835,43.6650&name=锅圈1号店&callnative=0" target="_blank" class="map-btn map-btn-a" style="font-size:10px;padding:4px 8px;">🗺 高德</a>
+            <a href="https://maps.apple.com/?ll=43.6650,-79.3835&z=17" target="_blank" class="map-btn map-btn-m" style="font-size:10px;padding:4px 8px;">🍎 Apple</a>
+          </div>
         </div>
         <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
             <span style="font-size:12px;font-weight:700;">2 号店 · North York</span>
             <span style="font-size:9.5px;background:rgba(217,119,6,.12);color:#b45309;padding:2px 8px;border-radius:999px;font-weight:600;">装修中</span>
           </div>
-          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">4750 Yonge St, Toronto, ON M2N 5M6</div>
-          <a href="https://maps.google.com/?layer=c&cbll=43.7726,-79.4141" target="_blank" style="font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+          <div style="font-size:11px;color:#64748b;margin-bottom:5px;">4750 Yonge St, Toronto, ON M2N 5M6</div>
+          <div style="display:flex;gap:6px;">
+            <a href="https://maps.google.com/?layer=c&cbll=43.7726,-79.4141" target="_blank" class="map-btn map-btn-g" style="font-size:10px;padding:4px 8px;">🌏 Google</a>
+            <a href="https://uri.amap.com/marker?position=-79.4141,43.7726&name=锅圈2号店&callnative=0" target="_blank" class="map-btn map-btn-a" style="font-size:10px;padding:4px 8px;">🗺 高德</a>
+            <a href="https://maps.apple.com/?ll=43.7726,-79.4141&z=17" target="_blank" class="map-btn map-btn-m" style="font-size:10px;padding:4px 8px;">🍎 Apple</a>
+          </div>
         </div>
         <div style="border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;background:#f8fafc;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
             <span style="font-size:12px;font-weight:700;">中央厨房 · Mississauga</span>
             <span style="font-size:9.5px;background:rgba(59,130,246,.12);color:#1d4ed8;padding:2px 8px;border-radius:999px;font-weight:600;">筹备</span>
           </div>
-          <div style="font-size:11px;color:#64748b;margin-bottom:6px;">2801 Argentia Rd, Mississauga, ON L5N 8E5</div>
-          <a href="https://maps.google.com/?layer=c&cbll=43.5923,-79.6586" target="_blank" style="font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+          <div style="font-size:11px;color:#64748b;margin-bottom:5px;">2801 Argentia Rd, Mississauga, ON L5N 8E5</div>
+          <div style="display:flex;gap:6px;">
+            <a href="https://maps.google.com/?layer=c&cbll=43.5923,-79.6586" target="_blank" class="map-btn map-btn-g" style="font-size:10px;padding:4px 8px;">🌏 Google</a>
+            <a href="https://uri.amap.com/marker?position=-79.6586,43.5923&name=锅圈中央厨房&callnative=0" target="_blank" class="map-btn map-btn-a" style="font-size:10px;padding:4px 8px;">🗺 高德</a>
+            <a href="https://maps.apple.com/?ll=43.5923,-79.6586&z=15" target="_blank" class="map-btn map-btn-m" style="font-size:10px;padding:4px 8px;">🍎 Apple</a>
+          </div>
         </div>
       </div>
     </div>
@@ -4870,6 +4890,12 @@ const DETAILS = {
       <div class="drill-section-title">🗺 1 号店 · 11 Wellesley St W（Downtown Toronto）</div>
       <iframe src="https://maps.google.com/maps?q=43.6650,-79.3835&z=17&output=embed"
         style="width:100%;height:210px;border:none;border-radius:10px;margin-top:4px;" loading="lazy" title="1号店位置"></iframe>
+      <div class="map-btn-grid" style="margin-top:8px;">
+        <a href="https://maps.google.com/?layer=c&cbll=43.6650,-79.3835" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=-79.3835,43.6650&name=锅圈小炒1号店&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=43.6650,-79.3835&z=17" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=43.6650,-79.3835" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
+      </div>
     </div>`},
 
   city_vancouver:{icon:'🌲',title:'温哥华 · M13 启动',sub:'西海岸华人核心市场',html:`
@@ -4885,6 +4911,17 @@ const DETAILS = {
       <div class="drill-row"><span class="drill-row-label">选址 Agent 启动</span><span class="drill-row-val">M13（2027-04）</span></div>
       <div class="drill-row"><span class="drill-row-label">1 号店开业目标</span><span class="drill-row-val">M16（2027-07）</span></div>
       <div class="drill-row"><span class="drill-row-label">供应链优势</span><span class="drill-row-val">海运直抵温哥华港，成本 -15%</span></div>
+    </div>
+    <div class="drill-section">
+      <div class="drill-section-title">🗺 列治文 / 本拿比华人商圈</div>
+      <iframe src="https://maps.google.com/maps?q=49.1666,-123.1336&z=13&output=embed"
+        style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="温哥华列治文华人区"></iframe>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=49.1666,-123.1336" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=-123.1336,49.1666&name=温哥华列治文华人区&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=49.1666,-123.1336&z=13" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=49.1666,-123.1336" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
+      </div>
     </div>`},
 
   city_vietnam:{icon:'🇻🇳',title:'越南（胡志明市）· JV 评估',sub:'Landmark 81 · M16 启动 · AI 建议延后 1 月',html:`
@@ -4912,11 +4949,11 @@ const DETAILS = {
       <div class="drill-section-title">🗺 Landmark 81 · 西贡河畔</div>
       <iframe src="https://maps.google.com/maps?q=10.7951,106.7218&z=16&output=embed"
         style="width:100%;height:210px;border:none;border-radius:10px;" loading="lazy" title="Landmark 81"></iframe>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <a href="https://maps.google.com/?layer=c&cbll=10.7951,106.7218" target="_blank"
-          style="flex:1;text-align:center;padding:7px;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:8px;font-size:11px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景</a>
-        <a href="https://maps.google.com/maps?q=10.7951,106.7218" target="_blank"
-          style="flex:1;text-align:center;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;font-weight:600;text-decoration:none;">📍 导航前往</a>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=10.7951,106.7218" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=106.7218,10.7951&name=锅圈越南1号店&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=10.7951,106.7218&z=16" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=10.7951,106.7218" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
       </div>
     </div>`},
 
@@ -4940,8 +4977,12 @@ const DETAILS = {
       <div class="drill-section-title">🗺 上海总部地区</div>
       <iframe src="https://maps.google.com/maps?q=31.1975,121.3448&z=16&output=embed"
         style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="上海虹桥总部"></iframe>
-      <a href="https://maps.google.com/?layer=c&cbll=31.1975,121.3448" target="_blank"
-        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+      <div class="map-btn-grid">
+        <a href="https://uri.amap.com/marker?position=121.3448,31.1975&name=锅圈食汇上海总部&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德全景 ★</a>
+        <a href="https://api.map.baidu.com/marker?location=31.1975,121.3448&title=锅圈食汇上海总部&content=虹桥协信中心&output=html&src=guoquan" target="_blank" class="map-btn map-btn-b">🔵 百度地图</a>
+        <a href="https://maps.google.com/?layer=c&cbll=31.1975,121.3448" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://maps.apple.com/?ll=31.1975,121.3448&z=16" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+      </div>
     </div>`},
 
   city_la:{icon:'🇺🇸',title:'洛杉矶 / 美西 · 评估中',sub:'M17+ · 圣盖博 / 亚凯迪亚华人核心区',html:`
@@ -4968,8 +5009,12 @@ const DETAILS = {
       <div class="drill-section-title">🗺 圣盖博 / 亚凯迪亚华人商圈</div>
       <iframe src="https://maps.google.com/maps?q=34.0966,-118.0355&z=13&output=embed"
         style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="洛杉矶华人区"></iframe>
-      <a href="https://maps.google.com/?layer=c&cbll=34.0966,-118.0355" target="_blank"
-        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=34.0966,-118.0355" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=-118.0355,34.0966&name=洛杉矶圣盖博华人区&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=34.0966,-118.0355&z=13" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=34.0966,-118.0355" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
+      </div>
     </div>`},
 
   city_singapore:{icon:'🇸🇬',title:'新加坡 · 东南亚旗舰站',sub:'远期 · 越南跑通后启动',html:`
@@ -4990,8 +5035,12 @@ const DETAILS = {
       <div class="drill-section-title">🗺 乌节路 / 牛车水商圈</div>
       <iframe src="https://maps.google.com/maps?q=1.2847,103.8452&z=14&output=embed"
         style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="新加坡牛车水"></iframe>
-      <a href="https://maps.google.com/?layer=c&cbll=1.2847,103.8452" target="_blank"
-        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=1.2847,103.8452" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=103.8452,1.2847&name=新加坡牛车水&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=1.2847,103.8452&z=14" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=1.2847,103.8452" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
+      </div>
     </div>`},
 
   city_bangkok:{icon:'🇹🇭',title:'曼谷 · 东南亚第二站',sub:'远期 · 越南成功 6 个月后入场',html:`
@@ -5012,8 +5061,12 @@ const DETAILS = {
       <div class="drill-section-title">🗺 曼谷 Central World 商圈</div>
       <iframe src="https://maps.google.com/maps?q=13.7468,100.5393&z=14&output=embed"
         style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="曼谷商圈"></iframe>
-      <a href="https://maps.google.com/?layer=c&cbll=13.7468,100.5393" target="_blank"
-        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=13.7468,100.5393" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=100.5393,13.7468&name=曼谷CentralWorld商圈&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=13.7468,100.5393&z=14" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=13.7468,100.5393" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
+      </div>
     </div>`},
 
   city_sydney:{icon:'🇦🇺',title:'悉尼 / 墨尔本 · 澳洲市场',sub:'远期 · 多伦多模型成熟后克隆',html:`
@@ -5034,8 +5087,12 @@ const DETAILS = {
       <div class="drill-section-title">🗺 悉尼 Chatswood 华人商圈</div>
       <iframe src="https://maps.google.com/maps?q=-33.7972,151.1808&z=14&output=embed"
         style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="悉尼Chatswood"></iframe>
-      <a href="https://maps.google.com/?layer=c&cbll=-33.7972,151.1808" target="_blank"
-        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=-33.7972,151.1808" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=151.1808,-33.7972&name=悉尼Chatswood华人区&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=-33.7972,151.1808&z=14" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=-33.7972,151.1808" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
+      </div>
     </div>`},
 
   city_london:{icon:'🇬🇧',title:'伦敦 · 欧洲旗舰探索',sub:'远期 · 欧洲华人最大聚集地',html:`
@@ -5057,8 +5114,12 @@ const DETAILS = {
       <div class="drill-section-title">🗺 伦敦唐人街 Gerrard Street</div>
       <iframe src="https://maps.google.com/maps?q=51.5126,-0.1313&z=15&output=embed"
         style="width:100%;height:200px;border:none;border-radius:10px;" loading="lazy" title="伦敦唐人街"></iframe>
-      <a href="https://maps.google.com/?layer=c&cbll=51.5126,-0.1313" target="_blank"
-        style="display:inline-block;margin-top:8px;font-size:10.5px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景 →</a>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=51.5126,-0.1313" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=-0.1313,51.5126&name=伦敦唐人街Gerrard街&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=51.5126,-0.1313&z=15" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=51.5126,-0.1313" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
+      </div>
     </div>`},
 
   /* ── 多伦多门店详情 ── */
@@ -5075,11 +5136,11 @@ const DETAILS = {
       <div class="drill-section-title">📍 地理位置</div>
       <iframe src="https://maps.google.com/maps?q=43.6650,-79.3835&z=17&output=embed"
         style="width:100%;height:220px;border:none;border-radius:10px;" loading="lazy" title="1号店位置"></iframe>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <a href="https://maps.google.com/?layer=c&cbll=43.6650,-79.3835" target="_blank"
-          style="flex:1;text-align:center;padding:7px;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:8px;font-size:11px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景</a>
-        <a href="https://maps.google.com/maps?q=43.6650,-79.3835" target="_blank"
-          style="flex:1;text-align:center;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;font-weight:600;text-decoration:none;">📍 导航前往</a>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=43.6650,-79.3835" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=-79.3835,43.6650&name=锅圈小炒1号店&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=43.6650,-79.3835&z=17" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=43.6650,-79.3835" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
       </div>
     </div>
     <div class="drill-section">
@@ -5111,11 +5172,11 @@ const DETAILS = {
       <div class="drill-section-title">📍 地理位置</div>
       <iframe src="https://maps.google.com/maps?q=43.7726,-79.4141&z=16&output=embed"
         style="width:100%;height:220px;border:none;border-radius:10px;" loading="lazy" title="2号店位置"></iframe>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <a href="https://maps.google.com/?layer=c&cbll=43.7726,-79.4141" target="_blank"
-          style="flex:1;text-align:center;padding:7px;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:8px;font-size:11px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景</a>
-        <a href="https://maps.google.com/maps?q=43.7726,-79.4141" target="_blank"
-          style="flex:1;text-align:center;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;font-weight:600;text-decoration:none;">📍 导航前往</a>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=43.7726,-79.4141" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=-79.4141,43.7726&name=锅圈小炒2号店&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=43.7726,-79.4141&z=17" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=43.7726,-79.4141" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
       </div>
     </div>`},
 
@@ -5139,11 +5200,11 @@ const DETAILS = {
       <div class="drill-section-title">📍 地理位置</div>
       <iframe src="https://maps.google.com/maps?q=43.5923,-79.6586&z=15&output=embed"
         style="width:100%;height:220px;border:none;border-radius:10px;" loading="lazy" title="中央厨房位置"></iframe>
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <a href="https://maps.google.com/?layer=c&cbll=43.5923,-79.6586" target="_blank"
-          style="flex:1;text-align:center;padding:7px;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.2);border-radius:8px;font-size:11px;color:#E53935;font-weight:700;text-decoration:none;">🗺 Google 街景</a>
-        <a href="https://maps.google.com/maps?q=43.5923,-79.6586" target="_blank"
-          style="flex:1;text-align:center;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:11px;color:#475569;font-weight:600;text-decoration:none;">📍 导航前往</a>
+      <div class="map-btn-grid">
+        <a href="https://maps.google.com/?layer=c&cbll=43.5923,-79.6586" target="_blank" class="map-btn map-btn-g">🌏 Google 街景</a>
+        <a href="https://uri.amap.com/marker?position=-79.6586,43.5923&name=锅圈中央厨房&callnative=0" target="_blank" class="map-btn map-btn-a">🗺 高德地图</a>
+        <a href="https://maps.apple.com/?ll=43.5923,-79.6586&z=15" target="_blank" class="map-btn map-btn-m">🍎 Apple 地图</a>
+        <a href="https://maps.google.com/maps?q=43.5923,-79.6586" target="_blank" class="map-btn map-btn-m">📍 Google 地图</a>
       </div>
     </div>`},
 
