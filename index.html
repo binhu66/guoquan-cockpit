@@ -3806,21 +3806,24 @@
       {name:'中央厨房 Mississauga',addr:'2801 Argentia Rd, Mississauga, ON',lat:43.5923,lng:-79.6586,color:'#60a5fa',key:'city_store_ck'},
     ];
 
-    // ── 大圆弧航线（多段折点近似真实飞行路径）──
-    // 上海→多伦多：经北大西洋/格陵兰/加拿大，避开赤道直线穿非洲
-    // 上海→伦敦：经西伯利亚/北欧
-    // 上海→悉尼：经东南亚沿海
-    const arcRoutes=[
-      {t:'main', coords:[[121.34,31.20],[110,38],[88,50],[55,58],[20,60],[-10,58],[-40,52],[-60,48],[-79.38,43.67]]},
-      {t:'main', coords:[[121.34,31.20],[115,24],[112,18],[108,14],[106.72,10.80]]},
-      {t:'plan', coords:[[-79.38,43.67],[-95,47],[-108,50],[-118,50],[-123.12,49.28]]},
-      {t:'plan', coords:[[-79.38,43.67],[-88,38],[-100,34],[-112,33],[-118.24,34.05]]},
-      {t:'future',coords:[[121.34,31.20],[95,48],[65,56],[30,57],[5,53],[-0.13,51.51]]},
-      {t:'future',coords:[[121.34,31.20],[128,22],[135,12],[140,2],[145,-10],[150,-22],[151.21,-33.87]]},
-      {t:'future',coords:[[121.34,31.20],[115,22],[110,15],[106,8],[103.82,1.35]]},
-      {t:'future',coords:[[106.72,10.80],[106,7],[104.5,4],[103.82,1.35]]},
-      {t:'future',coords:[[-79.38,43.67],[-65,47],[-30,55],[5,53],[30,55],[60,50],[95,45],[103.82,1.35]]},
+    // ── 货船路径（东海→西太平洋，循环演示动画）──
+    const shipPath=[
+      [121.5,30.5],[124,28.5],[127,26],[130,23],[134,20],
+      [138,18],[143,17.5],[148,18.5],[153,20],[157,22],
+      [161,24],[165,26],[169,27.5],[165,26],[161,24],
+      [157,22],[153,20],[148,18.5],[143,17.5],[138,18],
+      [134,20],[130,23],[127,26],[124,28.5]
     ];
+    let shipSegIdx=0,shipT=0;
+
+    // ── 货车路径（Mississauga 中央厨房→401→Gardiner→1号店 Downtown Toronto）──
+    const truckPath=[
+      [-79.6586,43.5923],[-79.635,43.610],[-79.606,43.622],
+      [-79.570,43.632],[-79.530,43.637],[-79.492,43.638],
+      [-79.462,43.646],[-79.430,43.655],[-79.405,43.659],
+      [-79.390,43.663],[-79.3835,43.665]
+    ];
+    let truckSegIdx=0,truckT=0,truckDone=false;
 
     // ── 门店 GeoJSON（支持 cluster 聚合）──
     const storeGeoJSON={
@@ -3843,23 +3846,121 @@
     map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
 
     map.on('load',function(){
-      // ── 大圆弧航线层 ──
-      const routeFeatures=arcRoutes.map(r=>({
-        type:'Feature',properties:{t:r.t},
-        geometry:{type:'LineString',coordinates:r.coords}
-      }));
-      map.addSource('routes',{type:'geojson',data:{type:'FeatureCollection',features:routeFeatures}});
-      const routeStyle={
-        main:{color:'#FF6B35',w:1.8,op:.78,dash:[5,3]},
-        plan:{color:'#F59E0B',w:1.4,op:.58,dash:[3,4]},
-        future:{color:'#A855F7',w:1.0,op:.40,dash:[2,6]}
-      };
-      Object.entries(routeStyle).forEach(([type,s])=>{
-        map.addLayer({id:`r-${type}`,type:'line',source:'routes',
-          filter:['==',['get','t'],type],
-          paint:{'line-color':s.color,'line-width':s.w,'line-opacity':s.op,'line-dasharray':s.dash}
-        });
+      // ── 货车路线（Toronto 本地绿色虚线，zoom 进去可见）──
+      map.addSource('truck-route',{type:'geojson',data:{
+        type:'Feature',geometry:{type:'LineString',coordinates:truckPath}
+      }});
+      map.addLayer({id:'truck-route-bg',type:'line',source:'truck-route',
+        paint:{'line-color':'rgba(34,197,94,.12)','line-width':8}
       });
+      map.addLayer({id:'truck-route-line',type:'line',source:'truck-route',
+        paint:{'line-color':'#22c55e','line-width':2.5,
+               'line-dasharray':[4,2],'line-opacity':.8}
+      });
+
+      // ── 货船 marker ──
+      const shipEl=document.createElement('div');
+      shipEl.style.cssText='width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+      shipEl.innerHTML='<div style="width:28px;height:28px;background:#FF6B35;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 12px rgba(255,107,53,.6);border:2.5px solid rgba(255,255,255,.9);">🚢</div>';
+      const shipPopup=new maplibregl.Popup({offset:18,closeButton:true,maxWidth:'250px',className:'gq-store-popup'});
+      const shipMarker=new maplibregl.Marker({element:shipEl,anchor:'center'})
+        .setLngLat(shipPath[0]).setPopup(shipPopup).addTo(map);
+      shipEl.addEventListener('click',e=>{e.stopPropagation();
+        shipPopup.setHTML(`
+          <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px;">🚢 GQ供应链-01号</div>
+          <div style="font-size:11px;color:#475569;line-height:1.8;">
+            路线：<b>上海港 → 太平洋 → 温哥华港</b><br>
+            货物：料包 12,000包 · CA$ 156K<br>
+            已航行：<b>14天</b> · 距温哥华约 4,200 km<br>
+            ETA：<span style="color:#FF6B35;font-weight:700;">6月3日 15:00</span>
+          </div>`);
+        shipMarker.togglePopup();
+      });
+
+      // ── 货车 marker ──
+      const truckEl=document.createElement('div');
+      truckEl.style.cssText='width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+      truckEl.innerHTML='<div style="width:26px;height:26px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 10px rgba(34,197,94,.6);border:2.5px solid rgba(255,255,255,.9);">🚛</div>';
+      const truckPopup=new maplibregl.Popup({offset:18,closeButton:true,maxWidth:'250px',className:'gq-store-popup'});
+      const truckMarker=new maplibregl.Marker({element:truckEl,anchor:'center'})
+        .setLngLat(truckPath[0]).setPopup(truckPopup).addTo(map);
+      truckEl.addEventListener('click',e=>{e.stopPropagation();
+        const pct=(truckSegIdx+truckT)/(truckPath.length-1);
+        const mins=Math.round((1-pct)*35);
+        truckPopup.setHTML(`
+          <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:6px;">🚛 D&amp;R-487 · Mike</div>
+          <div style="font-size:11px;color:#475569;line-height:1.8;">
+            路线：<b>Mississauga 中央厨房 → 1号店</b><br>
+            货物：料包 800包<br>
+            当前速度：<b>62 km/h</b><br>
+            ETA：<span style="color:#16a34a;font-weight:700;">还有 ${mins} 分钟（14:25）</span>
+          </div>`);
+        truckMarker.togglePopup();
+      });
+
+      // ── 悬浮信息卡（地图右下角）──
+      const infoBar=document.createElement('div');
+      infoBar.style.cssText='position:absolute;bottom:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:10;pointer-events:none;';
+      infoBar.innerHTML=`
+        <div style="background:rgba(15,23,42,.80);backdrop-filter:blur(8px);border:1px solid rgba(255,107,53,.38);border-radius:10px;padding:8px 12px;min-width:210px;font-size:11px;color:#fff;">
+          <div style="display:flex;align-items:center;gap:5px;font-weight:700;margin-bottom:3px;">
+            <span>🚢</span><span>GQ供应链-01号</span>
+            <span style="margin-left:auto;color:#FF6B35;font-size:10px;">● 在途</span>
+          </div>
+          <div style="color:#94a3b8;">上海港 → 温哥华港 · 第14天</div>
+          <div style="color:#f59e0b;font-weight:600;margin-top:2px;">ETA 6月3日 · 距港 4,200 km</div>
+        </div>
+        <div style="background:rgba(15,23,42,.80);backdrop-filter:blur(8px);border:1px solid rgba(34,197,94,.38);border-radius:10px;padding:8px 12px;min-width:210px;font-size:11px;color:#fff;">
+          <div style="display:flex;align-items:center;gap:5px;font-weight:700;margin-bottom:3px;">
+            <span>🚛</span><span>D&amp;R-487 · Mike</span>
+            <span id="gq-truck-status" style="margin-left:auto;color:#22c55e;font-size:10px;">● 在途</span>
+          </div>
+          <div style="color:#94a3b8;">中央厨房 → 1号店 · 料包 800包</div>
+          <div id="gq-truck-eta" style="color:#22c55e;font-weight:600;margin-top:2px;">ETA 14:25 · 约 35 分钟</div>
+        </div>`;
+      document.getElementById('bigMap').appendChild(infoBar);
+
+      // ── 货船动画（环形慢速）──
+      function animShip(){
+        shipT+=0.004;
+        if(shipT>=1){shipT=0;shipSegIdx=(shipSegIdx+1)%(shipPath.length-1);}
+        const[ax,ay]=shipPath[shipSegIdx],[bx,by]=shipPath[(shipSegIdx+1)%(shipPath.length-1)];
+        shipMarker.setLngLat([ax+(bx-ax)*shipT,ay+(by-ay)*shipT]);
+        setTimeout(animShip,65);
+      }
+      animShip();
+
+      // ── 货车动画（到达停 3s 重新出发）──
+      function animTruck(){
+        if(truckDone)return;
+        truckT+=0.007;
+        if(truckT>=1){
+          truckT=0;
+          if(truckSegIdx>=truckPath.length-2){
+            truckMarker.setLngLat(truckPath[truckPath.length-1]);
+            const st=document.getElementById('gq-truck-status');
+            const et=document.getElementById('gq-truck-eta');
+            if(st){st.textContent='✅ 已到达';st.style.color='#60a5fa';}
+            if(et){et.textContent='1号店 · 卸货中';et.style.color='#60a5fa';}
+            truckDone=true;
+            setTimeout(()=>{
+              truckSegIdx=0;truckT=0;truckDone=false;
+              truckMarker.setLngLat(truckPath[0]);
+              if(st){st.textContent='● 在途';st.style.color='#22c55e';}
+              if(et){et.style.color='#22c55e';}
+              animTruck();
+            },3000);
+            return;
+          }
+          truckSegIdx++;
+        }
+        const[ax,ay]=truckPath[truckSegIdx],[bx,by]=truckPath[truckSegIdx+1];
+        truckMarker.setLngLat([ax+(bx-ax)*truckT,ay+(by-ay)*truckT]);
+        const pct=(truckSegIdx+truckT)/(truckPath.length-1);
+        const et=document.getElementById('gq-truck-eta');
+        if(et)et.textContent=`ETA 14:25 · 还有 ${Math.max(0,Math.round((1-pct)*35))} 分钟`;
+        setTimeout(animTruck,55);
+      }
 
       // ── 门店 cluster GeoJSON 层 ──
       map.addSource('stores',{
@@ -3941,9 +4042,10 @@
         new maplibregl.Marker({element:div,anchor:'center'}).setLngLat([city.lng,city.lat]).addTo(map);
       });
 
-      // 演示飞入：聚焦多伦多 → 返回全球
-      setTimeout(()=>map.flyTo({center:[-79.3835,43.665],zoom:10,duration:2000,essential:true}),600);
-      setTimeout(()=>map.flyTo({center:[35,25],zoom:1.7,duration:2200,essential:true}),4000);
+      // 演示：先全球看货船 → 飞入多伦多看货车 → 返回全球
+      setTimeout(()=>map.flyTo({center:[-79.52,43.63],zoom:10,duration:1800,essential:true}),1000);
+      setTimeout(()=>animTruck(),1000);
+      setTimeout(()=>map.flyTo({center:[35,25],zoom:1.7,duration:2000,essential:true}),6000);
     });
   })();
 
