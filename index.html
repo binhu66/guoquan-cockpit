@@ -4174,14 +4174,98 @@
       document.getElementById('bigMap').appendChild(infoBar);
 
       // ── 主地图亮/暗切换按钮（左上角）──
-      let _bigMapDark=true;
-      const themeBtn=document.createElement('button');
-      themeBtn.id='gqBigMapTheme';
-      themeBtn.textContent='☀️ 亮色';
-      themeBtn.title='切换地图亮/暗色风格';
-      themeBtn.style.cssText='position:absolute;top:10px;left:10px;z-index:10;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;border:1px solid rgba(255,255,255,.22);background:rgba(15,23,42,.72);color:#fff;cursor:pointer;backdrop-filter:blur(4px);transition:all .2s;';
-      themeBtn.onmouseenter=()=>themeBtn.style.background='rgba(255,107,53,.85)';
-      themeBtn.onmouseleave=()=>themeBtn.style.background=_bigMapDark?'rgba(15,23,42,.72)':'rgba(255,255,255,.85)';
+      // ── 地图样式定义 ──
+      const _MSTYLES={
+        dark:{label:'🌙 暗色',url:'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'},
+        light:{label:'☀️ 亮色',url:'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'},
+        voyager:{label:'🗺 地形',url:'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'},
+        satellite:{label:'🛸 卫星',url:null,style:{
+          version:8,
+          glyphs:'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
+          sources:{'esri-sat':{type:'raster',
+            tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+            tileSize:256,maxzoom:17,attribution:'© Esri, Maxar, Earthstar Geographics'}},
+          layers:[{id:'esri-sat',type:'raster',source:'esri-sat'}]
+        }}
+      };
+      let _curMapStyle='dark';
+      let _weatherOn=false;
+
+      function _switchMapStyle(key){
+        _curMapStyle=key;
+        const s=_MSTYLES[key];
+        map.setStyle(s.url||s.style);
+        map.once('style.load',()=>{
+          _addBigMapLayers();
+          if(_weatherOn)_applyWeatherLayer();
+        });
+        document.querySelectorAll('.gq-msty-btn').forEach(b=>{
+          const on=b.dataset.sty===key;
+          b.style.background=on?'#E53935':'rgba(15,23,42,.72)';
+          b.style.borderColor=on?'rgba(229,57,53,.5)':'rgba(255,255,255,.22)';
+          b.style.color='#fff';
+        });
+      }
+
+      // 天气图层（RainViewer 免费雷达 API，无需 key）
+      async function _applyWeatherLayer(){
+        if(map.getLayer('rain-radar'))return;
+        try{
+          const resp=await fetch('https://api.rainviewer.com/public/weather-maps.json');
+          const data=await resp.json();
+          const ts=data.radar.past[data.radar.past.length-1].time;
+          if(!map.getSource('rain-radar')){
+            map.addSource('rain-radar',{type:'raster',tileSize:512,attribution:'RainViewer',
+              tiles:[`https://tilecache.rainviewer.com/v2/radar/${ts}/512/{z}/{x}/{y}/6/1_1.png`]
+            });
+          }
+          if(!map.getLayer('rain-radar')){
+            map.addLayer({id:'rain-radar',type:'raster',source:'rain-radar',
+              paint:{'raster-opacity':0.55}
+            },'city-halo');
+          }
+        }catch(err){console.warn('Weather layer failed:',err);}
+      }
+
+      function _toggleWeather(){
+        _weatherOn=!_weatherOn;
+        const wb=document.getElementById('gqWeatherBtn');
+        if(wb){
+          wb.style.background=_weatherOn?'rgba(59,130,246,.85)':'rgba(15,23,42,.72)';
+          wb.style.borderColor=_weatherOn?'rgba(96,165,250,.5)':'rgba(255,255,255,.22)';
+          wb.textContent=_weatherOn?'🌧 关天气':'🌧 天气雷达';
+        }
+        if(_weatherOn){
+          _applyWeatherLayer();
+        }else{
+          if(map.getLayer('rain-radar'))map.removeLayer('rain-radar');
+          if(map.getSource('rain-radar'))map.removeSource('rain-radar');
+        }
+      }
+
+      // 控件容器（左上角）
+      const ctrlWrap=document.createElement('div');
+      ctrlWrap.style.cssText='position:absolute;top:10px;left:10px;z-index:10;display:flex;gap:4px;flex-wrap:wrap;max-width:440px;';
+      const _btnBase='padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid;cursor:pointer;backdrop-filter:blur(4px);transition:all .18s;white-space:nowrap;color:#fff;';
+
+      // 样式切换按钮组
+      Object.entries(_MSTYLES).forEach(([k,s])=>{
+        const btn=document.createElement('button');
+        btn.className='gq-msty-btn';
+        btn.dataset.sty=k;
+        btn.textContent=s.label;
+        btn.style.cssText=_btnBase+'background:'+(k==='dark'?'#E53935':'rgba(15,23,42,.72)')+';border-color:'+(k==='dark'?'rgba(229,57,53,.5)':'rgba(255,255,255,.22)')+';';
+        btn.onclick=()=>_switchMapStyle(k);
+        ctrlWrap.appendChild(btn);
+      });
+
+      // 天气雷达按钮
+      const wBtn=document.createElement('button');
+      wBtn.id='gqWeatherBtn';
+      wBtn.textContent='🌧 天气雷达';
+      wBtn.style.cssText=_btnBase+'background:rgba(15,23,42,.72);border-color:rgba(255,255,255,.22);';
+      wBtn.onclick=_toggleWeather;
+      ctrlWrap.appendChild(wBtn);
 
       // 定义图层重建函数（setStyle 后调用）
       function _addBigMapLayers(){
@@ -4243,18 +4327,7 @@
         }
       }
 
-      themeBtn.onclick=()=>{
-        _bigMapDark=!_bigMapDark;
-        themeBtn.textContent=_bigMapDark?'☀️ 亮色':'🌙 暗色';
-        themeBtn.style.background=_bigMapDark?'rgba(15,23,42,.72)':'rgba(255,255,255,.85)';
-        themeBtn.style.color=_bigMapDark?'#fff':'#0f172a';
-        themeBtn.style.borderColor=_bigMapDark?'rgba(255,255,255,.22)':'rgba(15,23,42,.18)';
-        const darkUrl='https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
-        const lightUrl='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
-        map.setStyle(_bigMapDark?darkUrl:lightUrl);
-        map.once('style.load',_addBigMapLayers);
-      };
-      document.getElementById('bigMap').appendChild(themeBtn);
+      document.getElementById('bigMap').appendChild(ctrlWrap);
 
       // ── 全屏按钮（右上角，MapLibre 导航控件左侧）──
       const fsBtn=document.createElement('button');
