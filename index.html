@@ -126,6 +126,16 @@
   .maplibregl-ctrl-group button{background:transparent!important;}
   .gq-store-popup .maplibregl-popup-content{padding:10px 13px;border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,.18);font-family:inherit;}
   .gq-store-popup .maplibregl-popup-tip{display:none;}
+  /* ===== miniMap 全屏模式 ===== */
+  #miniMapWrap:fullscreen{background:#eaf2fa;padding:0;width:100vw;height:100vh;}
+  #miniMapWrap:fullscreen #miniMap{height:100vh !important;width:100vw !important;border-radius:0 !important;border:0 !important;}
+  #miniMapWrap:fullscreen #miniMapFS{top:16px;right:16px;padding:9px 14px;font-size:13px;background:rgba(229,57,53,.92) !important;color:#fff !important;border-color:rgba(255,255,255,.3) !important;box-shadow:0 4px 14px rgba(15,23,42,.22);}
+  #miniMapFS:hover{background:rgba(255,107,53,.94) !important;color:#fff !important;}
+  /* ===== 语言切换器 ===== */
+  .gq-lang-switch{display:inline-flex;background:#f1f5f9;border-radius:7px;padding:2px;gap:0;border:1px solid var(--line);}
+  .gq-lang-btn{padding:3px 9px;font-size:10.5px;font-weight:700;border:0;background:transparent;color:#64748b;cursor:pointer;border-radius:5px;transition:all .15s;letter-spacing:.3px;}
+  .gq-lang-btn:hover{color:#0f172a;}
+  .gq-lang-btn.active{background:#fff;color:#E53935;box-shadow:0 1px 3px rgba(15,23,42,.08);}
   .map-store-bar{display:flex;gap:10px;margin-bottom:10px;}
   .map-store-card{flex:1;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s;}
   .map-store-card:hover{border-color:#FF6B35;box-shadow:0 4px 12px rgba(229,57,53,.12);}
@@ -308,18 +318,23 @@
           <span>食</span><span>汇</span>
         </div>
         <div>
-          <div class="gq-logo-text-cn">锅圈<span class="accent">食汇</span> · 小炒出海<span class="slogan hide-on-mobile">好吃不贵</span></div>
-          <div class="gq-logo-text-en">GUOQUAN AI COCKPIT · 多伦多样板</div>
+          <div class="gq-logo-text-cn" data-i18n="brandTitle">锅圈<span class="accent">食汇</span> · 小炒出海<span class="slogan hide-on-mobile" data-i18n="brandSlogan">好吃不贵</span></div>
+          <div class="gq-logo-text-en" data-i18n="brandSub">GUOQUAN AI COCKPIT · 多伦多样板</div>
         </div>
       </div>
     </div>
-    <div class="flex items-center gap-4 text-xs text-slate-500">
-      <span class="flex items-center gap-1.5"><span class="pulse"></span>系统运行中</span>
-      <span class="hide-on-mobile">15 Agents · 8 机器人 在线</span>
-      <span class="hide-on-mobile">数据更新：刚刚</span>
+    <div class="flex items-center gap-3 text-xs text-slate-500">
+      <div class="gq-lang-switch hide-on-mobile" id="langSwitch" role="group" aria-label="Language">
+        <button type="button" class="gq-lang-btn active" data-lang="sc" title="简体中文">简</button>
+        <button type="button" class="gq-lang-btn" data-lang="tc" title="繁體中文">繁</button>
+        <button type="button" class="gq-lang-btn" data-lang="en" title="English">EN</button>
+      </div>
+      <span class="flex items-center gap-1.5"><span class="pulse"></span><span data-i18n="sysOnline">系统运行中</span></span>
+      <span class="hide-on-mobile" data-i18n="agentsStatus">15 Agents · 8 机器人 在线</span>
+      <span class="hide-on-mobile"><span data-i18n="dataUpdated">数据更新：刚刚</span></span>
       <div class="flex items-center gap-2 pl-4 border-l border-slate-200">
         <div class="w-7 h-7 rounded-full grad-red flex items-center justify-center text-[11px] font-bold text-white">杨</div>
-        <span class="text-slate-800 font-medium">杨总</span>
+        <span class="text-slate-800 font-medium" data-i18n="userYang">杨总</span>
       </div>
     </div>
   </div>
@@ -329,80 +344,80 @@
 <div class="flex">
   <!-- 左侧导航 -->
   <aside id="sidebar" class="desktop-side w-60 border-r border-slate-200 bg-white min-h-[calc(100vh-57px)] sticky top-[57px] py-4 px-3 flex-shrink-0">
-    <div class="text-[11px] uppercase tracking-widest text-slate-400 px-3 mb-2">主视图</div>
+    <div class="text-[11px] uppercase tracking-widest text-slate-400 px-3 mb-2" data-i18n="navSecMain">主视图</div>
     <nav class="flex flex-col gap-0.5 mb-4">
       <a class="nav-item active" data-target="cockpit">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        CEO 驾驶舱
+        <span data-i18n="navCockpit">CEO 驾驶舱</span>
       </a>
       <a class="nav-item" data-target="org">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 6-9 6-9-6 9-6z"/><path d="M3 15l9 6 9-6"/></svg>
-        组织金字塔
+        <span data-i18n="navOrg">组织金字塔</span>
       </a>
       <a class="nav-item" data-target="agents">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg>
-        AI Agent 矩阵
+        <span data-i18n="navAgents">AI Agent 矩阵</span>
       </a>
       <a class="nav-item" data-target="workbench">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        部门工作台
+        <span data-i18n="navWorkbench">部门工作台</span>
       </a>
       <a class="nav-item" data-target="flow">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
-        端到端流程
+        <span data-i18n="navFlow">端到端流程</span>
       </a>
       <a class="nav-item" data-target="stack">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7l10-4 10 4-10 4-10-4z"/><path d="M2 12l10 4 10-4M2 17l10 4 10-4"/></svg>
-        技术架构
+        <span data-i18n="navStack">技术架构</span>
       </a>
       <a class="nav-item" data-target="risk">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 22h20L12 2z"/><path d="M12 9v6M12 18h.01"/></svg>
-        风险监控中心
+        <span data-i18n="navRisk">风险监控中心</span>
       </a>
       <a class="nav-item" data-target="scenario">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        场景演示
+        <span data-i18n="navScenario">场景演示</span>
       </a>
       <a class="nav-item" data-target="roadmap">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><path d="M9 3v15M15 6v15"/></svg>
-        18 个月路线图
+        <span data-i18n="navRoadmap">18 个月路线图</span>
       </a>
       <a class="nav-item" data-target="globe">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/></svg>
-        全球布局地图
+        <span data-i18n="navGlobe">全球布局地图</span>
       </a>
       <a class="nav-item" data-target="robot">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="8" width="12" height="10" rx="2"/><path d="M9 18v3M15 18v3M12 3v5M9 12h.01M15 12h.01"/></svg>
-        小炒机器人
+        <span data-i18n="navRobot">小炒机器人</span>
       </a>
       <a class="nav-item" data-target="tracker">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        计划 vs 实际 <span style="font-size:9px;background:rgba(229,57,53,.12);color:#E53935;padding:1px 5px;border-radius:4px;margin-left:auto;font-weight:700;">第一期</span>
+        <span data-i18n="navTracker">计划 vs 实际</span> <span style="font-size:9px;background:rgba(229,57,53,.12);color:#E53935;padding:1px 5px;border-radius:4px;margin-left:auto;font-weight:700;" data-i18n="badgePhase1">第一期</span>
       </a>
       <a class="nav-item" data-target="cctv">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4V8z"/></svg>
-        视频监控 <span style="font-size:9px;background:#f1f5f9;color:#94a3b8;padding:1px 5px;border-radius:4px;margin-left:auto;">可选</span>
+        <span data-i18n="navCctv">视频监控</span> <span style="font-size:9px;background:#f1f5f9;color:#94a3b8;padding:1px 5px;border-radius:4px;margin-left:auto;" data-i18n="badgeOptional">可选</span>
       </a>
     </nav>
-    <div class="text-[11px] uppercase tracking-widest text-slate-400 px-3 mb-2 mt-4">速览</div>
+    <div class="text-[11px] uppercase tracking-widest text-slate-400 px-3 mb-2 mt-4" data-i18n="navSecQuick">速览</div>
     <div class="px-3 space-y-3 text-xs">
       <div>
-        <div class="text-slate-500 mb-1">在建项目</div>
-        <div class="text-base font-semibold">3 <span class="text-[10px] font-normal text-slate-400">/ 多伦多</span></div>
+        <div class="text-slate-500 mb-1" data-i18n="quickActive">在建项目</div>
+        <div class="text-base font-semibold">3 <span class="text-[10px] font-normal text-slate-400" data-i18n="quickActiveCity">/ 多伦多</span></div>
       </div>
       <div>
-        <div class="text-slate-500 mb-1">本月花费</div>
+        <div class="text-slate-500 mb-1" data-i18n="quickSpend">本月花费</div>
         <div class="text-base font-semibold">CA$ 487K <span class="pill pill-ok ml-1">-3.2%</span></div>
       </div>
       <div>
-        <div class="text-slate-500 mb-1">风险等级</div>
-        <div class="text-base font-semibold text-amber-600">⚠ 黄</div>
+        <div class="text-slate-500 mb-1" data-i18n="quickRisk">风险等级</div>
+        <div class="text-base font-semibold text-amber-600"><span data-i18n="riskYellow">⚠ 黄</span></div>
       </div>
     </div>
     <div class="mt-6 px-3">
       <div class="card-2 p-3 text-[11px] text-slate-600">
-        <div class="font-semibold text-slate-800 mb-1">提示</div>
-        本原型为体系蓝图演示，所有数据为模拟示例。点击各模块查看 AI + 人协同细节。
+        <div class="font-semibold text-slate-800 mb-1" data-i18n="noteTitle">提示</div>
+        <span data-i18n="noteBody">本原型为体系蓝图演示，所有数据为模拟示例。点击各模块查看 AI + 人协同细节。</span>
       </div>
     </div>
   </aside>
@@ -650,20 +665,27 @@
         <div class="card p-5 col-span-2">
           <div class="flex items-center justify-between mb-3">
             <div>
-              <div class="text-sm font-semibold">🌐 全球项目实时地图</div>
-              <div class="text-[11px] text-slate-500">点击「全球布局地图」模块可查看完整版</div>
+              <div class="text-sm font-semibold" data-i18n="miniMapTitle">🌐 全球项目实时地图</div>
+              <div class="text-[11px] text-slate-500" data-i18n="miniMapSub">点击「全球布局地图」模块可查看完整版</div>
             </div>
-            <div class="flex gap-2 text-[11px]">
-              <span class="pill" style="background:rgba(229,57,53,.18);color:#f87171;">●在营/在建</span>
-              <span class="pill pill-warn">●近期</span>
-              <span class="pill" style="background:rgba(168,85,247,.18);color:#c084fc;">●远期</span>
+            <div class="flex gap-2 text-[11px] items-center">
+              <span class="pill" style="background:rgba(229,57,53,.18);color:#f87171;" data-i18n="legendActive">●在营/在建</span>
+              <span class="pill pill-warn" data-i18n="legendSoon">●近期</span>
+              <span class="pill" style="background:rgba(168,85,247,.18);color:#c084fc;" data-i18n="legendFuture">●远期</span>
             </div>
           </div>
-          <div id="miniMap" style="height:340px;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--line);"></div>
+          <div id="miniMapWrap" style="position:relative;">
+            <div id="miniMap" style="height:340px;width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--line);"></div>
+            <button id="miniMapFS" type="button" title="全屏查看地图（ESC 退出）"
+              style="position:absolute;top:10px;right:10px;z-index:1000;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1px solid rgba(15,23,42,.18);background:rgba(255,255,255,.94);color:#0f172a;cursor:pointer;backdrop-filter:blur(6px);box-shadow:0 2px 8px rgba(15,23,42,.12);transition:all .18s;line-height:1;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
+              <span data-i18n="fullscreen">全屏看地图</span>
+            </button>
+          </div>
           <div class="grid grid-cols-3 gap-2 mt-3 text-[11px]">
-            <div class="card-2 p-2"><b class="text-[#FF6B35]">在营/在建：</b><span class="text-slate-700">多伦多 3 项目</span></div>
-            <div class="card-2 p-2"><b class="text-amber-600">M13-M18 启动：</b><span class="text-slate-700">温哥华 / 美西 / 越南</span></div>
-            <div class="card-2 p-2"><b style="color:#c084fc;">远期评估：</b><span class="text-slate-700">伦敦 / 新加坡 / 悉尼</span></div>
+            <div class="card-2 p-2"><b class="text-[#FF6B35]" data-i18n="sumActiveLabel">在营/在建：</b><span class="text-slate-700" data-i18n="sumActiveVal">多伦多 3 项目</span></div>
+            <div class="card-2 p-2"><b class="text-amber-600" data-i18n="sumSoonLabel">M13-M18 启动：</b><span class="text-slate-700" data-i18n="sumSoonVal">温哥华 / 美西 / 越南</span></div>
+            <div class="card-2 p-2"><b style="color:#c084fc;" data-i18n="sumFutureLabel">远期评估：</b><span class="text-slate-700" data-i18n="sumFutureVal">伦敦 / 新加坡 / 悉尼</span></div>
           </div>
         </div>
 
@@ -3629,6 +3651,181 @@
 </div>
 
 <script>
+  // ============ 语言切换 (简 / 繁 / EN) ============
+  window.GQ_I18N = {
+    sc: {
+      brandTitle: '锅圈<span class="accent">食汇</span> · 小炒出海<span class="slogan hide-on-mobile" data-i18n="brandSlogan">好吃不贵</span>',
+      brandSlogan: '好吃不贵',
+      brandSub: 'GUOQUAN AI COCKPIT · 多伦多样板',
+      sysOnline: '系统运行中',
+      agentsStatus: '15 Agents · 8 机器人 在线',
+      dataUpdated: '数据更新：刚刚',
+      userYang: '杨总',
+      navSecMain: '主视图',
+      navCockpit: 'CEO 驾驶舱',
+      navOrg: '组织金字塔',
+      navAgents: 'AI Agent 矩阵',
+      navWorkbench: '部门工作台',
+      navFlow: '端到端流程',
+      navStack: '技术架构',
+      navRisk: '风险监控中心',
+      navScenario: '场景演示',
+      navRoadmap: '18 个月路线图',
+      navGlobe: '全球布局地图',
+      navRobot: '小炒机器人',
+      navTracker: '计划 vs 实际',
+      navCctv: '视频监控',
+      badgePhase1: '第一期',
+      badgeOptional: '可选',
+      navSecQuick: '速览',
+      quickActive: '在建项目',
+      quickActiveCity: '/ 多伦多',
+      quickSpend: '本月花费',
+      quickRisk: '风险等级',
+      riskYellow: '⚠ 黄',
+      noteTitle: '提示',
+      noteBody: '本原型为体系蓝图演示，所有数据为模拟示例。点击各模块查看 AI + 人协同细节。',
+      miniMapTitle: '🌐 全球项目实时地图',
+      miniMapSub: '点击「全球布局地图」模块可查看完整版',
+      legendActive: '●在营/在建',
+      legendSoon: '●近期',
+      legendFuture: '●远期',
+      fullscreen: '全屏看地图',
+      exitFullscreen: '退出全屏',
+      sumActiveLabel: '在营/在建：',
+      sumActiveVal: '多伦多 3 项目',
+      sumSoonLabel: 'M13-M18 启动：',
+      sumSoonVal: '温哥华 / 美西 / 越南',
+      sumFutureLabel: '远期评估：',
+      sumFutureVal: '伦敦 / 新加坡 / 悉尼'
+    },
+    tc: {
+      brandTitle: '鍋圈<span class="accent">食匯</span> · 小炒出海<span class="slogan hide-on-mobile" data-i18n="brandSlogan">好吃不貴</span>',
+      brandSlogan: '好吃不貴',
+      brandSub: 'GUOQUAN AI COCKPIT · 多倫多樣板',
+      sysOnline: '系統運行中',
+      agentsStatus: '15 Agents · 8 機器人 在線',
+      dataUpdated: '數據更新：剛剛',
+      userYang: '楊總',
+      navSecMain: '主視圖',
+      navCockpit: 'CEO 駕駛艙',
+      navOrg: '組織金字塔',
+      navAgents: 'AI Agent 矩陣',
+      navWorkbench: '部門工作台',
+      navFlow: '端到端流程',
+      navStack: '技術架構',
+      navRisk: '風險監控中心',
+      navScenario: '場景演示',
+      navRoadmap: '18 個月路線圖',
+      navGlobe: '全球佈局地圖',
+      navRobot: '小炒機器人',
+      navTracker: '計劃 vs 實際',
+      navCctv: '視頻監控',
+      badgePhase1: '第一期',
+      badgeOptional: '可選',
+      navSecQuick: '速覽',
+      quickActive: '在建項目',
+      quickActiveCity: '/ 多倫多',
+      quickSpend: '本月花費',
+      quickRisk: '風險等級',
+      riskYellow: '⚠ 黃',
+      noteTitle: '提示',
+      noteBody: '本原型為體系藍圖演示，所有數據為模擬示例。點擊各模組查看 AI + 人協同細節。',
+      miniMapTitle: '🌐 全球項目實時地圖',
+      miniMapSub: '點擊「全球佈局地圖」模組可查看完整版',
+      legendActive: '●在營/在建',
+      legendSoon: '●近期',
+      legendFuture: '●遠期',
+      fullscreen: '全屏看地圖',
+      exitFullscreen: '退出全屏',
+      sumActiveLabel: '在營/在建：',
+      sumActiveVal: '多倫多 3 項目',
+      sumSoonLabel: 'M13-M18 啟動：',
+      sumSoonVal: '溫哥華 / 美西 / 越南',
+      sumFutureLabel: '遠期評估：',
+      sumFutureVal: '倫敦 / 新加坡 / 悉尼'
+    },
+    en: {
+      brandTitle: 'GUOQUAN<span class="accent">FOOD</span> · STIR-FRY OVERSEAS<span class="slogan hide-on-mobile" data-i18n="brandSlogan">Tasty &amp; Affordable</span>',
+      brandSlogan: 'Tasty & Affordable',
+      brandSub: 'GUOQUAN AI COCKPIT · TORONTO PILOT',
+      sysOnline: 'System Online',
+      agentsStatus: '15 Agents · 8 Bots Online',
+      dataUpdated: 'Updated: just now',
+      userYang: 'Mr. Yang',
+      navSecMain: 'MAIN',
+      navCockpit: 'CEO Cockpit',
+      navOrg: 'Org Pyramid',
+      navAgents: 'AI Agent Matrix',
+      navWorkbench: 'Dept Workbench',
+      navFlow: 'End-to-End Flow',
+      navStack: 'Tech Stack',
+      navRisk: 'Risk Center',
+      navScenario: 'Scenarios',
+      navRoadmap: '18-Month Roadmap',
+      navGlobe: 'Global Map',
+      navRobot: 'Stir-Fry Bots',
+      navTracker: 'Plan vs Actual',
+      navCctv: 'CCTV',
+      badgePhase1: 'Phase 1',
+      badgeOptional: 'Optional',
+      navSecQuick: 'AT A GLANCE',
+      quickActive: 'Active Projects',
+      quickActiveCity: '/ Toronto',
+      quickSpend: 'Monthly Spend',
+      quickRisk: 'Risk Level',
+      riskYellow: '⚠ Yellow',
+      noteTitle: 'Note',
+      noteBody: 'This is a blueprint prototype. All data is simulated. Click any module to see AI + human collaboration detail.',
+      miniMapTitle: '🌐 Global Project Map',
+      miniMapSub: 'Open "Global Map" module for full view',
+      legendActive: '●Active / Building',
+      legendSoon: '●Near-term',
+      legendFuture: '●Future',
+      fullscreen: 'Fullscreen',
+      exitFullscreen: 'Exit Fullscreen',
+      sumActiveLabel: 'Active / Building: ',
+      sumActiveVal: 'Toronto · 3 projects',
+      sumSoonLabel: 'M13-M18 launch: ',
+      sumSoonVal: 'Vancouver / US West / Vietnam',
+      sumFutureLabel: 'Future eval: ',
+      sumFutureVal: 'London / Singapore / Sydney'
+    }
+  };
+  window.GQ_LANG = (function(){
+    try { return localStorage.getItem('gq_lang') || 'sc'; } catch(_) { return 'sc'; }
+  })();
+  window.applyI18n = function(lang){
+    if(lang) window.GQ_LANG = lang;
+    const L = window.GQ_I18N[window.GQ_LANG] || window.GQ_I18N.sc;
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      const k = el.getAttribute('data-i18n');
+      if(L[k] !== undefined){
+        // brandTitle 含子节点 span，用 innerHTML；其余用 textContent 更安全
+        if(k === 'brandTitle' || /<[a-z]/i.test(L[k])){
+          el.innerHTML = L[k];
+        } else {
+          el.textContent = L[k];
+        }
+      }
+    });
+    // 切换 html lang 属性
+    document.documentElement.setAttribute('lang', window.GQ_LANG === 'en' ? 'en' : (window.GQ_LANG === 'tc' ? 'zh-Hant' : 'zh-Hans'));
+    // 高亮按钮
+    document.querySelectorAll('#langSwitch .gq-lang-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang') === window.GQ_LANG);
+    });
+    try { localStorage.setItem('gq_lang', window.GQ_LANG); } catch(_) {}
+  };
+  // 绑定切换按钮
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('#langSwitch .gq-lang-btn');
+    if(!btn) return;
+    window.applyI18n(btn.getAttribute('data-lang'));
+  });
+  // 初始应用一次
+  window.applyI18n();
+
   // 导航切换
   const items = document.querySelectorAll('.nav-item');
   const modules = document.querySelectorAll('.module');
@@ -3712,15 +3909,15 @@
   const cities = [
     {key:'shanghai',name:'中国总部 · 上海',sub:'出海大本营 · 料包工厂',lat:31.1975,lng:121.3448,level:'base'},
     {key:'toronto',name:'多伦多 ★',sub:'M1-M12 · 1+2+CK',lat:43.665,lng:-79.383,level:'active'},
-    {key:'vancouver',name:'温哥华',sub:'M13-M16 · 计划 1-2 家',lat:49.28,lng:-123.12,level:'soon'},
-    {key:'la',name:'洛杉矶 · 美西',sub:'M17+ · 评估中',lat:34.05,lng:-118.24,level:'soon'},
+    {key:'vancouver',name:'温哥华',sub:'M13-M16 · 计划 1-2 家',lat:49.1666,lng:-123.1336,level:'soon'},
+    {key:'la',name:'洛杉矶 · 美西',sub:'M17+ · 评估中',lat:34.0966,lng:-118.0355,level:'soon'},
     {key:'hcm',name:'胡志明 · 越南',sub:'M15-M18 · JV 入场 · Landmark 81',lat:10.7951,lng:106.7218,level:'soon'},
     {key:'ny',name:'纽约（远期）',sub:'',lat:40.71,lng:-74.00,level:'future'},
-    {key:'sg',name:'新加坡（远期）',sub:'',lat:1.35,lng:103.82,level:'future'},
-    {key:'bk',name:'曼谷（远期）',sub:'',lat:13.76,lng:100.50,level:'future'},
-    {key:'syd',name:'悉尼（远期）',sub:'',lat:-33.87,lng:151.21,level:'future'},
+    {key:'sg',name:'新加坡（远期）',sub:'',lat:1.2847,lng:103.8452,level:'future'},
+    {key:'bk',name:'曼谷（远期）',sub:'',lat:13.7468,lng:100.5393,level:'future'},
+    {key:'syd',name:'悉尼（远期）',sub:'',lat:-33.7972,lng:151.1808,level:'future'},
     {key:'mel',name:'墨尔本（远期）',sub:'',lat:-37.81,lng:144.96,level:'future'},
-    {key:'london',name:'伦敦（远期）',sub:'',lat:51.51,lng:-0.13,level:'future'},
+    {key:'london',name:'伦敦（远期）',sub:'',lat:51.5126,lng:-0.1313,level:'future'},
   ];
 
   // 航线（曲线）
@@ -3798,21 +3995,56 @@
   // 初始化两张地图
   window.miniMap = initLeafletMap('miniMap',1,[28,40]);
   if(window.miniMap){drawArcs(window.miniMap);}
+
+  // ── miniMap 全屏按钮（与右上角已 inline 的 #miniMapFS 配合）──
+  (function bindMiniMapFullscreen(){
+    const wrap=document.getElementById('miniMapWrap');
+    const btn=document.getElementById('miniMapFS');
+    if(!wrap||!btn||!window.miniMap)return;
+    const enterIcon='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>';
+    const exitIcon='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3"/></svg>';
+    function setLabel(isFull){
+      const txtKey=isFull?'exitFullscreen':'fullscreen';
+      const fallback=isFull?'退出全屏':'全屏看地图';
+      btn.innerHTML=(isFull?exitIcon:enterIcon)+' <span data-i18n="'+txtKey+'">'+fallback+'</span>';
+      if(window.applyI18n)window.applyI18n();
+    }
+    btn.onclick=function(e){
+      e.stopPropagation();
+      if(document.fullscreenElement===wrap){
+        document.exitFullscreen&&document.exitFullscreen();
+      }else if(wrap.requestFullscreen){
+        wrap.requestFullscreen();
+      }else if(wrap.webkitRequestFullscreen){
+        wrap.webkitRequestFullscreen();
+      }
+    };
+    document.addEventListener('fullscreenchange',function(){
+      const isFull=document.fullscreenElement===wrap;
+      setLabel(isFull);
+      setTimeout(function(){window.miniMap&&window.miniMap.invalidateSize();},120);
+    });
+    document.addEventListener('webkitfullscreenchange',function(){
+      const isFull=document.webkitFullscreenElement===wrap;
+      setLabel(isFull);
+      setTimeout(function(){window.miniMap&&window.miniMap.invalidateSize();},120);
+    });
+  })();
   // ========== MapLibre GL 大地图（暗色 · 店面 pin · Google 街景入口） ==========
   (function initBigMapLibre(){
     const el=document.getElementById('bigMap');
     if(!el||typeof maplibregl==='undefined')return;
 
     const cityDefs=[
-      {key:'city_china',   name:'中国总部 · 上海',  lat:31.1975, lng:121.3448, level:'base',   lbl:true},
-      {key:'city_toronto', name:'多伦多 ★',        lat:43.665,  lng:-79.383,  level:'active', lbl:true},
-      {key:'city_vancouver',name:'温哥华',          lat:49.28, lng:-123.12,level:'soon',  lbl:true},
-      {key:'city_la',      name:'洛杉矶',          lat:34.05, lng:-118.24,level:'soon',  lbl:false},
-      {key:'city_vietnam', name:'胡志明 · Landmark 81', lat:10.7951, lng:106.7218, level:'soon',  lbl:true},
-      {key:'city_singapore',name:'新加坡',         lat:1.35,  lng:103.82, level:'future',lbl:false},
-      {key:'city_bangkok', name:'曼谷',            lat:13.76, lng:100.50, level:'future',lbl:false},
-      {key:'city_sydney',  name:'悉尼',            lat:-33.87,lng:151.21, level:'future',lbl:false},
-      {key:'city_london',  name:'伦敦',            lat:51.51, lng:-0.13,  level:'future',lbl:false},
+      {key:'city_china',   name:'中国总部 · 上海',  lat:31.1975, lng:121.3448,  level:'base',   lbl:true},
+      {key:'city_toronto', name:'多伦多 ★',        lat:43.665,  lng:-79.383,   level:'active', lbl:true},
+      {key:'city_vancouver',name:'温哥华',          lat:49.1666, lng:-123.1336, level:'soon',   lbl:true},
+      {key:'city_la',      name:'洛杉矶',          lat:34.0966, lng:-118.0355, level:'soon',   lbl:false},
+      {key:'city_vietnam', name:'胡志明 · Landmark 81', lat:10.7951, lng:106.7218, level:'soon', lbl:true},
+      {key:'city_singapore',name:'新加坡',         lat:1.2847,  lng:103.8452,  level:'future', lbl:false},
+      {key:'city_bangkok', name:'曼谷',            lat:13.7468, lng:100.5393,  level:'future', lbl:false},
+      {key:'city_sydney',  name:'悉尼',            lat:-33.7972,lng:151.1808,  level:'future', lbl:false},
+      {key:'city_london',  name:'伦敦',            lat:51.5126, lng:-0.1313,   level:'future', lbl:false},
     ];
 
     const storeDefs=[
