@@ -3936,6 +3936,57 @@
         </div>`;
       document.getElementById('bigMap').appendChild(infoBar);
 
+      // ── 主地图亮/暗切换按钮（左上角）──
+      let _bigMapDark=true;
+      const themeBtn=document.createElement('button');
+      themeBtn.id='gqBigMapTheme';
+      themeBtn.textContent='☀️ 亮色';
+      themeBtn.title='切换地图亮/暗色风格';
+      themeBtn.style.cssText='position:absolute;top:10px;left:10px;z-index:10;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;border:1px solid rgba(255,255,255,.22);background:rgba(15,23,42,.72);color:#fff;cursor:pointer;backdrop-filter:blur(4px);transition:all .2s;';
+      themeBtn.onmouseenter=()=>themeBtn.style.background='rgba(255,107,53,.85)';
+      themeBtn.onmouseleave=()=>themeBtn.style.background=_bigMapDark?'rgba(15,23,42,.72)':'rgba(255,255,255,.85)';
+
+      // 定义图层重建函数（setStyle 后调用）
+      function _addBigMapLayers(){
+        // 货车路线
+        if(!map.getSource('truck-route')){
+          map.addSource('truck-route',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:truckPath}}});
+          map.addLayer({id:'truck-route-bg',type:'line',source:'truck-route',paint:{'line-color':'rgba(34,197,94,.12)','line-width':8}});
+          map.addLayer({id:'truck-route-line',type:'line',source:'truck-route',paint:{'line-color':'#22c55e','line-width':2.5,'line-dasharray':[4,2],'line-opacity':.8}});
+        }
+        // 门店 cluster
+        if(!map.getSource('stores')){
+          map.addSource('stores',{type:'geojson',data:storeGeoJSON,cluster:true,clusterMaxZoom:7,clusterRadius:55});
+          map.addLayer({id:'clusters',type:'circle',source:'stores',filter:['has','point_count'],
+            paint:{'circle-color':'#FF6B35','circle-radius':['step',['get','point_count'],15,3,19,6,24],'circle-opacity':.88,'circle-stroke-width':2.5,'circle-stroke-color':'rgba(255,255,255,.92)'}});
+          map.addLayer({id:'cluster-count',type:'symbol',source:'stores',filter:['has','point_count'],
+            layout:{'text-field':'{point_count_abbreviated}','text-size':11,'text-font':['Open Sans Bold','Arial Unicode MS Bold']},paint:{'text-color':'#fff'}});
+          map.addLayer({id:'store-point',type:'circle',source:'stores',filter:['!',['has','point_count']],
+            paint:{'circle-color':['get','color'],'circle-radius':7,'circle-stroke-width':2.5,'circle-stroke-color':'rgba(255,255,255,.95)','circle-opacity':.92}});
+          map.on('click','clusters',e=>{
+            const f=map.queryRenderedFeatures(e.point,{layers:['clusters']})[0];
+            map.getSource('stores').getClusterExpansionZoom(f.properties.cluster_id,(err,zoom)=>{if(!err)map.easeTo({center:f.geometry.coordinates,zoom:zoom+1,duration:600});});
+          });
+          ['clusters','store-point'].forEach(id=>{
+            map.on('mouseenter',id,()=>map.getCanvas().style.cursor='pointer');
+            map.on('mouseleave',id,()=>map.getCanvas().style.cursor='');
+          });
+        }
+      }
+
+      themeBtn.onclick=()=>{
+        _bigMapDark=!_bigMapDark;
+        themeBtn.textContent=_bigMapDark?'☀️ 亮色':'🌙 暗色';
+        themeBtn.style.background=_bigMapDark?'rgba(15,23,42,.72)':'rgba(255,255,255,.85)';
+        themeBtn.style.color=_bigMapDark?'#fff':'#0f172a';
+        themeBtn.style.borderColor=_bigMapDark?'rgba(255,255,255,.22)':'rgba(15,23,42,.18)';
+        const darkUrl='https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+        const lightUrl='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+        map.setStyle(_bigMapDark?darkUrl:lightUrl);
+        map.once('style.load',_addBigMapLayers);
+      };
+      document.getElementById('bigMap').appendChild(themeBtn);
+
       // ── 货船动画（环形慢速）──
       function animShip(){
         shipT+=0.004;
@@ -5530,10 +5581,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();close
           <div id="gqMMSub" style="font-size:11px;color:#64748b;margin-top:1px;"></div>
         </div>
         <div class="gq-map-svc">
-          <button class="gq-map-svc-btn active" id="gqSvcML"     onclick="switchMapSvc('ml',this)">🗺 驾驶舱暗色地图</button>
+          <button class="gq-map-svc-btn active" id="gqSvcML"     onclick="switchMapSvc('ml',this)">🗺 驾驶舱地图</button>
           <button class="gq-map-svc-btn"         id="gqSvcGoogle" onclick="switchMapSvc('google',this)">🌐 Google Maps</button>
           <button class="gq-map-svc-btn"         id="gqSvcAmap"   onclick="switchMapSvc('amap',this)">🟢 高德地图</button>
         </div>
+        <button id="gqThemeToggle" onclick="toggleMapTheme()"
+          style="padding:5px 11px;border-radius:6px;font-size:11px;font-weight:700;border:1px solid #e2e8f0;cursor:pointer;background:#f8fafc;color:#475569;white-space:nowrap;transition:all .15s;flex-shrink:0;"
+          title="切换亮色/暗色地图">🌙 暗色</button>
         <button class="gq-map-close" onclick="closeMapModal()">✕</button>
       </div>
       <iframe id="gqMapFrame" class="gq-map-frame" src="" title="地图" loading="lazy" allowfullscreen></iframe>
@@ -5548,46 +5602,70 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();close
   m.addEventListener('click',e=>{if(e.target===m)closeMapModal();});
 })();
 
-let _mLat=0,_mLng=0,_mName='',_mSvc='ml';
+const _CARTO={
+  dark:'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+  light:'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+};
+let _mLat=0,_mLng=0,_mName='',_mSvc='ml',_mlDark=true;
+
+function _mlIframeHTML(lat,lng,dark){
+  const style=dark?_CARTO.dark:_CARTO.light;
+  const dot=dark?'background:#FF6B35;border:3px solid rgba(255,255,255,.9);':'background:#E53935;border:3px solid #fff;';
+  return `<!DOCTYPE html><html><head>
+    <meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+    <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet'/>
+    <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'><\/script>
+    <style>*{margin:0;padding:0;}body,#m{width:100%;height:100vh;}</style>
+  </head><body><div id='m'></div><script>
+    const map=new maplibregl.Map({container:'m',style:'${style}',
+      center:[${lng},${lat}],zoom:16,attributionControl:false});
+    map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+    map.on('load',()=>{
+      const el=document.createElement('div');
+      el.style.cssText='width:22px;height:22px;border-radius:50%;box-shadow:0 2px 10px rgba(229,57,53,.6);${dot}';
+      new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([${lng},${lat}]).addTo(map);
+    });
+  <\/script></body></html>`;
+}
+
+function _syncThemeBtn(){
+  const btn=document.getElementById('gqThemeToggle');
+  if(!btn)return;
+  const onML=_mSvc==='ml';
+  btn.style.display=onML?'':'none';
+  btn.textContent=_mlDark?'☀️ 亮色':'🌙 暗色';
+  btn.title=_mlDark?'切换为亮色地图':'切换为暗色地图';
+}
+
+function toggleMapTheme(){
+  _mlDark=!_mlDark;
+  _syncThemeBtn();
+  const frame=document.getElementById('gqMapFrame');
+  if(frame&&_mSvc==='ml')
+    frame.src='data:text/html;charset=utf-8,'+encodeURIComponent(_mlIframeHTML(_mLat,_mLng,_mlDark));
+}
 
 function openMapModal(lat,lng,name,sub){
-  _mLat=lat;_mLng=lng;_mName=name;
+  _mLat=lat;_mLng=lng;_mName=name;_mlDark=true;
   document.getElementById('gqMMTitle').textContent=name;
   document.getElementById('gqMMSub').textContent=sub||'';
   document.getElementById('gqMapModal').classList.add('open');
-  // 默认驾驶舱暗色地图
   document.querySelectorAll('.gq-map-svc-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('gqSvcML').classList.add('active');
+  _mSvc='ml';_syncThemeBtn();
   switchMapSvc('ml');
 }
 
 function switchMapSvc(svc,el){
   if(el){document.querySelectorAll('.gq-map-svc-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
   _mSvc=svc;
+  _syncThemeBtn();
   const frame=document.getElementById('gqMapFrame');
   const ext=document.getElementById('gqMapExt');
 
   if(svc==='ml'){
-    // MapLibre 暗色地图 — 用嵌入式 mini MapLibre 实例
     frame.style.display='block';ext.style.display='none';
-    // 生成一个独立 HTML data URL 内嵌 MapLibre 地图
-    const html=`<!DOCTYPE html><html><head>
-      <meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
-      <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet'/>
-      <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'><\/script>
-      <style>*{margin:0;padding:0;}body,#m{width:100%;height:100vh;}</style>
-    </head><body><div id='m'></div><script>
-      const map=new maplibregl.Map({container:'m',
-        style:'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-        center:[${_mLng},${_mLat}],zoom:16,attributionControl:false});
-      map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
-      map.on('load',()=>{
-        const el=document.createElement('div');
-        el.style.cssText='width:22px;height:22px;background:#FF6B35;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 10px rgba(255,107,53,.6);';
-        new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([${_mLng},${_mLat}]).addTo(map);
-      });
-    <\/script></body></html>`;
-    frame.src='data:text/html;charset=utf-8,'+encodeURIComponent(html);
+    frame.src='data:text/html;charset=utf-8,'+encodeURIComponent(_mlIframeHTML(_mLat,_mLng,_mlDark));
 
   }else if(svc==='google'){
     frame.style.display='block';ext.style.display='none';
