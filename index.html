@@ -287,6 +287,11 @@
   .drill-timeline-time{font-size:10px;color:var(--text-dim);margin-bottom:2px;}
   @media(max-width:640px){.drill-panel{width:100vw;}}
   /* ── 地图大图 Modal ── */
+  /* 城市 Popup */
+  .maplibregl-popup.gq-city-popup .maplibregl-popup-content{padding:16px 18px;border-radius:14px;box-shadow:0 12px 40px rgba(15,23,42,.18);border:1px solid #e2e8f0;min-width:230px;}
+  .maplibregl-popup.gq-city-popup .maplibregl-popup-tip{border-top-color:#fff;}
+  .maplibregl-popup.gq-city-popup .maplibregl-popup-close-button{font-size:18px;color:#94a3b8;padding:6px 10px;line-height:1;}
+  .maplibregl-popup.gq-city-popup .maplibregl-popup-close-button:hover{color:#0f172a;background:transparent;}
   .gq-map-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
   .gq-map-modal.open{display:flex;}
   .gq-map-box{background:#fff;border-radius:16px;overflow:hidden;width:min(920px,96vw);height:min(640px,88vh);display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(15,23,42,.3);}
@@ -4041,15 +4046,15 @@
     if(!el||typeof maplibregl==='undefined')return;
 
     const cityDefs=[
-      {key:'city_china',   name:'中国总部 · 上海',  lat:31.1975, lng:121.3448,  level:'base',   lbl:true},
-      {key:'city_toronto', name:'多伦多 ★',        lat:43.665,  lng:-79.383,   level:'active', lbl:true},
-      {key:'city_vancouver',name:'温哥华',          lat:49.1666, lng:-123.1336, level:'soon',   lbl:true},
-      {key:'city_la',      name:'洛杉矶',          lat:34.0966, lng:-118.0355, level:'soon',   lbl:false},
-      {key:'city_vietnam', name:'胡志明 · Landmark 81', lat:10.7951, lng:106.7218, level:'soon', lbl:true},
-      {key:'city_singapore',name:'新加坡',         lat:1.2847,  lng:103.8452,  level:'future', lbl:false},
-      {key:'city_bangkok', name:'曼谷',            lat:13.7468, lng:100.5393,  level:'future', lbl:false},
-      {key:'city_sydney',  name:'悉尼',            lat:-33.7972,lng:151.1808,  level:'future', lbl:false},
-      {key:'city_london',  name:'伦敦',            lat:51.5126, lng:-0.1313,   level:'future', lbl:false},
+      {key:'city_china',    name:'中国总部 · 上海', icon:'🇨🇳', sub:'出海大本营 · 料包工厂',           lat:31.1975, lng:121.3448,  level:'base',   lbl:true},
+      {key:'city_toronto',  name:'多伦多 ★',       icon:'🇨🇦', sub:'1+2号店 + 中央厨房 · 在营',       lat:43.665,  lng:-79.383,   level:'active', lbl:true},
+      {key:'city_vancouver',name:'温哥华',          icon:'🇨🇦', sub:'M13-M16 · 计划 1-2 家门店',      lat:49.1666, lng:-123.1336, level:'soon',   lbl:true},
+      {key:'city_la',       name:'洛杉矶',          icon:'🇺🇸', sub:'M17+ · 美西市场评估中',           lat:34.0966, lng:-118.0355, level:'soon',   lbl:false},
+      {key:'city_vietnam',  name:'胡志明 · Landmark 81',icon:'🇻🇳',sub:'M15-M18 · JV 合作入场',      lat:10.7951, lng:106.7218,  level:'soon',   lbl:true},
+      {key:'city_singapore',name:'新加坡',          icon:'🇸🇬', sub:'远期 · 越南跑通后启动',           lat:1.2847,  lng:103.8452,  level:'future', lbl:false},
+      {key:'city_bangkok',  name:'曼谷',            icon:'🇹🇭', sub:'远期 · 越南成功 6 个月后入场',    lat:13.7468, lng:100.5393,  level:'future', lbl:false},
+      {key:'city_sydney',   name:'悉尼',            icon:'🇦🇺', sub:'远期 · 多伦多模型成熟后克隆',     lat:-33.7972,lng:151.1808,  level:'future', lbl:false},
+      {key:'city_london',   name:'伦敦',            icon:'🇬🇧', sub:'远期 · 欧洲华人最大聚集地',       lat:51.5126, lng:-0.1313,   level:'future', lbl:false},
     ];
 
     const storeDefs=[
@@ -4297,7 +4302,7 @@
         if(!map.getSource('cities')){
           const cityGeoJSON={type:'FeatureCollection',features:cityDefs.map(c=>({
             type:'Feature',
-            properties:{key:c.key,name:c.name,level:c.level,lbl:c.lbl?1:0},
+            properties:{key:c.key,name:c.name,icon:c.icon||'',sub:c.sub||'',level:c.level,lbl:c.lbl?1:0},
             geometry:{type:'Point',coordinates:[c.lng,c.lat]}
           }))};
           map.addSource('cities',{type:'geojson',data:cityGeoJSON});
@@ -4318,10 +4323,7 @@
             },
             paint:{'text-color':'#ffffff','text-halo-color':'rgba(15,23,42,.9)','text-halo-width':1.8}
           });
-          map.on('click','city-dot',e=>{
-            if(!e.features.length)return;
-            openDetail(e.features[0].properties.key);
-          });
+          // 鼠标样式（在 _addBigMapLayers 里注册，样式切换后需恢复）
           map.on('mouseenter','city-dot',()=>map.getCanvas().style.cursor='pointer');
           map.on('mouseleave','city-dot',()=>map.getCanvas().style.cursor='');
         }
@@ -4495,10 +4497,41 @@
         },
         paint:{'text-color':'#ffffff','text-halo-color':'rgba(15,23,42,.9)','text-halo-width':1.8}
       });
-      // 点击城市 → 详情面板
+      // 点击城市 → Popup（再点"查看详情"→右侧详情面板）
+      const _lvlCfg={
+        base:  {label:'总部基地', bg:'rgba(229,57,53,.12)',  color:'#E53935'},
+        active:{label:'在营 / 在建',bg:'rgba(255,107,53,.12)',color:'#FF6B35'},
+        soon:  {label:'近期启动', bg:'rgba(245,158,11,.12)', color:'#d97706'},
+        future:{label:'远期评估', bg:'rgba(168,85,247,.12)', color:'#9333ea'},
+      };
+      let _cityPopup=null;
       map.on('click','city-dot',e=>{
         if(!e.features.length)return;
-        openDetail(e.features[0].properties.key);
+        const p=e.features[0].properties;
+        const coords=e.features[0].geometry.coordinates.slice();
+        const cfg=_lvlCfg[p.level]||_lvlCfg.future;
+        if(_cityPopup)_cityPopup.remove();
+        _cityPopup=new maplibregl.Popup({closeButton:true,maxWidth:'260px',className:'gq-city-popup',offset:14})
+          .setLngLat(coords)
+          .setHTML(`
+            <div style="font-family:Inter,system-ui,sans-serif;padding:4px 2px;">
+              <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px;line-height:1.3;">${p.icon} ${p.name}</div>
+              <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;background:${cfg.bg};color:${cfg.color};margin-bottom:10px;">● ${cfg.label}</span>
+              <div style="color:#64748b;font-size:11.5px;line-height:1.6;margin-bottom:14px;">${p.sub}</div>
+              <button class="gq-popup-detail-btn" style="width:100%;padding:9px 12px;background:#E53935;color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.3px;transition:background .15s;">
+                查看详情 &nbsp;→
+              </button>
+            </div>`)
+          .addTo(map);
+        // 用 setTimeout 确保 DOM 渲染完再绑事件
+        setTimeout(()=>{
+          const btn=_cityPopup&&_cityPopup.getElement()&&_cityPopup.getElement().querySelector('.gq-popup-detail-btn');
+          if(btn){
+            btn.onmouseenter=()=>btn.style.background='#B71C1C';
+            btn.onmouseleave=()=>btn.style.background='#E53935';
+            btn.addEventListener('click',()=>{ _cityPopup.remove(); openDetail(p.key); });
+          }
+        },0);
       });
       map.on('mouseenter','city-dot',()=>map.getCanvas().style.cursor='pointer');
       map.on('mouseleave','city-dot',()=>map.getCanvas().style.cursor='');
